@@ -4,11 +4,28 @@ import { Injectable } from '@nestjs/common';
 import { RealDigitalTokenRepository } from './rd-token.repository';
 import { ContractDto, DeployContractDto, ResponseDeployContractDto } from './dto/rd-dto';
 
+interface ISmartContractInteract {
+  customerTag: string;
+  customerRefId: string;
+  description: string;
+  metadata: Object;
+  source: {
+    assetId: string,
+    walletId: string,
+  };
+  priority: string;
+}
+
+interface IService {
+  contractId: string;
+  data: ISmartContractInteract;
+}
+
 @Injectable()
 export class RealDigitalTokenService {
   constructor(
     private readonly realDigitalTokenRepository: RealDigitalTokenRepository,
-  ) {}
+  ) { }
 
   // Função para realizar o deploy do contrato e retornar o ID do contrato e o hash da transação
   deployContract(deployContractDto: DeployContractDto): ResponseDeployContractDto {
@@ -22,34 +39,28 @@ export class RealDigitalTokenService {
       transactionHash,
     };
   }
-    
+
   // Função para retornar uma lista do DTO ApiResponseDto
   async getAllContracts(): Promise<ContractDto[]> {
     const allContracts = await this.realDigitalTokenRepository.getAllContracts();
     return allContracts;
   }
 
-  async mint(to: string, amount: number, contractId: string): Promise<any> {
-    const data = {
-      to,
-      amount,
-    };
-    return await this.realDigitalTokenRepository.callSmartContract(contractId, 'mint', data);
+  // TODO: Criar domínio cada tipo de ativo (Real Digital, Real Tokenizado, TPFt)
+  // TODO: Adicionar os demais métodos de cada contrato
+
+  // Função para emitir um ativo
+  async mint({ contractId, data }: IService): Promise<any> {
+    return await this.realDigitalTokenRepository.smartContractInteract(contractId, 'mint', data);
   }
 
-  async transfer(to: string, amount: number, contractId: string): Promise<any> {
-    const data = {
-      to,
-      amount,
-    };
-    return await this.realDigitalTokenRepository.callSmartContract(contractId, 'transfer', data);
+  // Função para resgatar um ativo
+  async burn({ contractId, data }: IService): Promise<any> {
+    return await this.realDigitalTokenRepository.smartContractInteract(contractId, 'burn', data);
   }
 
-  async burn(from: string, amount: number, contractId: string): Promise<any> {
-    const data = {
-      from,
-      amount,
-    };    
-    return await this.realDigitalTokenRepository.callSmartContract(contractId, 'burn', data);
+  // Função para transferência de um ativo
+  async transfer({ contractId, data }: IService): Promise<any> {
+    return await this.realDigitalTokenRepository.smartContractInteract(contractId, 'transfer', data);
   }
 }

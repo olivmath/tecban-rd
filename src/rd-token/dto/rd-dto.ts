@@ -5,7 +5,7 @@ export class ResponseDeployContractDto {
   contractId: string;
 
   @ApiProperty({ description: 'Transaction Hash' })
-  transactionHash: string;  
+  transactionHash: string;
 }
 export class DeployContractDto {
   @ApiProperty({ description: 'Customer tag' })
@@ -54,7 +54,7 @@ export class BurnDto {
   amount: number;
 
   @ApiProperty({ description: 'Endereço da carteira' })
-  from: string;  
+  from: string;
 }
 
 export class ContractDto {
@@ -81,4 +81,27 @@ export class ContractDto {
 
   @ApiProperty({ description: 'Creation date' })
   createdAt: string;
+}
+
+export class ContractInteractionDto {
+  @ApiProperty({ description: 'Customer tag' })
+  customerTag: string;
+
+  @ApiProperty({ description: 'Customer reference ID' })
+  customerRefId: string;
+
+  @ApiProperty({ description: 'Interaction description' })
+  description: string;
+
+  @ApiProperty({ description: 'Metadata' })
+  metadata: Object;
+
+  @ApiProperty({ description: 'Source' })
+  source: {
+    assetId: string;
+    walletId: string;
+  };
+
+  @ApiProperty({ description: 'Operation priority' })
+  priority: string;
 }
