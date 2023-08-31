@@ -1,13 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ResponseDeployContractDto {
+export class ResponseDeployContractDTO {
   @ApiProperty({ description: 'Contract Id' })
   contractId: string;
 
   @ApiProperty({ description: 'Transaction Hash' })
   transactionHash: string;
 }
-export class DeployContractDto {
+
+export class DeployContractDTO {
   @ApiProperty({ description: 'Customer tag' })
   customerTag: string;
 
@@ -33,23 +34,40 @@ export class DeployContractDto {
   parameters: any[];
 }
 
-export class MintDto {
+export class CreateWalletDTO {
+  @ApiProperty({ description: 'Nome da carteira' })
+  walletName: string;
+
+  @ApiProperty({ description: 'ID da blockchain' })
+  blockchainId: string;
+
+  @ApiProperty({ description: 'Tipo de carteira' })
+  walletType: string;
+}
+
+export class EnableWalletDTO {
+  @ApiProperty({ description: 'Ativo da carteira' })
+  asset: string;
+
+  @ApiProperty({ description: 'Endereço da carteira' })
+  address: string;
+}
+
+export class MintDTO {
+  @ApiProperty({ description: 'Tipo de ativo' })
+  asset: string;
+
   @ApiProperty({ description: 'Endereço do destinatário' })
-  to: string;
+  to?: string;
 
   @ApiProperty({ description: 'Quantidade a ser transferida' })
   amount: number;
 }
 
-export class TransferDto {
-  @ApiProperty({ description: 'Endereço do destinatário' })
-  to: string;
+export class BurnDTO {
+  @ApiProperty({ description: 'Tipo de ativo' })
+  asset: string;
 
-  @ApiProperty({ description: 'Quantidade a ser transferida' })
-  amount: number;
-}
-
-export class BurnDto {
   @ApiProperty({ description: 'Quantidade a ser queimada' })
   amount: number;
 
@@ -57,7 +75,21 @@ export class BurnDto {
   from: string;
 }
 
-export class ContractDto {
+export class TransferDTO {
+  @ApiProperty({ description: 'Tipo de ativo' })
+  asset: string;
+
+  @ApiProperty({ description: 'CNPJ do destinatário' })
+  cnpj: string;
+
+  @ApiProperty({ description: 'Endereço do destinatário' })
+  to: string;
+
+  @ApiProperty({ description: 'Quantidade a ser transferida' })
+  amount: number;
+}
+
+export class ContractDTO {
   @ApiProperty({ description: 'Transaction hash' })
   transactionHash: string;
 
@@ -83,7 +115,15 @@ export class ContractDto {
   createdAt: string;
 }
 
-export class ContractInteractionDto {
+export class ContractCallDTO {
+  @ApiProperty({ description: 'Metadata' })
+  metadata: any;
+
+  @ApiProperty({ description: 'ID da blockchain' })
+  blockchainId: string;
+}
+
+export class ContractSendDTO {
   @ApiProperty({ description: 'Customer tag' })
   customerTag: string;
 
@@ -94,7 +134,7 @@ export class ContractInteractionDto {
   description: string;
 
   @ApiProperty({ description: 'Metadata' })
-  metadata: Object;
+  metadata: any;
 
   @ApiProperty({ description: 'Source' })
   source: {

@@ -19,8 +19,8 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('Real Digital Tecban API')
-    .setDescription('Backend responsible for call real digital')
+    .setTitle('Real Digital TecBan API')
+    .setDescription('Backend responsible for interacting with the Central Bank smart contracts')
     .setVersion('1.0')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
