@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RealDigitalTokenController } from './token.controller';
+import { TokenController } from './token.controller';
 
-describe('RealDigitalTokenController', () => {
-  let controller: RealDigitalTokenController;
+describe('TokenController', () => {
+  let controller: TokenController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [RealDigitalTokenController],
+      controllers: [TokenController],
     }).compile();
 
-    controller = module.get<RealDigitalTokenController>(
-      RealDigitalTokenController,
+    controller = module.get<TokenController>(
+      TokenController,
     );
   });
 
