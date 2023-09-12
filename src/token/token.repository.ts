@@ -4,10 +4,12 @@ import { Injectable } from '@nestjs/common';
 import { parfinApi } from './token-api-client';
 import { ConfigService } from '@nestjs/config';
 import { ContractCallDTO, ContractSendDTO } from './DTO/token-DTO';
+import { Wallet } from '../wallet/wallet.schema';
 
 @Injectable()
 export class TokenRepository {
-  constructor(private readonly configService: ConfigService) { }
+  constructor(  
+    private readonly configService: ConfigService) { }
 
   // Função que chama API da Parfin para listagem de contratos
   async getAllContracts(): Promise<any> {
