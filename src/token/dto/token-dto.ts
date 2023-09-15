@@ -45,6 +45,17 @@ export class CreateWalletDTO {
   walletType: string;
 }
 
+export class ResponseWalletDTO {
+  @ApiProperty({ description: 'Nome da carteira' })
+  walletName: string;
+
+  @ApiProperty({ description: 'ID da blockchain' })
+  blockchainId: string;
+
+  @ApiProperty({ description: 'Tipo de carteira' })
+  walletType: string;
+}
+
 export class EnableWalletDTO {
   @ApiProperty({ description: 'Ativo da carteira' })
   asset: string;
