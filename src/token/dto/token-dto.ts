@@ -34,17 +34,6 @@ export class DeployContractDTO {
   parameters: any[];
 }
 
-export class CreateWalletDTO {
-  @ApiProperty({ description: 'Nome da carteira' })
-  walletName: string;
-
-  @ApiProperty({ description: 'ID da blockchain' })
-  blockchainId: string;
-
-  @ApiProperty({ description: 'Tipo de carteira' })
-  walletType: string;
-}
-
 export class ResponseWalletDTO {
   @ApiProperty({ description: 'Nome da carteira' })
   walletName: string;

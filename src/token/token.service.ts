@@ -75,11 +75,6 @@ export class TokenService {
     return allContracts;
   }
 
-  // Função para criar uma nova carteira da insituição
-  async createInstitutionWallet({ dto }: IService): Promise<any> {
-    return await this.tokenRepository.createWallet(dto);
-  }
-
   setContract(abiInterface: Array<any>, contractAddress?: string) {
     if (contractAddress) {
     }

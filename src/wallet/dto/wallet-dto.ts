@@ -1,6 +1,7 @@
 
 import { IsString, IsArray, IsBoolean, ValidateNested, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class AssetDTO {
     @IsString()
@@ -25,6 +26,16 @@ export class AssetDTO {
     blockchainTokenName: string;
 }
 
+export class CreateWalletDTO {
+    @ApiProperty({ description: 'Nome da carteira' })
+    walletName: string;
+
+    @ApiProperty({ description: 'ID da blockchain' })
+    blockchainId: string;
+
+    @ApiProperty({ description: 'Tipo de carteira' })
+    walletType: string;
+}
 export class WalletDTO {
     @IsString()
     id: string;
