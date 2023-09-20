@@ -15,16 +15,15 @@ import { Contract } from 'web3-eth-contract';
 import {
   BurnDTO,
   ContractDTO,
-  CreateWalletDTO,
   DeployContractDTO,
   EnableWalletDTO,
   MintDTO,
   ResponseDeployContractDTO,
   TransferDTO,
-} from './DTO/token-DTO';
+} from './dto/token-dto';
 
 interface IService {
-  dto: CreateWalletDTO | EnableWalletDTO | MintDTO | BurnDTO | TransferDTO;
+  dto: MintDTO | BurnDTO | TransferDTO;
   contractId?: string;
 }
 
@@ -51,7 +50,7 @@ export class TokenService {
   private contractAddress: string;
   private contract: Contract | any;
   constructor(private readonly tokenRepository: TokenRepository) {
-    this.web3 = new Web3();
+    // this.web3 = new Web3();
   }
 
   // Função para realizar o deploy do contrato e retornar o ID do contrato e o hash da transação
@@ -80,56 +79,56 @@ export class TokenService {
     }
     this.contract = new this.web3.eth.Contract(abiInterface, contractAddress);
     return this;
-  }  
-
-  // Função para criar uma nova carteira do cliente
-  async createClientWallet({ contractId, dto }: IService): Promise<any> {
-    //TODO: Implementar lógica para criação de uma nova carteira para um cliente com o contrato KeyDictionary.sol
-    await this.setContract(keyDictionaryABI, contractId);
-    parfinSendData.metadata = this.contract.methods.addAccount('lorem').encodeABI();
-    const { transactionId } = await this.tokenRepository.smartContractSend(
-      contractId,
-      parfinSendData,
-    );
-    await this.tokenRepository.smartContractSignAndPush(transactionId);
-    return await this.tokenRepository.createWallet(dto);
   }
 
-  // Função para habilitar uma carteira
-  async enableWallet({ contractId, dto }: IService): Promise<any> {
-    const { asset, address } = dto as EnableWalletDTO;
-    if (asset === 'rd') {
-      await this.setContract(realDigitalEnableAccountABI, contractId);
-      parfinSendData.metadata = this.contract.methods
-        .enableAccount(address)
-        .encodeABI();
-      const { transactionId } = await this.tokenRepository.smartContractSend(
-        contractId,
-        parfinSendData,
-      );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
-    } else if (asset === 'rt') {
-      await this.setContract(realTokenizadoABI, contractId);
-      parfinSendData.metadata = this.contract.methods
-        .enableAccount(address)
-        .encodeABI();
-      const { transactionId } = await this.tokenRepository.smartContractSend(
-        contractId,
-        parfinSendData,
-      );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
-    } else if (asset === 'tpft') {
-      await this.setContract(tpftABI, contractId);
-      parfinSendData.metadata = this.contract.methods
-        .enableAccount(address)
-        .encodeABI();
-      const { transactionId } = await this.tokenRepository.smartContractSend(
-        contractId,
-        parfinSendData,
-      );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
-    }
-  }
+  // // Função para criar uma nova carteira do cliente
+  // async createClientWallet({ contractId, dto }: IService): Promise<any> {
+  //   //TODO: Implementar lógica para criação de uma nova carteira para um cliente com o contrato KeyDictionary.sol
+  //   await this.setContract(keyDictionaryABI, contractId);
+  //   parfinSendData.metadata = this.contract.methods.addAccount('lorem').encodeABI();
+  //   const { transactionId } = await this.tokenRepository.smartContractSend(
+  //     contractId,
+  //     parfinSendData,
+  //   );
+  //   await this.tokenRepository.smartContractSignAndPush(transactionId);
+  //   return await this.tokenRepository.createWallet(dto);
+  // }
+
+  // // Função para habilitar uma carteira
+  // async enableWallet({ contractId, dto }: IService): Promise<any> {
+  //   const { asset, address } = dto as EnableWalletDTO;
+  //   if (asset === 'rd') {
+  //     await this.setContract(realDigitalEnableAccountABI, contractId);
+  //     parfinSendData.metadata = this.contract.methods
+  //       .enableAccount(address)
+  //       .encodeABI();
+  //     const { transactionId } = await this.tokenRepository.smartContractSend(
+  //       contractId,
+  //       parfinSendData,
+  //     );
+  //     return await this.tokenRepository.smartContractSignAndPush(transactionId);
+  //   } else if (asset === 'rt') {
+  //     await this.setContract(realTokenizadoABI, contractId);
+  //     parfinSendData.metadata = this.contract.methods
+  //       .enableAccount(address)
+  //       .encodeABI();
+  //     const { transactionId } = await this.tokenRepository.smartContractSend(
+  //       contractId,
+  //       parfinSendData,
+  //     );
+  //     return await this.tokenRepository.smartContractSignAndPush(transactionId);
+  //   } else if (asset === 'tpft') {
+  //     await this.setContract(tpftABI, contractId);
+  //     parfinSendData.metadata = this.contract.methods
+  //       .enableAccount(address)
+  //       .encodeABI();
+  //     const { transactionId } = await this.tokenRepository.smartContractSend(
+  //       contractId,
+  //       parfinSendData,
+  //     );
+  //     return await this.tokenRepository.smartContractSignAndPush(transactionId);
+  //   }
+  // }
 
   // Função para emitir um ativo
   async mint({ contractId, dto }: IService): Promise<any> {
@@ -146,7 +145,9 @@ export class TokenService {
       return await this.tokenRepository.smartContractSignAndPush(transactionId);
     } else if (asset === 'rt') {
       await this.setContract(realTokenizadoABI, contractId);
-      parfinSendData.metadata = this.contract.methods.mint(to, amount).encodeABI();
+      parfinSendData.metadata = this.contract.methods
+        .mint(to, amount)
+        .encodeABI();
       const { transactionId } = await this.tokenRepository.smartContractSend(
         contractId,
         parfinSendData,
@@ -154,7 +155,9 @@ export class TokenService {
       return await this.tokenRepository.smartContractSignAndPush(transactionId);
     } else if (asset === 'tpft') {
       await this.setContract(tpftABI, contractId);
-      parfinSendData.metadata = this.contract.methods.mint(to, amount).encodeABI();
+      parfinSendData.metadata = this.contract.methods
+        .mint(to, amount)
+        .encodeABI();
       const { transactionId } = await this.tokenRepository.smartContractSend(
         contractId,
         parfinSendData,
@@ -178,7 +181,7 @@ export class TokenService {
       return await this.tokenRepository.smartContractSignAndPush(transactionId);
     } else if (asset === 'rt') {
       await this.setContract(realTokenizadoABI, contractId);
-      tpftABI
+      tpftABI;
       parfinSendData.metadata = this.contract.methods.burn(amount).encodeABI();
       const { transactionId } = await this.tokenRepository.smartContractSend(
         contractId,
