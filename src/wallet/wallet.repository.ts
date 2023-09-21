@@ -4,7 +4,7 @@ import { Wallet, WalletDocument } from '../wallet/wallet.schema';
 import { Model } from 'mongoose';
 import { CreateWalletDTO, WalletDTO } from './dto/wallet-dto';
 import { parfinApi } from 'src/config/parfin-api-client';
-import { PreRequest } from 'src/util/pre-request';
+import { PreRequest } from 'src/helpers/pre-request';
 
 @Injectable()
 export class WalletRepository {
