@@ -4,7 +4,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
 import { WalletModule } from './wallet/wallet.module';
-import { Mongoose } from 'mongoose';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
