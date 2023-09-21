@@ -2,9 +2,9 @@
 
 import { Injectable } from '@nestjs/common';
 import { parfinApi } from 'src/config/parfin-api-client';
-import { ContractCallDTO, ContractSendDTO } from './dto/token-dto';
-import { Wallet } from '../wallet/wallet.schema';
-import { PreRequest } from 'src/util/pre-request';
+import { PreRequest } from 'src/helpers/pre-request';
+
+import { ContractCallDTO, ContractSendDTO } from 'src/shared-dtos/contract';
 
 @Injectable()
 export class TokenRepository {
