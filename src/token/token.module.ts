@@ -1,20 +1,23 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TokenController } from './token.controller';
 import { TokenService } from './token.service';
 import { TokenRepository } from './token.repository';
 import { PreRequest } from 'src/helpers/pre-request';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { ContractHelper } from 'src/helpers/contract';
+import { TransactionsService } from 'src/transactions/transactions.service';
+import { TransactionsModule } from 'src/transactions/transactions.module';
 
 @Module({
+  imports: [TransactionsModule],
   controllers: [TokenController],
   providers: [
     TokenService,
-    TokenRepository,
     PreRequest,
     TokenRepository,
     ParfinService,
     ContractHelper,
   ],
+  exports:[TokenService]
 })
 export class RealDigitalTokenModule {}

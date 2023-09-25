@@ -2,7 +2,10 @@ import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { TokenService } from './token.service';
 import { MintDTO, BurnDTO, TransferDTO } from './dto/token-dto';
-import { DeployContractDTO, ResponseDeployContractDTO } from 'src/shared-dtos/contract';
+import {
+  DeployContractDTO,
+  ResponseDeployContractDTO,
+} from 'src/shared-dtos/contract';
 
 @Controller('token')
 @ApiTags('Central Bank Tokens')

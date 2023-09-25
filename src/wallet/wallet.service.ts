@@ -15,14 +15,16 @@ import tpftABI from '../ABI/tpftABI.json';
 
 import { ContractHelper } from 'src/helpers/contract';
 import { parfinSendData } from 'src/parfin/mock';
-import { TokenRepository } from 'src/token/token.repository';
+import { TransactionsService } from 'src/transactions/transactions.service';
+import { TokenService } from 'src/token/token.service';
 
 @Injectable()
 export class WalletService {
   constructor(
     private readonly walletRepository: WalletRepository,
     private readonly contractHelper: ContractHelper,
-    private readonly tokenRepository: TokenRepository,
+    private readonly tokenService: TokenService,
+    private readonly transactionService: TransactionsService,
   ) {}
 
   // Gravação: Create a new Wallet
@@ -48,11 +50,11 @@ export class WalletService {
       .getContract()
       .methods.addAccount('lorem')
       .encodeABI();
-    const { transactionId } = await this.tokenRepository.smartContractSend(
+    const { transactionId } = await this.tokenService.smartContractSend(
       contractId,
       parfinSendData,
     );
-    await this.tokenRepository.smartContractSignAndPush(transactionId);
+    await this.transactionService.smartContractSignAndPush(transactionId);
     return await this.walletRepository.createWallet(CreateClientWalletDTO);
   }
 
@@ -74,33 +76,39 @@ export class WalletService {
         .getContract()
         .methods.enableAccount(address)
         .encodeABI();
-      const { transactionId } = await this.tokenRepository.smartContractSend(
+      const { transactionId } = await this.tokenService.smartContractSend(
         contractId,
         parfinSendData,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     } else if (asset === 'rt') {
       await this.contractHelper.setContract(realTokenizadoABI, contractId);
       parfinSendData.metadata = this.contractHelper
         .getContract()
         .methods.enableAccount(address)
         .encodeABI();
-      const { transactionId } = await this.tokenRepository.smartContractSend(
+      const { transactionId } = await this.tokenService.smartContractSend(
         contractId,
         parfinSendData,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     } else if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
       parfinSendData.metadata = this.contractHelper
         .getContract()
         .methods.enableAccount(address)
         .encodeABI();
-      const { transactionId } = await this.tokenRepository.smartContractSend(
+      const { transactionId } = await this.tokenService.smartContractSend(
         contractId,
         parfinSendData,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     }
   }
 

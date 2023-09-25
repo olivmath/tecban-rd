@@ -1,6 +1,4 @@
 // real-digital-token.service.ts
-
-import Web3 from 'web3';
 import strABI from '../ABI/strABI.json';
 import realDigitalABI from '../ABI/realDigitalABI.json';
 import realDigitalDefaultAccountABI from '../ABI/realDigitalDefaultAccountABI.json';
@@ -16,10 +14,15 @@ import { ContractHelper } from 'src/helpers/contract';
 import { parfinCallData, parfinSendData } from 'src/parfin/mock';
 import {
   ContractDTO,
-  DeployContractDTO,
+  ContractSendDTO,
   ResponseDeployContractDTO,
 } from 'src/shared-dtos/contract';
 import { ParfinService } from 'src/parfin/parfin.service';
+import { TransactionsService } from 'src/transactions/transactions.service';
+import {
+  AssetTypes,
+  TransactionOperations,
+} from 'src/transactions/dtos/create-transaction.dto';
 
 @Injectable()
 export class TokenService {
@@ -27,6 +30,7 @@ export class TokenService {
     private readonly tokenRepository: TokenRepository,
     private readonly contractHelper: ContractHelper,
     private readonly parfinService: ParfinService,
+    private readonly transactionService: TransactionsService,
   ) {}
 
   // Função para emitir um ativo
@@ -42,7 +46,22 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+
+      //salvar no banco
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.MINT,
+        asset: AssetTypes.RD,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+        dbTransactionId,
+      );
     } else if (asset === 'rt') {
       await this.contractHelper.setContract(realTokenizadoABI, contractId);
       parfinSendData.metadata = this.contractHelper
@@ -53,7 +72,9 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     } else if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
       parfinSendData.metadata = this.contractHelper
@@ -64,7 +85,9 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     }
   }
 
@@ -81,7 +104,9 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     } else if (asset === 'rt') {
       await this.contractHelper.setContract(realTokenizadoABI, contractId);
       tpftABI;
@@ -93,7 +118,9 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     } else if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
       parfinSendData.metadata = this.contractHelper
@@ -104,7 +131,9 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     }
   }
 
@@ -126,7 +155,7 @@ export class TokenService {
           contractId,
           parfinCallData,
         );
-      await this.tokenRepository.smartContractSignAndPush(
+      await this.transactionService.smartContractSignAndPush(
         realDigitalDefaultAccounttransactionId,
       );
       // Executar a transferência entre instituições distintas
@@ -139,7 +168,9 @@ export class TokenService {
         contractId,
         data,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     } else if (asset === 'rt') {
       // Executar a transferência entre clientes da mesma instituição
       await this.contractHelper.setContract(realTokenizadoABI, contractId);
@@ -151,7 +182,9 @@ export class TokenService {
         contractId,
         data,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     } else if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
       const data = this.contractHelper
@@ -162,7 +195,9 @@ export class TokenService {
         contractId,
         data,
       );
-      return await this.tokenRepository.smartContractSignAndPush(transactionId);
+      return await this.transactionService.smartContractSignAndPush(
+        transactionId,
+      );
     }
   }
 
@@ -173,5 +208,9 @@ export class TokenService {
 
   async deployContract(deployContractDTO): Promise<ResponseDeployContractDTO> {
     return this.parfinService.deployContract(deployContractDTO);
+  }
+
+  async smartContractSend(contractId: string, data: ContractSendDTO) {
+    return await this.tokenRepository.smartContractSend(contractId, data);
   }
 }

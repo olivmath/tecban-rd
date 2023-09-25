@@ -5,6 +5,8 @@ import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
 import { WalletModule } from './wallet/wallet.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { TransactionsModule } from './transactions/transactions.module';
+import { TransactionsRepository } from './transactions/transactions.repository';
 
 @Module({
   imports: [
@@ -12,8 +14,10 @@ import { MongooseModule } from '@nestjs/mongoose';
     MongooseModule.forRoot(process.env.DATABASE_URL),
     TerminusModule,
     WalletModule,
+    TransactionsModule,
     RealDigitalTokenModule,
   ],
+
   controllers: [HealthController],
 })
-export class AppModule { }
+export class AppModule {}

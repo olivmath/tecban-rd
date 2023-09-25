@@ -34,5 +34,4 @@ export class TransferDTO {
 
   @ApiProperty({ description: 'Quantidade a ser transferida' })
   amount: number;
-  
 }
