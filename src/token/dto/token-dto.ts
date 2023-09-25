@@ -1,13 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class MintDTO {
   @ApiProperty({ description: 'Tipo de ativo' })
+  @IsString()
+  @IsNotEmpty()
   asset: string;
 
   @ApiProperty({ description: 'Endereço do destinatário' })
+  @IsOptional()
   to?: string;
 
   @ApiProperty({ description: 'Quantidade a ser transferida' })
+  @IsNumber()
+  @IsNotEmpty()
   amount: number;
 }
 

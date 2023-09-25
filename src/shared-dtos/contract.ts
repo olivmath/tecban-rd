@@ -1,13 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmpty, IsOptional, IsString } from 'class-validator';
 
 export class DeployContractDTO {
   @ApiProperty({ description: 'Customer tag' })
-  customerTag: string;
+  @IsString()
+  @IsOptional()
+  customerTag?: string;
 
   @ApiProperty({ description: 'Customer reference ID' })
+  @IsString()
+  @IsOptional()
   customerRefId: string;
 
   @ApiProperty({ description: 'Description' })
+  @IsString()
+  @IsOptional()
   description: string;
 
   @ApiProperty({ description: 'Source asset ID' })

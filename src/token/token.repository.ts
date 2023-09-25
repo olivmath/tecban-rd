@@ -17,6 +17,7 @@ export class TokenRepository {
       const response = await parfinApi.get(`/custody/web3/contracts`);
       return response.data;
     } catch (error) {
+      console.log(error);
       throw new Error('Erro ao listar os contratos!');
     }
   }

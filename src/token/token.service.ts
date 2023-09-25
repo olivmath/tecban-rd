@@ -72,8 +72,20 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
+
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.MINT,
+        asset: AssetTypes.RT,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId,
       );
     } else if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
@@ -85,8 +97,20 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
+
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.MINT,
+        asset: AssetTypes.TPFT,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId,
       );
     }
   }
@@ -104,8 +128,20 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
+
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.BURN,
+        asset: AssetTypes.RD,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId,
       );
     } else if (asset === 'rt') {
       await this.contractHelper.setContract(realTokenizadoABI, contractId);
@@ -118,8 +154,20 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
+
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.BURN,
+        asset: AssetTypes.RT,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId,
       );
     } else if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
@@ -131,8 +179,20 @@ export class TokenService {
         contractId,
         parfinSendData,
       );
+
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.BURN,
+        asset: AssetTypes.TPFT,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId,
       );
     }
   }
@@ -155,8 +215,20 @@ export class TokenService {
           contractId,
           parfinCallData,
         );
+
+      const transactionData = {
+        parfinTransactionId: realDigitalDefaultAccounttransactionId,
+        operation: TransactionOperations.TRANSFER,
+        asset: AssetTypes.RT,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       await this.transactionService.smartContractSignAndPush(
         realDigitalDefaultAccounttransactionId,
+        dbTransactionId,
       );
       // Executar a transferência entre instituições distintas
       await this.contractHelper.setContract(realDigitalABI, contractId);
@@ -168,8 +240,12 @@ export class TokenService {
         contractId,
         data,
       );
+
+      transactionData.parfinTransactionId = transactionId;
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId
       );
     } else if (asset === 'rt') {
       // Executar a transferência entre clientes da mesma instituição
@@ -182,8 +258,20 @@ export class TokenService {
         contractId,
         data,
       );
+
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.TRANSFER,
+        asset: AssetTypes.RT,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId,
       );
     } else if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
@@ -195,8 +283,20 @@ export class TokenService {
         contractId,
         data,
       );
+
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.TRANSFER,
+        asset: AssetTypes.TPFT,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId,
       );
     }
   }
