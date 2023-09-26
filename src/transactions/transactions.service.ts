@@ -4,6 +4,11 @@ import { Transaction } from './transactions.schema';
 import { CreateTransactionDto } from './dtos/create-transaction.dto';
 import { TransactionsRepository } from './transactions.repository';
 
+export enum InteractionEnum {
+  CALL = 'Call',
+  SEND = 'Send',
+}
+
 @Injectable()
 export class TransactionsService {
   constructor(
@@ -42,32 +47,40 @@ export class TransactionsService {
     await this.transactionsRepository.remove(id);
   }
 
-  async smartContractSignAndPush(id: string, dbTransactionId?: string) {
-    //verificar se a transactionId existe no banco de dados
-    const existingTransaction = await this.transactionsRepository.findOne(
-      dbTransactionId,
-    );
+  async smartContractSignAndPush(
+    id: string,
+    dbTransactionId: string,
+    interactionType: InteractionEnum = InteractionEnum.SEND,
+  ) {
+    if (interactionType !== InteractionEnum.CALL) {
+      //verificar se a transactionId existe no banco de dados
+      const existingTransaction = await this.transactionsRepository.findOne(
+        dbTransactionId,
+      );
 
-    if (!existingTransaction) {
-      throw new Error(`Transação com ID ${id} não encontrada.`);
+      if (!existingTransaction) {
+        throw new Error(`Transação com ID ${id} não encontrada.`);
+      }
+
+      //chamar o transaction repository
+      await this.transactionsRepository.smartContractSignAndPush(id);
+
+      //pegar a transação criada pela parfin
+      const parfinTransaction =
+        await this.transactionsRepository.getSingleParfinTransaction(id);
+
+      //update a transaction
+      const { blockchainNetwork, statusDescription } = parfinTransaction;
+      await this.update(dbTransactionId, {
+        blockchainNetwork,
+        statusDescription,
+      });
+
+      //retornar o status da transaction
+      return { statusDescription };
+    } else {
+      await this.transactionsRepository.smartContractSignAndPush(id);
     }
-
-    //chamar o transaction repository
-    await this.transactionsRepository.smartContractSignAndPush(id);
-
-    //pegar a transação criada pela parfin
-    const parfinTransaction =
-      await this.transactionsRepository.getSingleParfinTransaction(id);
-
-    //update a transaction
-    const { blockchainNetwork, statusDescription } = parfinTransaction;
-    await this.update(dbTransactionId, {
-      blockchainNetwork,
-      statusDescription,
-    });
-
-    //retornar o status da transaction
-    return { statusDescription };
   }
 
   async getSingleParfinTransaction(id: string) {

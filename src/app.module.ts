@@ -6,8 +6,8 @@ import { HealthController } from './health.controller';
 import { WalletModule } from './wallet/wallet.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TransactionsModule } from './transactions/transactions.module';
-import { TransactionsRepository } from './transactions/transactions.repository';
 import { ParfinModule } from './parfin/parfin.module';
+import { RealDigitalModule } from './real-digital/real-digital.module';
 
 @Module({
   imports: [
@@ -18,6 +18,7 @@ import { ParfinModule } from './parfin/parfin.module';
     TransactionsModule,
     RealDigitalTokenModule,
     ParfinModule,
+    RealDigitalModule,
   ],
 
   controllers: [HealthController],

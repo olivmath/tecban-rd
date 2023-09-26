@@ -17,6 +17,10 @@ import { ContractHelper } from 'src/helpers/contract';
 import { parfinSendData } from 'src/parfin/mock';
 import { TransactionsService } from 'src/transactions/transactions.service';
 import { TokenService } from 'src/token/token.service';
+import {
+  AssetTypes,
+  TransactionOperations,
+} from 'src/transactions/dtos/create-transaction.dto';
 
 @Injectable()
 export class WalletService {
@@ -45,7 +49,7 @@ export class WalletService {
     //TODO: Implementar lógica para criação de uma nova carteira para um cliente com o contrato KeyDictionary.sol
     const { contractId } = CreateClientWalletDTO;
     await this.contractHelper.setContract(keyDictionaryABI, contractId);
-    console.log(this.contractHelper.getContract().methods);
+
     parfinSendData.metadata = this.contractHelper
       .getContract()
       .methods.addAccount('lorem')
@@ -54,7 +58,21 @@ export class WalletService {
       contractId,
       parfinSendData,
     );
-    await this.transactionService.smartContractSignAndPush(transactionId);
+
+    const transactionData = {
+      parfinTransactionId: transactionId,
+      operation: TransactionOperations.CREATE_WALLET,
+      asset: null,
+      ...parfinSendData,
+    };
+    const { id: dbTransactionId } = await this.transactionService.create(
+      transactionData,
+    );
+
+    await this.transactionService.smartContractSignAndPush(
+      transactionId,
+      dbTransactionId,
+    );
     return await this.walletRepository.createWallet(CreateClientWalletDTO);
   }
 
@@ -80,8 +98,19 @@ export class WalletService {
         contractId,
         parfinSendData,
       );
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.ENABLE_ACCOUNT,
+        asset: AssetTypes.RD,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId,
       );
     } else if (asset === 'rt') {
       await this.contractHelper.setContract(realTokenizadoABI, contractId);
@@ -93,8 +122,19 @@ export class WalletService {
         contractId,
         parfinSendData,
       );
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.ENABLE_ACCOUNT,
+        asset: AssetTypes.RT,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId,
       );
     } else if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
@@ -106,8 +146,19 @@ export class WalletService {
         contractId,
         parfinSendData,
       );
+      const transactionData = {
+        parfinTransactionId: transactionId,
+        operation: TransactionOperations.ENABLE_ACCOUNT,
+        asset: AssetTypes.TPFT,
+        ...parfinSendData,
+      };
+      const { id: dbTransactionId } = await this.transactionService.create(
+        transactionData,
+      );
+
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
+        dbTransactionId,
       );
     }
   }

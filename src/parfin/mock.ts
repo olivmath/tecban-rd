@@ -1,6 +1,4 @@
-import {
-  Priority,
-} from 'src/transactions/dtos/create-transaction.dto';
+import { Priority } from 'src/transactions/dtos/create-transaction.dto';
 
 export const parfinSendData = {
   customerTag: 'lorem',

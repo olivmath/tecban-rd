@@ -1,11 +1,5 @@
 // create-transaction.dto.ts
-import {
-  IsString,
-  IsNumber,
-  IsDate,
-  IsEnum,
-  IsOptional,
-} from 'class-validator';
+import { IsString, IsEnum, IsOptional } from 'class-validator';
 
 export enum Priority {
   HIGH = 'HIGH',
@@ -22,6 +16,8 @@ export enum TransactionOperations {
   MINT = 'Mint',
   BURN = 'Burn',
   TRANSFER = 'Transfer',
+  ENABLE_ACCOUNT = 'EnableAccount',
+  CREATE_WALLET = 'CreateWallet',
 }
 
 export enum AssetTypes {
@@ -41,7 +37,7 @@ export class CreateTransactionDto {
   customerRefId: string;
 
   @IsString()
-  asset: AssetTypes;
+  asset: AssetTypes | null;
 
   @IsString()
   source: {

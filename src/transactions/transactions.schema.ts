@@ -50,7 +50,7 @@ export class Transaction extends Document {
   customerRefId: string;
 
   @Prop()
-  asset: AssetTypes;
+  asset: AssetTypes | null;
 
   @Prop({ type: Source })
   source: Source;
