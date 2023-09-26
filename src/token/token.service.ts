@@ -245,7 +245,7 @@ export class TokenService {
 
       return await this.transactionService.smartContractSignAndPush(
         transactionId,
-        dbTransactionId
+        dbTransactionId,
       );
     } else if (asset === 'rt') {
       // Executar a transferência entre clientes da mesma instituição
@@ -304,10 +304,6 @@ export class TokenService {
   async getAllContracts(): Promise<ContractDTO[]> {
     const allContracts = await this.tokenRepository.getAllContracts();
     return allContracts;
-  }
-
-  async deployContract(deployContractDTO): Promise<ResponseDeployContractDTO> {
-    return this.parfinService.deployContract(deployContractDTO);
   }
 
   async smartContractSend(contractId: string, data: ContractSendDTO) {
