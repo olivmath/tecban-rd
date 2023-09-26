@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class DeployContractDTO {
   @ApiProperty({ description: 'Customer tag' })
@@ -39,6 +39,40 @@ export class ResponseDeployContractDTO {
 
   @ApiProperty({ description: 'Transaction Hash' })
   transactionHash: string;
+}
+
+export class RegisterContractDTO {
+  @ApiProperty({ description: 'Contract Address' })
+  @IsString()
+  @IsNotEmpty()
+  contractAddress: string;
+
+  @ApiProperty({ description: 'Blockchain ID' })
+  @IsString()
+  @IsNotEmpty()
+  blockchainId: string;
+}
+
+export class ResponseRegisterContractDTO {
+  @ApiProperty({ description: 'Contract Id' })
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  @ApiProperty({ description: 'Blockchain ID' })
+  @IsString()
+  @IsNotEmpty()
+  blockchainId: string;
+
+  @ApiProperty({ description: 'Contract Address' })
+  @IsString()
+  @IsNotEmpty()
+  contractAddress: string;
+
+  @ApiProperty({ description: 'Contract Register date' })
+  @IsString()
+  @IsNotEmpty()
+  createdAt: Date;
 }
 
 export class ContractDTO {

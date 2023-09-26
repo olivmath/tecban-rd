@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { parfinApi } from 'src/config/parfin-api-client';
+import { PreRequest } from 'src/helpers/pre-request';
 import {
   DeployContractDTO,
+  RegisterContractDTO,
   ResponseDeployContractDTO,
 } from 'src/shared-dtos/contract';
 
 @Injectable()
 export class ParfinService {
+  constructor(private readonly preRequest: PreRequest) {}
+
   // Função para realizar o deploy do contrato e retornar o ID do contrato e o hash da transação
   async deployContract(
     deployContractDTO: DeployContractDTO,
@@ -19,5 +24,18 @@ export class ParfinService {
       contractId,
       transactionHash,
     };
+  }
+
+  async registerContract(registerContractDTO: RegisterContractDTO) {
+    try {
+      await this.preRequest.setAuthorizationToken();
+      const url = `/custody/web3/contract`;
+      const response = await parfinApi.post(url, registerContractDTO);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        `Erro ao tentar registrar com o contrato ${registerContractDTO.contractAddress}!`,
+      );
+    }
   }
 }

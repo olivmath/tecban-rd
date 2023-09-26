@@ -2,23 +2,11 @@ import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { TokenService } from './token.service';
 import { MintDTO, BurnDTO, TransferDTO } from './dto/token-dto';
-import {
-  DeployContractDTO,
-  ResponseDeployContractDTO,
-} from 'src/shared-dtos/contract';
 
 @Controller('token')
 @ApiTags('Central Bank Tokens')
 export class TokenController {
   constructor(private readonly tokenService: TokenService) {}
-
-  // Rota para realizar o deploy de um contrato
-  @Post('deploy')
-  async deployContract(
-    @Body() deployContractDTO: DeployContractDTO,
-  ): Promise<ResponseDeployContractDTO> {
-    return await this.tokenService.deployContract(deployContractDTO);
-  }
 
   // Rota para obter uma listagem de contratos
   @Get('contracts')
