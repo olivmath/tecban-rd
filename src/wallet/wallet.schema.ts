@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import * as crypto from 'crypto';
 
 export type WalletDocument = Wallet & Document;
 
 @Schema({ timestamps: true, versionKey: false, strictQuery: false })
 export class Wallet {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true, index:true, default: () => crypto.randomUUID() })
   id: string;
 
   @Prop({ required: true })
