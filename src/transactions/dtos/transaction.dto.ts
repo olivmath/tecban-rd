@@ -21,12 +21,12 @@ export enum TransactionOperations {
 }
 
 export enum AssetTypes {
-  RD = 'rd',
-  RT = 'rt',
-  TPFT = 'tpft',
+  RD = 'RD',
+  RT = 'RT',
+  TPFT = 'TPFT',
 }
 
-export class CreateTransactionDto {
+export class TransactionDTO {
   @IsString()
   parfinTransactionId: string;
 
@@ -42,7 +42,6 @@ export class CreateTransactionDto {
   @IsString()
   source: {
     assetId: string;
-    walletId: string;
   };
 
   @IsString()

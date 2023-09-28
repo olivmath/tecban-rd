@@ -1,7 +1,7 @@
 // transactions.service.ts
 import { Injectable } from '@nestjs/common';
 import { Transaction } from './transactions.schema';
-import { CreateTransactionDto } from './dtos/create-transaction.dto';
+import { TransactionDTO } from './dtos/transaction.dto';
 import { TransactionsRepository } from './transactions.repository';
 
 export enum InteractionEnum {
@@ -13,10 +13,10 @@ export enum InteractionEnum {
 export class TransactionsService {
   constructor(
     private readonly transactionsRepository: TransactionsRepository,
-  ) {}
+  ) { }
 
   async create(
-    createTransactionDto: CreateTransactionDto,
+    createTransactionDto: TransactionDTO,
   ): Promise<Transaction> {
     return this.transactionsRepository.create(createTransactionDto);
   }
@@ -31,7 +31,7 @@ export class TransactionsService {
 
   async update(
     id: string,
-    updateTransactionDto: Partial<CreateTransactionDto>,
+    updateTransactionDto: Partial<TransactionDTO>,
   ): Promise<Transaction> {
     const existingTransaction = await this.transactionsRepository.findOne(id);
 
@@ -47,7 +47,7 @@ export class TransactionsService {
     await this.transactionsRepository.remove(id);
   }
 
-  async smartContractSignAndPush(
+  async transactionSignAndPush(
     id: string,
     dbTransactionId: string,
     interactionType: InteractionEnum = InteractionEnum.SEND,
@@ -63,11 +63,11 @@ export class TransactionsService {
       }
 
       //chamar o transaction repository
-      await this.transactionsRepository.smartContractSignAndPush(id);
+      await this.transactionsRepository.transactionSignAndPush(id);
 
       //pegar a transação criada pela parfin
       const parfinTransaction =
-        await this.transactionsRepository.getSingleParfinTransaction(id);
+        await this.transactionsRepository.getTransactionById(id);
 
       //update a transaction
       const { blockchainNetwork, statusDescription } = parfinTransaction;
@@ -79,11 +79,11 @@ export class TransactionsService {
       //retornar o status da transaction
       return { statusDescription };
     } else {
-      await this.transactionsRepository.smartContractSignAndPush(id);
+      await this.transactionsRepository.transactionSignAndPush(id);
     }
   }
 
-  async getSingleParfinTransaction(id: string) {
-    return await this.transactionsRepository.getSingleParfinTransaction(id);
+  async getTransactionById(id: string) {
+    return await this.transactionsRepository.getTransactionById(id);
   }
 }

@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Transaction } from './transactions.schema';
-import { CreateTransactionDto } from './dtos/create-transaction.dto';
+import { TransactionDTO } from './dtos/transaction.dto';
 import { PreRequest } from 'src/helpers/pre-request';
 import { parfinApi } from 'src/config/parfin-api-client';
 
@@ -13,10 +13,10 @@ export class TransactionsRepository {
     @InjectModel(Transaction.name)
     private readonly transactionModel: Model<Transaction>,
     private readonly preRequest: PreRequest,
-  ) {}
+  ) { }
 
   async create(
-    createTransactionDto: CreateTransactionDto,
+    createTransactionDto: TransactionDTO,
   ): Promise<Transaction> {
     const createdTransaction = new this.transactionModel(createTransactionDto);
     return createdTransaction.save();
@@ -32,7 +32,7 @@ export class TransactionsRepository {
 
   async update(
     id: string,
-    updateTransactionDto: Partial<CreateTransactionDto>,
+    updateTransactionDto: Partial<TransactionDTO>,
   ): Promise<Transaction> {
     return this.transactionModel
       .findOneAndUpdate({ id }, updateTransactionDto, { new: true })
@@ -44,7 +44,7 @@ export class TransactionsRepository {
   }
 
   // Função que chama API da Parfin para interagir com um contrato
-  async smartContractSignAndPush(id: string) {
+  async transactionSignAndPush(id: string) {
     try {
       await this.preRequest.setAuthorizationToken();
       const url = `/transaction/${id}/sign-and-push`;
@@ -55,7 +55,7 @@ export class TransactionsRepository {
     }
   }
 
-  async getSingleParfinTransaction(id: string) {
+  async getTransactionById(id: string) {
     try {
       await this.preRequest.setAuthorizationToken();
       const url = `/transaction/${id}/`;
