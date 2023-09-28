@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Wallet, WalletDocument } from '../wallet/wallet.schema';
 import { Model } from 'mongoose';
-import { CreateWalletDTO, WalletDTO } from './dto/wallet-dto';
+import {
+  WalletDTO,
+  WalletCreateDTO
+} from './dto/wallet.dto';
 import { parfinApi } from 'src/config/parfin-api-client';
 import { PreRequest } from 'src/helpers/pre-request';
 
@@ -12,7 +15,7 @@ export class WalletRepository {
     @InjectModel(Wallet.name)
     private walletModel: Model<WalletDocument>,
     private preRequest: PreRequest,
-  ) {}
+  ) { }
 
   async create(createWalletDTO: WalletDTO): Promise<Wallet> {
     const walletModel = new this.walletModel(createWalletDTO);
@@ -28,7 +31,12 @@ export class WalletRepository {
   }
 
   // Função que chama API da Parfin para criar uma nova carteira
-  async createWallet(data: CreateWalletDTO) {
+  async createWallet({ walletName, blockchainId, walletType }: WalletCreateDTO) {
+    const data = {
+      walletName,
+      blockchainId,
+      walletType,
+    }
     try {
       await this.preRequest.setAuthorizationToken();
       const url = `/wallet`;
