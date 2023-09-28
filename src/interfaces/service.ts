@@ -1,6 +1,19 @@
-import { BurnDTO, MintDTO, TransferDTO } from 'src/token/dto/token-dto';
-
+import {
+  RealDigitalBurnDTO,
+  RealDigitalMintDTO,
+  RealDigitalTransferDTO
+} from 'src/real-digital/dtos/real-digital.dto';
+import {
+  RealTokenizadoMintDTO,
+  RealTokenizadoBurnDTO,
+  RealTokenizadoTransferDTO
+} from 'src/real-tokenizado/dtos/real-tokenizado.dto';
 export interface IService {
-  dto: MintDTO | BurnDTO | TransferDTO;
+  dto: RealDigitalMintDTO |
+  RealDigitalBurnDTO |
+  RealDigitalTransferDTO |
+  RealTokenizadoMintDTO |
+  RealTokenizadoBurnDTO |
+  RealTokenizadoTransferDTO;
   contractId?: string;
 }
