@@ -32,28 +32,34 @@ export class AssetDTO {
   blockchainTokenName: string;
 }
 
-export class CreateWalletDTO {
-  @ApiProperty({ description: 'Nome da carteira' })
+export class WalletAssetDTO {
   @IsString()
-  @IsNotEmpty()
-  walletName: string;
+  assetId: string;
 
-  @ApiProperty({ description: 'ID da blockchain' })
   @IsString()
-  @IsNotEmpty()
-  blockchainId: string;
+  blockchainTokenId: string;
 
-  @ApiProperty({ description: 'Tipo de carteira' })
   @IsString()
-  @IsNotEmpty()
-  walletType: string;
+  availableBalance: string;
+
+  @IsString()
+  balance: string;
+
+  @IsString()
+  createdTime: Date;
+
+  @IsString()
+  blockchainTokenCode: string;
+
+  @IsString()
+  blockchainTokenName: string;
 }
 
-export class CreateClientWalletDTO {
+export class WalletCreateDTO {
   @ApiProperty({ description: 'ID do contrato' })
   @IsString()
-  @IsNotEmpty()
-  contractId: string;
+  @IsOptional()
+  contractId?: string;
 
   @ApiProperty({ description: 'Nome da carteira' })
   @IsString()
@@ -120,7 +126,7 @@ export class WalletDTO {
   userId?: string;
 }
 
-export class ResponseWalletDTO {
+export class WalletResDTO {
   @ApiProperty({ description: 'Nome da carteira' })
   walletName: string;
 
@@ -131,7 +137,7 @@ export class ResponseWalletDTO {
   walletType: string;
 }
 
-export class EnableWalletDTO {
+export class WalletEnableDTO {
   @ApiProperty({ description: 'Ativo da carteira' })
   asset: string;
 

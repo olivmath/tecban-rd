@@ -1,41 +1,40 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { WalletRepository } from './wallet.repository';
 import { Wallet } from './wallet.schema';
-import {
-  CreateClientWalletDTO,
-  EnableWalletDTO,
-  WalletDTO,
-} from './dto/wallet-dto';
-import { CreateWalletDTO } from './dto/wallet-dto';
+import { WalletCreateDTO, WalletEnableDTO, WalletDTO } from './dto/wallet.dto';
 
-import keyDictionaryABI from '../ABI/keyDictionaryABI.json';
-import realDigitalEnableAccountABI from '../ABI/realDigitalEnableAccountABI.json';
-import realTokenizadoABI from '../ABI/realTokenizadoABI.json';
-import tpftABI from '../ABI/tpftABI.json';
+import keyDictionaryABI from '../ABI/KeyDictionary.abi.json';
+import realDigitalEnableAccountABI from '../ABI/RealDigitalEnableAccount.abi.json';
+import realTokenizadoABI from '../ABI/RealTokenizado.abi.json';
 
 import { ContractHelper } from 'src/helpers/contract';
-import { parfinSendData } from 'src/parfin/mock';
+import { parfinSendData } from 'src/parfin/parfin.body';
 import { TransactionsService } from 'src/transactions/transactions.service';
-import { TokenService } from 'src/token/token.service';
 import {
   AssetTypes,
   TransactionOperations,
-} from 'src/transactions/dtos/create-transaction.dto';
+} from 'src/transactions/dtos/transaction.dto';
+import { ParfinService } from 'src/parfin/parfin.service';
 
 @Injectable()
 export class WalletService {
   constructor(
     private readonly walletRepository: WalletRepository,
     private readonly contractHelper: ContractHelper,
-    private readonly tokenService: TokenService,
+    private readonly parfinService: ParfinService,
     private readonly transactionService: TransactionsService,
   ) {}
 
   // Gravação: Create a new Wallet
-  async createInstitutionWallet(walletData: CreateWalletDTO): Promise<Wallet> {
+  async createInstitutionWallet({
+    dto: createInstitutionWalletDTO,
+  }: {
+    dto: WalletCreateDTO;
+  }): Promise<Wallet> {
     //chamando a criação de wallet na parfin
-    const resp = await this.walletRepository.createWallet(walletData);
-
+    const resp = await this.walletRepository.createWallet(
+      createInstitutionWalletDTO,
+    );
     //salvamos o retorno da parfin no banco
     const wallet = await this.walletRepository.create(resp);
 
@@ -43,18 +42,21 @@ export class WalletService {
   }
 
   // Função para criar uma nova carteira do cliente
-  async createClientWallet(
-    CreateClientWalletDTO: CreateClientWalletDTO,
-  ): Promise<any> {
+  async createClientWallet({
+    dto: createClientWalletDTO,
+  }: {
+    dto: WalletCreateDTO;
+  }): Promise<any> {
     //TODO: Implementar lógica para criação de uma nova carteira para um cliente com o contrato KeyDictionary.sol
-    const { contractId } = CreateClientWalletDTO;
+    const { contractId, walletName, blockchainId, walletType } =
+      createClientWalletDTO;
     await this.contractHelper.setContract(keyDictionaryABI, contractId);
 
     parfinSendData.metadata = this.contractHelper
       .getContract()
       .methods.addAccount('lorem')
       .encodeABI();
-    const { transactionId } = await this.tokenService.smartContractSend(
+    const { id: transactionId } = await this.parfinService.smartContractSend(
       contractId,
       parfinSendData,
     );
@@ -69,11 +71,15 @@ export class WalletService {
       transactionData,
     );
 
-    await this.transactionService.smartContractSignAndPush(
+    await this.transactionService.transactionSignAndPush(
       transactionId,
       dbTransactionId,
     );
-    return await this.walletRepository.createWallet(CreateClientWalletDTO);
+    return await this.walletRepository.createWallet({
+      walletName,
+      blockchainId,
+      walletType,
+    });
   }
 
   // Função para habilitar uma carteira
@@ -82,10 +88,10 @@ export class WalletService {
     dto,
   }: {
     contractId: string;
-    dto: EnableWalletDTO;
+    dto: WalletEnableDTO;
   }): Promise<any> {
-    const { asset, address } = dto as EnableWalletDTO;
-    if (asset === 'rd') {
+    const { asset, address } = dto as WalletEnableDTO;
+    if (asset === 'RD') {
       await this.contractHelper.setContract(
         realDigitalEnableAccountABI,
         contractId,
@@ -94,7 +100,7 @@ export class WalletService {
         .getContract()
         .methods.enableAccount(address)
         .encodeABI();
-      const { transactionId } = await this.tokenService.smartContractSend(
+      const { id: transactionId } = await this.parfinService.smartContractSend(
         contractId,
         parfinSendData,
       );
@@ -108,17 +114,17 @@ export class WalletService {
         transactionData,
       );
 
-      return await this.transactionService.smartContractSignAndPush(
+      return await this.transactionService.transactionSignAndPush(
         transactionId,
         dbTransactionId,
       );
-    } else if (asset === 'rt') {
+    } else if (asset === 'RT') {
       await this.contractHelper.setContract(realTokenizadoABI, contractId);
       parfinSendData.metadata = this.contractHelper
         .getContract()
         .methods.enableAccount(address)
         .encodeABI();
-      const { transactionId } = await this.tokenService.smartContractSend(
+      const { id: transactionId } = await this.parfinService.smartContractSend(
         contractId,
         parfinSendData,
       );
@@ -132,34 +138,13 @@ export class WalletService {
         transactionData,
       );
 
-      return await this.transactionService.smartContractSignAndPush(
+      return await this.transactionService.transactionSignAndPush(
         transactionId,
         dbTransactionId,
       );
-    } else if (asset === 'tpft') {
-      await this.contractHelper.setContract(tpftABI, contractId);
-      parfinSendData.metadata = this.contractHelper
-        .getContract()
-        .methods.enableAccount(address)
-        .encodeABI();
-      const { transactionId } = await this.tokenService.smartContractSend(
-        contractId,
-        parfinSendData,
-      );
-      const transactionData = {
-        parfinTransactionId: transactionId,
-        operation: TransactionOperations.ENABLE_ACCOUNT,
-        asset: AssetTypes.TPFT,
-        ...parfinSendData,
-      };
-      const { id: dbTransactionId } = await this.transactionService.create(
-        transactionData,
-      );
-
-      return await this.transactionService.smartContractSignAndPush(
-        transactionId,
-        dbTransactionId,
-      );
+    } else if (asset === 'TPFT') {
+      console.log('');
+      // TODO: Implementar lógica de habilitação para receber TPFt aqui
     }
   }
 

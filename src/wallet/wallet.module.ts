@@ -8,12 +8,12 @@ import { Wallet, WalletSchema } from './wallet.schema';
 import { PreRequest } from 'src/helpers/pre-request';
 import { ContractHelper } from 'src/helpers/contract';
 import { TransactionsModule } from 'src/transactions/transactions.module';
-import { RealDigitalTokenModule } from 'src/token/token.module';
+import { ParfinService } from 'src/parfin/parfin.service';
 
 @Module({
   imports: [
+    ParfinService,
     TransactionsModule,
-    RealDigitalTokenModule,
     MongooseModule.forFeature([
       { name: Wallet.name, schema: WalletSchema, collection: 'Wallet' },
     ]),

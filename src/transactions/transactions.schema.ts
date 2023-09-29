@@ -6,7 +6,7 @@ import {
   BlockchainNetwork,
   Priority,
   TransactionOperations,
-} from './dtos/create-transaction.dto';
+} from './dtos/transaction.dto';
 
 @Schema()
 class Source {

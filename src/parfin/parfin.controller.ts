@@ -1,12 +1,13 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ParfinService } from './parfin.service';
 import {
-  DeployContractDTO,
-  RegisterContractDTO,
-  ResponseDeployContractDTO,
-  ResponseRegisterContractDTO,
-} from 'src/shared-dtos/contract';
+  ParfinDeployContractDTO,
+  ParfinDeployContractResDTO,
+  ParfinRegisterContractDTO,
+  ParfinRegisterContractResDTO,
+  ParfinContractDTO,
+} from './dtos/parfin.dto';
 
 @Controller('parfin')
 @ApiTags('Parfin Requests')
@@ -16,16 +17,22 @@ export class ParfinController {
   // Rota para realizar o deploy de um contrato
   @Post('contract/deploy')
   async deployContract(
-    @Body() deployContractDTO: DeployContractDTO,
-  ): Promise<ResponseDeployContractDTO> {
+    @Body() deployContractDTO: ParfinDeployContractDTO,
+  ): Promise<ParfinDeployContractResDTO> {
     return await this.parfinService.deployContract(deployContractDTO);
   }
 
   // Rota para realizar o registro de um contrato
   @Post('contract/register')
   async registerContract(
-    @Body() registerContractDTO: RegisterContractDTO,
-  ): Promise<ResponseRegisterContractDTO> {
+    @Body() registerContractDTO: ParfinRegisterContractDTO,
+  ): Promise<ParfinRegisterContractResDTO> {
     return await this.parfinService.registerContract(registerContractDTO);
+  }
+
+  // Rota para obter uma listagem de contratos
+  @Get('contracts')
+  getAllContracts(): Promise<ParfinContractDTO[]> {
+    return this.parfinService.getAllContracts();
   }
 }
