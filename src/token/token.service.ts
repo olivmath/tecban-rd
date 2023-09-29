@@ -1,5 +1,3 @@
-// real-digital-token.service.ts
-import realTokenizadoABI from '../ABI/realTokenizadoABI.json';
 import tpftABI from '../ABI/tpftABI.json';
 
 import { Injectable } from '@nestjs/common';
@@ -31,32 +29,7 @@ export class TokenService {
   // Função para emitir um ativo
   async mint({ contractId, dto }: IService): Promise<any> {
     const { asset, amount, to } = dto as MintDTO;
-    if (asset === 'rt') {
-      await this.contractHelper.setContract(realTokenizadoABI, contractId);
-      parfinSendData.metadata = this.contractHelper
-        .getContract()
-        .methods.mint(to, amount)
-        .encodeABI();
-      const { transactionId } = await this.tokenRepository.smartContractSend(
-        contractId,
-        parfinSendData,
-      );
-
-      const transactionData = {
-        parfinTransactionId: transactionId,
-        operation: TransactionOperations.MINT,
-        asset: AssetTypes.RT,
-        ...parfinSendData,
-      };
-      const { id: dbTransactionId } = await this.transactionService.create(
-        transactionData,
-      );
-
-      return await this.transactionService.smartContractSignAndPush(
-        transactionId,
-        dbTransactionId,
-      );
-    } else if (asset === 'tpft') {
+    if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
       parfinSendData.metadata = this.contractHelper
         .getContract()
@@ -87,33 +60,7 @@ export class TokenService {
   // Função para resgatar um ativo
   async burn({ contractId, dto }: IService): Promise<any> {
     const { asset, amount } = dto as BurnDTO;
-    if (asset === 'rt') {
-      await this.contractHelper.setContract(realTokenizadoABI, contractId);
-      tpftABI;
-      parfinSendData.metadata = this.contractHelper
-        .getContract()
-        .methods.burn(amount)
-        .encodeABI();
-      const { transactionId } = await this.tokenRepository.smartContractSend(
-        contractId,
-        parfinSendData,
-      );
-
-      const transactionData = {
-        parfinTransactionId: transactionId,
-        operation: TransactionOperations.BURN,
-        asset: AssetTypes.RT,
-        ...parfinSendData,
-      };
-      const { id: dbTransactionId } = await this.transactionService.create(
-        transactionData,
-      );
-
-      return await this.transactionService.smartContractSignAndPush(
-        transactionId,
-        dbTransactionId,
-      );
-    } else if (asset === 'tpft') {
+    if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
       parfinSendData.metadata = this.contractHelper
         .getContract()
@@ -144,33 +91,7 @@ export class TokenService {
   // Função para transferência de um ativo
   async transfer({ contractId, dto }: IService): Promise<any> {
     const { asset, amount, to } = dto as TransferDTO;
-    if (asset === 'rt') {
-      // Executar a transferência entre clientes da mesma instituição
-      await this.contractHelper.setContract(realTokenizadoABI, contractId);
-      const data = this.contractHelper
-        .getContract()
-        .methods.transfer(to, amount)
-        .encodeABI();
-      const { transactionId } = await this.tokenRepository.smartContractSend(
-        contractId,
-        data,
-      );
-
-      const transactionData = {
-        parfinTransactionId: transactionId,
-        operation: TransactionOperations.TRANSFER,
-        asset: AssetTypes.RT,
-        ...parfinSendData,
-      };
-      const { id: dbTransactionId } = await this.transactionService.create(
-        transactionData,
-      );
-
-      return await this.transactionService.smartContractSignAndPush(
-        transactionId,
-        dbTransactionId,
-      );
-    } else if (asset === 'tpft') {
+    if (asset === 'tpft') {
       await this.contractHelper.setContract(tpftABI, contractId);
       const data = this.contractHelper
         .getContract()

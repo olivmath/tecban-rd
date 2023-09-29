@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ContractHelper } from 'src/helpers/contract';
 import { IService } from 'src/interfaces/service';
-import strABI from '../ABI/strABI.json';
-import realDigitalABI from '../ABI/realDigitalABI.json';
+import realTokenizadoABI from '../ABI/realTokenizadoABI.json';
 import realDigitalDefaultAccountABI from '../ABI/realDigitalDefaultAccountABI.json';
 
 import { parfinCallData, parfinSendData } from 'src/parfin/mock';
@@ -18,7 +17,7 @@ import {
 import { TokenService } from 'src/token/token.service';
 
 @Injectable()
-export class RealDigitalService {
+export class RealTokenizadoService {
   constructor(
     private readonly contractHelper: ContractHelper,
     private readonly transactionService: TransactionsService,
@@ -26,25 +25,21 @@ export class RealDigitalService {
   ) {}
 
   async mint({ contractId, dto }: IService): Promise<any> {
-    const { amount } = dto as MintDTO;
-    await this.contractHelper.setContract(
-      strABI,
-      parfinSendData.metadata.contractAddress,
-    );
+    const { amount, to } = dto as MintDTO;
+    await this.contractHelper.setContract(realTokenizadoABI, contractId);
     parfinSendData.metadata = this.contractHelper
       .getContract()
-      .methods.requestToMint(amount)
+      .methods.mint(to, amount)
       .encodeABI();
     const { transactionId } = await this.tokenService.smartContractSend(
       contractId,
       parfinSendData,
     );
 
-    //salvar no banco
     const transactionData = {
       parfinTransactionId: transactionId,
       operation: TransactionOperations.MINT,
-      asset: AssetTypes.RD,
+      asset: AssetTypes.RT,
       ...parfinSendData,
     };
     const { id: dbTransactionId } = await this.transactionService.create(
@@ -59,13 +54,10 @@ export class RealDigitalService {
 
   async burn({ contractId, dto }: IService): Promise<any> {
     const { amount } = dto as BurnDTO;
-    await this.contractHelper.setContract(
-      strABI,
-      parfinSendData.metadata.contractAddress,
-    );
+    await this.contractHelper.setContract(realTokenizadoABI, contractId);
     parfinSendData.metadata = this.contractHelper
       .getContract()
-      .methods.requestToBurn(amount)
+      .methods.burn(amount)
       .encodeABI();
     const { transactionId } = await this.tokenService.smartContractSend(
       contractId,
@@ -75,7 +67,7 @@ export class RealDigitalService {
     const transactionData = {
       parfinTransactionId: transactionId,
       operation: TransactionOperations.BURN,
-      asset: AssetTypes.RD,
+      asset: AssetTypes.RT,
       ...parfinSendData,
     };
     const { id: dbTransactionId } = await this.transactionService.create(
@@ -90,39 +82,8 @@ export class RealDigitalService {
 
   async transfer({ contractId, dto }: IService): Promise<any> {
     const { cnpj, amount, to } = dto as TransferDTO;
-
-    await this.contractHelper.setContract(
-      realDigitalDefaultAccountABI,
-      parfinSendData.metadata.contractAddress,
-    );
-    // Buscar o endereço da carteira do destinatário usando o CNPJ da instituição
-    parfinCallData.metadata = this.contractHelper
-      .getContract()
-      .methods.defaultAccount(cnpj)
-      .encodeABI();
-    const { realDigitalDefaultAccounttransactionId } =
-      await this.tokenService.smartContractCall(contractId, parfinCallData);
-
-    const transactionData = {
-      parfinTransactionId: realDigitalDefaultAccounttransactionId,
-      operation: TransactionOperations.TRANSFER,
-      asset: AssetTypes.RD,
-      ...parfinSendData,
-    };
-    const { id: dbTransactionId } = await this.transactionService.create(
-      transactionData,
-    );
-
-    await this.transactionService.smartContractSignAndPush(
-      realDigitalDefaultAccounttransactionId,
-      dbTransactionId,
-      InteractionEnum.CALL,
-    );
-    // Executar a transferência entre instituições distintas
-    await this.contractHelper.setContract(
-      realDigitalABI,
-      parfinSendData.metadata.contractAddress,
-    );
+    // Executar a transferência entre clientes da mesma instituição
+    await this.contractHelper.setContract(realTokenizadoABI, contractId);
     const data = this.contractHelper
       .getContract()
       .methods.transfer(to, amount)
@@ -132,7 +93,15 @@ export class RealDigitalService {
       data,
     );
 
-    transactionData.parfinTransactionId = transactionId;
+    const transactionData = {
+      parfinTransactionId: transactionId,
+      operation: TransactionOperations.TRANSFER,
+      asset: AssetTypes.RT,
+      ...parfinSendData,
+    };
+    const { id: dbTransactionId } = await this.transactionService.create(
+      transactionData,
+    );
 
     return await this.transactionService.smartContractSignAndPush(
       transactionId,
