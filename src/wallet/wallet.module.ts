@@ -22,4 +22,4 @@ import { ParfinService } from 'src/parfin/parfin.service';
   providers: [WalletService, WalletRepository, PreRequest, ContractHelper],
   exports: [WalletService],
 })
-export class WalletModule {}
+export class WalletModule { }

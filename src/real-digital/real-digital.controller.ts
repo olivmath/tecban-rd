@@ -27,7 +27,7 @@ export class RealDigitalController {
   }
 
   // Rota para executar a transferência do token
-  @Post(':contractId/transfer')
+  @Post('real-digital/:contractId/transfer')
   transfer(
     @Param('contractId') contractId: string,
     @Body() transferDTO: RealDigitalTransferDTO,

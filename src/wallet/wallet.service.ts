@@ -23,7 +23,7 @@ export class WalletService {
     private readonly contractHelper: ContractHelper,
     private readonly parfinService: ParfinService,
     private readonly transactionService: TransactionsService,
-  ) {}
+  ) { }
 
   // Gravação: Create a new Wallet
   async createInstitutionWallet({

@@ -23,4 +23,4 @@ import { RealTokenizadoModule } from './real-tokenizado/real-tokenizado.module';
 
   controllers: [HealthController],
 })
-export class AppModule {}
+export class AppModule { }

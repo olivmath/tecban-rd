@@ -12,7 +12,7 @@ import {
 @Controller('parfin')
 @ApiTags('Parfin Requests')
 export class ParfinController {
-  constructor(private readonly parfinService: ParfinService) {}
+  constructor(private readonly parfinService: ParfinService) { }
 
   // Rota para realizar o deploy de um contrato
   @Post('contract/deploy')
