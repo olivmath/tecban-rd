@@ -13,14 +13,14 @@ export class RealDigitalController {
   constructor(private readonly realDigitalService: RealDigitalService) { }
 
   //Rota para executar a emissão do token
-  @Post('real-digital/:contractId/mint')
+  @Post(':contractId/mint')
   mint(@Param('contractId') contractId: string, @Body() mintDTO: RealDigitalMintDTO) {
     // Chama o serviço para executar a emissão (mint)
     return this.realDigitalService.mint({ contractId, dto: mintDTO });
   }
 
   // Rota para executar o resgate do token
-  @Post('real-digital/:contractId/burn')
+  @Post(':contractId/burn')
   burn(@Param('contractId') contractId: string, @Body() burnDTO: RealDigitalBurnDTO) {
     // Chama o serviço para executar o resgate (burn)
     this.realDigitalService.burn({ contractId, dto: burnDTO });

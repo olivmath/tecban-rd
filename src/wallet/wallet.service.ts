@@ -1,11 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { WalletRepository } from './wallet.repository';
 import { Wallet } from './wallet.schema';
-import {
-  WalletCreateDTO,
-  WalletEnableDTO,
-  WalletDTO,
-} from './dto/wallet.dto';
+import { WalletCreateDTO, WalletEnableDTO, WalletDTO } from './dto/wallet.dto';
 
 import keyDictionaryABI from '../ABI/KeyDictionary.abi.json';
 import realDigitalEnableAccountABI from '../ABI/RealDigitalEnableAccount.abi.json';
@@ -30,10 +26,15 @@ export class WalletService {
   ) { }
 
   // Gravação: Create a new Wallet
-  async createInstitutionWallet(dto: WalletCreateDTO): Promise<Wallet> {
+  async createInstitutionWallet({
+    dto: createInstitutionWalletDTO,
+  }: {
+    dto: WalletCreateDTO;
+  }): Promise<Wallet> {
     //chamando a criação de wallet na parfin
-    const resp = await this.walletRepository.createWallet(dto);
-
+    const resp = await this.walletRepository.createWallet(
+      createInstitutionWalletDTO,
+    );
     //salvamos o retorno da parfin no banco
     const wallet = await this.walletRepository.create(resp);
 
@@ -41,16 +42,14 @@ export class WalletService {
   }
 
   // Função para criar uma nova carteira do cliente
-  async createClientWallet(
-    createClientWalletDTO: WalletCreateDTO,
-  ): Promise<any> {
+  async createClientWallet({
+    dto: createClientWalletDTO,
+  }: {
+    dto: WalletCreateDTO;
+  }): Promise<any> {
     //TODO: Implementar lógica para criação de uma nova carteira para um cliente com o contrato KeyDictionary.sol
-    const {
-      contractId,
-      walletName,
-      blockchainId,
-      walletType,
-    } = createClientWalletDTO;
+    const { contractId, walletName, blockchainId, walletType } =
+      createClientWalletDTO;
     await this.contractHelper.setContract(keyDictionaryABI, contractId);
 
     parfinSendData.metadata = this.contractHelper
