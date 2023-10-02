@@ -13,11 +13,9 @@ export class TransactionsRepository {
     @InjectModel(Transaction.name)
     private readonly transactionModel: Model<Transaction>,
     private readonly preRequest: PreRequest,
-  ) { }
+  ) {}
 
-  async create(
-    createTransactionDto: TransactionDTO,
-  ): Promise<Transaction> {
+  async create(createTransactionDto: TransactionDTO): Promise<Transaction> {
     const createdTransaction = new this.transactionModel(createTransactionDto);
     return createdTransaction.save();
   }

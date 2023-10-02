@@ -8,11 +8,11 @@ import { Wallet, WalletSchema } from './wallet.schema';
 import { PreRequest } from 'src/helpers/pre-request';
 import { ContractHelper } from 'src/helpers/contract';
 import { TransactionsModule } from 'src/transactions/transactions.module';
-import { ParfinService } from 'src/parfin/parfin.service';
+import { ParfinModule } from 'src/parfin/parfin.module';
 
 @Module({
   imports: [
-    ParfinService,
+    ParfinModule,
     TransactionsModule,
     MongooseModule.forFeature([
       { name: Wallet.name, schema: WalletSchema, collection: 'Wallet' },
@@ -22,4 +22,4 @@ import { ParfinService } from 'src/parfin/parfin.service';
   providers: [WalletService, WalletRepository, PreRequest, ContractHelper],
   exports: [WalletService],
 })
-export class WalletModule { }
+export class WalletModule {}

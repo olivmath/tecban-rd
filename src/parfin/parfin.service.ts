@@ -12,15 +12,10 @@ import {
   ParfinContractSendResDTO,
   ParfinContractDTO,
 } from './dtos/parfin.dto';
-import { ParfinRepository } from './parfin.repository';
 
 @Injectable()
 export class ParfinService {
-  constructor(
-    private readonly preRequest: PreRequest,
-    private readonly parfinRepository: ParfinRepository,
-
-  ) { }
+  constructor(private readonly preRequest: PreRequest) {}
 
   // Função para realizar o deploy do contrato e retornar o ID do contrato e o hash da transação
   async deployContract(
@@ -38,7 +33,7 @@ export class ParfinService {
   }
 
   async registerContract(
-    registerContractDTO: ParfinRegisterContractDTO
+    registerContractDTO: ParfinRegisterContractDTO,
   ): Promise<ParfinRegisterContractResDTO> {
     try {
       await this.preRequest.setAuthorizationToken();
@@ -47,25 +42,50 @@ export class ParfinService {
       return response.data;
     } catch (error) {
       throw new Error(
-        `Erro ao tentar registrar com o contrato ${registerContractDTO.contractAddress}!`,
+        `Erro ao tentar registrar o contrato ${registerContractDTO.contractAddress}!`,
       );
     }
   }
 
   async getAllContracts(): Promise<ParfinContractDTO[]> {
-    const allContracts = await this.parfinRepository.getAllContracts();
-    return allContracts;
+    try {
+      await this.preRequest.setAuthorizationToken();
+      const response = await parfinApi.get(`/custody/web3/contracts`);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error('Erro ao listar os contratos!');
+    }
   }
 
   async smartContractCall(
-    contractId, data: ParfinContractCallDTO
+    contractId,
+    data: ParfinContractCallDTO,
   ): Promise<ParfinContractCallResDTO> {
-    return await this.parfinRepository.smartContractCall(contractId, data);
+    try {
+      await this.preRequest.setAuthorizationToken();
+      const url = `/custody/web3/contract/call`;
+      const response = await parfinApi.post(url, data);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        `Erro ao tentar visualizar informações do contrato ${contractId}!`,
+      );
+    }
   }
 
   async smartContractSend(
-    contractId: string, data: ParfinContractSendDTO
+    contractId: string,
+    data: ParfinContractSendDTO,
   ): Promise<ParfinContractSendResDTO> {
-    return await this.parfinRepository.smartContractSend(contractId, data);
+    try {
+      await this.preRequest.setAuthorizationToken();
+      const url = `/custody/web3/contract/send`;
+      const response = await parfinApi.post(url, data);
+
+      return response.data;
+    } catch (error) {
+      throw new Error(`Erro ao tentar interagir com o contrato ${contractId}!`);
+    }
   }
 }

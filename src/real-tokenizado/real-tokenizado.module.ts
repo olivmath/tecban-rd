@@ -3,11 +3,11 @@ import { RealTokenizadoController } from './real-tokenizado.controller';
 import { RealTokenizadoService } from './real-tokenizado.service';
 import { ContractHelper } from 'src/helpers/contract';
 import { TransactionsModule } from 'src/transactions/transactions.module';
-import { ParfinService } from 'src/parfin/parfin.service';
+import { ParfinModule } from 'src/parfin/parfin.module';
 
 @Module({
-  imports: [ParfinService, TransactionsModule],
+  imports: [ParfinModule, TransactionsModule],
   controllers: [RealTokenizadoController],
   providers: [RealTokenizadoService, ContractHelper],
 })
-export class RealTokenizadoModule { }
+export class RealTokenizadoModule {}

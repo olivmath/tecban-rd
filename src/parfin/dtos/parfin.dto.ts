@@ -134,6 +134,8 @@ export class ParfinContractSendDTO {
 }
 
 export class ParfinContractSendResDTO {
-  @ApiProperty({ description: 'ID da transação que foi assinada e inserida na blockchain' })
+  @ApiProperty({
+    description: 'ID da transação que foi assinada e inserida na blockchain',
+  })
   id: string;
 }

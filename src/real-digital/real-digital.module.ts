@@ -3,11 +3,11 @@ import { RealDigitalController } from './real-digital.controller';
 import { RealDigitalService } from './real-digital.service';
 import { ContractHelper } from 'src/helpers/contract';
 import { TransactionsModule } from 'src/transactions/transactions.module';
-import { ParfinService } from 'src/parfin/parfin.service';
+import { ParfinModule } from 'src/parfin/parfin.module';
 
 @Module({
-  imports: [ParfinService, TransactionsModule],
+  imports: [ParfinModule, TransactionsModule],
   controllers: [RealDigitalController],
   providers: [RealDigitalService, ContractHelper],
 })
-export class RealDigitalModule { }
+export class RealDigitalModule {}
