@@ -1,19 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { WalletRepository } from './wallet.repository';
 import { Wallet } from './wallet.schema';
-import { WalletCreateDTO, WalletEnableDTO, WalletDTO } from './dto/wallet.dto';
+import { WalletCreateDTO, WalletEnableDTO } from './dto/wallet.dto';
 
-import keyDictionaryABI from '../ABI/KeyDictionary.abi.json';
+// import keyDictionaryABI from '../ABI/KeyDictionary.abi.json';
 import realDigitalEnableAccountABI from '../ABI/RealDigitalEnableAccount.abi.json';
 import realTokenizadoABI from '../ABI/RealTokenizado.abi.json';
 
 import { ContractHelper } from 'src/helpers/contract';
-import { parfinSendData } from 'src/parfin/parfin.body';
 import { TransactionsService } from 'src/transactions/transactions.service';
 import {
   AssetTypes,
   TransactionOperations,
-} from 'src/transactions/dtos/transaction.dto';
+} from 'src/transactions/types/transactions.types';
 import { ParfinService } from 'src/parfin/parfin.service';
 
 @Injectable()
@@ -48,38 +47,40 @@ export class WalletService {
     dto: WalletCreateDTO;
   }): Promise<any> {
     //TODO: Implementar lógica para criação de uma nova carteira para um cliente com o contrato KeyDictionary.sol
-    const { contractId, walletName, blockchainId, walletType } =
-      createClientWalletDTO;
-    await this.contractHelper.setContract(keyDictionaryABI, contractId);
+    // const { walletName, blockchainId, walletType } = createClientWalletDTO;
 
-    parfinSendData.metadata = this.contractHelper
-      .getContract()
-      .methods.addAccount('lorem')
-      .encodeABI();
-    const { id: transactionId } = await this.parfinService.smartContractSend(
-      contractId,
-      parfinSendData,
-    );
+    // this.contractHelper.setContract(keyDictionaryABI);
 
-    const transactionData = {
-      parfinTransactionId: transactionId,
-      operation: TransactionOperations.CREATE_WALLET,
-      asset: null,
-      ...parfinSendData,
-    };
-    const { id: dbTransactionId } = await this.transactionService.create(
-      transactionData,
-    );
+    // parfinSendData.metadata = this.contractHelper
+    //   .getContract()
+    //   .methods.addAccount('lorem')
+    //   .encodeABI();
 
-    await this.transactionService.transactionSignAndPush(
-      transactionId,
-      dbTransactionId,
-    );
-    return await this.walletRepository.createWallet({
-      walletName,
-      blockchainId,
-      walletType,
-    });
+    // const { id: transactionId } = await this.parfinService.smartContractSend(
+    //   contractId,
+    //   parfinSendData,
+    // );
+
+    // const transactionData = {
+    //   parfinTransactionId: transactionId,
+    //   operation: TransactionOperations.CREATE_WALLET,
+    //   asset: null,
+    //   ...parfinSendData,
+    // };
+    // const { id: dbTransactionId } = await this.transactionService.create(
+    //   transactionData,
+    // );
+
+    // await this.transactionService.transactionSignAndPush(
+    //   transactionId,
+    //   dbTransactionId,
+    // );
+    // return await this.walletRepository.createWallet({
+    //   walletName,
+    //   blockchainId,
+    //   walletType,
+    // });
+    console.log();
   }
 
   // Função para habilitar uma carteira
@@ -149,7 +150,7 @@ export class WalletService {
   }
 
   // Consulta: Retrieve a Wallet by its ID
-  async getWalletById(id: string): Promise<WalletDTO> {
+  async getWalletById(id: string): Promise<Wallet> {
     const wallet = await this.walletRepository.findById(id);
     if (!wallet) {
       throw new NotFoundException(`Wallet with ID ${id} not found`);
@@ -158,7 +159,7 @@ export class WalletService {
   }
 
   // Listagem: List all Wallets
-  async getAllWallets(): Promise<WalletDTO[]> {
+  async getAllWallets(): Promise<Wallet[]> {
     return await this.walletRepository.findAll();
   }
 }

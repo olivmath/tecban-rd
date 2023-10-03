@@ -1,65 +1,44 @@
 // create-transaction.dto.ts
-import { IsString, IsEnum, IsOptional } from 'class-validator';
-
-export enum Priority {
-  HIGH = 'HIGH',
-  MEDIUM = 'MEDIUM',
-  LOW = 'LOW',
-}
-
-export enum BlockchainNetwork {
-  Mainnet = 'Mainnet',
-  Testnet = 'Testnet',
-}
-
-export enum TransactionOperations {
-  MINT = 'Mint',
-  BURN = 'Burn',
-  TRANSFER = 'Transfer',
-  ENABLE_ACCOUNT = 'EnableAccount',
-  CREATE_WALLET = 'CreateWallet',
-}
-
-export enum AssetTypes {
-  RD = 'RD',
-  RT = 'RT',
-  TPFT = 'TPFT',
-}
+import { IsString, IsEnum, IsOptional, IsObject } from 'class-validator';
+import { InteractMetadata, Priority, Source } from 'src/parfin/types/parfin.types';
+import { AssetTypes, BlockchainNetwork, TransactionOperations } from '../types/transactions.types';
+import { BlockchainId } from 'src/wallet/types/wallet.types';
 
 export class TransactionDTO {
   @IsString()
   parfinTransactionId: string;
 
   @IsString()
-  customerTag: string;
+  customerTag?: string;
 
   @IsString()
-  customerRefId: string;
+  customerRefId?: string;
 
   @IsString()
   asset: AssetTypes | null;
 
   @IsString()
-  source: {
-    assetId: string;
-  };
+  source?: Source;
 
-  @IsString()
   @IsString()
   operation: TransactionOperations;
 
-  @IsString()
-  metadata: {
-    data: string;
-    contractAddress: string;
-  };
+  @IsObject()
+  callMetadata?: InteractMetadata;
+
+  @IsObject()
+  sendMetadata?: InteractMetadata;
 
   @IsEnum(Priority)
-  priority: Priority;
+  priority?: Priority;
 
   @IsEnum(BlockchainNetwork)
   @IsOptional()
   blockchainNetwork?: BlockchainNetwork;
+
+  @IsEnum(BlockchainId)
+  @IsOptional()
+  blockchainId?: BlockchainId;
 
   @IsString()
   @IsOptional()

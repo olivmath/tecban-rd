@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Transaction } from './transactions.schema';
 import { TransactionDTO } from './dtos/transaction.dto';
 import { TransactionsRepository } from './transactions.repository';
+import { ParfinService } from 'src/parfin/parfin.service';
 
 export enum InteractionEnum {
   CALL = 'Call',
@@ -13,6 +14,7 @@ export enum InteractionEnum {
 export class TransactionsService {
   constructor(
     private readonly transactionsRepository: TransactionsRepository,
+    private readonly parfinService: ParfinService,
   ) { }
 
   async create(
@@ -63,11 +65,11 @@ export class TransactionsService {
       }
 
       //chamar o transaction repository
-      await this.transactionsRepository.transactionSignAndPush(id);
+      await this.parfinService.transactionSignAndPush(id);
 
       //pegar a transação criada pela parfin
       const parfinTransaction =
-        await this.transactionsRepository.getTransactionById(id);
+        await this.parfinService.getTransactionById(id);
 
       //update a transaction
       const { blockchainNetwork, statusDescription } = parfinTransaction;
@@ -79,11 +81,7 @@ export class TransactionsService {
       //retornar o status da transaction
       return { statusDescription };
     } else {
-      await this.transactionsRepository.transactionSignAndPush(id);
+      await this.parfinService.transactionSignAndPush(id);
     }
-  }
-
-  async getTransactionById(id: string) {
-    return await this.transactionsRepository.getTransactionById(id);
   }
 }

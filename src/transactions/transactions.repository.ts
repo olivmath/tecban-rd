@@ -12,8 +12,7 @@ export class TransactionsRepository {
   constructor(
     @InjectModel(Transaction.name)
     private readonly transactionModel: Model<Transaction>,
-    private readonly preRequest: PreRequest,
-  ) {}
+  ) { }
 
   async create(createTransactionDto: TransactionDTO): Promise<Transaction> {
     const createdTransaction = new this.transactionModel(createTransactionDto);
@@ -39,28 +38,5 @@ export class TransactionsRepository {
 
   async remove(id: string): Promise<Transaction> {
     return this.transactionModel.findOneAndDelete({ id }).exec();
-  }
-
-  // Função que chama API da Parfin para interagir com um contrato
-  async transactionSignAndPush(id: string) {
-    try {
-      await this.preRequest.setAuthorizationToken();
-      const url = `/transaction/${id}/sign-and-push`;
-      const response = await parfinApi.put(url, id);
-      return response.data;
-    } catch (error) {
-      throw new Error(`Erro ao tentar assinar a transação ${id}!`);
-    }
-  }
-
-  async getTransactionById(id: string) {
-    try {
-      await this.preRequest.setAuthorizationToken();
-      const url = `/transaction/${id}/`;
-      const response = await parfinApi.get(url);
-      return response.data;
-    } catch (error) {
-      throw new Error(`Erro ao tentar solicitar a transação ${id}!`);
-    }
   }
 }

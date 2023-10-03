@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Wallet, WalletDocument } from '../wallet/wallet.schema';
 import { Model } from 'mongoose';
 import {
-  WalletDTO,
   WalletCreateDTO
 } from './dto/wallet.dto';
 import { parfinApi } from 'src/config/parfin-api-client';
@@ -17,16 +16,16 @@ export class WalletRepository {
     private preRequest: PreRequest,
   ) { }
 
-  async create(createWalletDTO: WalletDTO): Promise<Wallet> {
-    const walletModel = new this.walletModel(createWalletDTO);
+  async create(createWallet: WalletCreateDTO): Promise<Wallet> {
+    const walletModel = new this.walletModel(createWallet);
     return await walletModel.save();
   }
 
-  async findAll(): Promise<WalletDTO[]> {
+  async findAll(): Promise<Wallet[]> {
     return await this.walletModel.find({ enabled: true }).exec();
   }
 
-  async findById(id: string): Promise<WalletDTO> {
+  async findById(id: string): Promise<Wallet> {
     return await this.walletModel.findOne({ id, active: true }).exec();
   }
 

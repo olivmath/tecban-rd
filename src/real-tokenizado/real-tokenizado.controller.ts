@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import {
   RealTokenizadoMintDTO,
   RealTokenizadoBurnDTO,
-  RealTokenizadoTransferDTO
+  RealTokenizadoInternalTransferDTO,
 } from './dtos/real-tokenizado.dto';
 import { RealTokenizadoService } from './real-tokenizado.service';
 
@@ -13,26 +13,23 @@ export class RealTokenizadoController {
   constructor(private readonly realTokenizadoService: RealTokenizadoService) { }
 
   //Rota para executar a emissão do token
-  @Post(':contractId/mint')
-  mint(@Param('contractId') contractId: string, @Body() mintDTO: RealTokenizadoMintDTO) {
+  @Post('rt/mint')
+  mint(@Body() dto: RealTokenizadoMintDTO) {
     // Chama o serviço para executar a emissão (mint)
-    return this.realTokenizadoService.mint({ contractId, dto: mintDTO });
+    return this.realTokenizadoService.mint({ dto });
   }
 
   // Rota para executar o resgate do token
-  @Post(':contractId/burn')
-  burn(@Param('contractId') contractId: string, @Body() burnDTO: RealTokenizadoBurnDTO) {
+  @Post('rt/burn')
+  burn(@Body() dto: RealTokenizadoBurnDTO) {
     // Chama o serviço para executar o resgate (burn)
-    this.realTokenizadoService.burn({ contractId, dto: burnDTO });
+    this.realTokenizadoService.burn({ dto });
   }
 
-  // Rota para executar a transferência do token
-  @Post(':contractId/transfer')
-  transfer(
-    @Param('contractId') contractId: string,
-    @Body() transferDTO: RealTokenizadoTransferDTO,
-  ) {
+  // Rota para executar a transferência do token entre clientes da mesma insituição
+  @Post('rt/internal-transfer')
+  transfer(@Body() dto: RealTokenizadoInternalTransferDTO,) {
     // Chama o serviço para lidar com a transferência
-    return this.realTokenizadoService.transfer({ contractId, dto: transferDTO });
+    return this.realTokenizadoService.internalTransfer({ dto });
   }
 }

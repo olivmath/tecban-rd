@@ -1,21 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { ParfinContractInteractDTO } from 'src/parfin/dtos/parfin.dto';
 
-export class RealDigitalMintDTO {
+export class RealDigitalMintDTO extends ParfinContractInteractDTO {
   @ApiProperty({ description: 'Quantidade a ser emitida' })
   @IsNumber()
   @IsNotEmpty()
   amount: number;
 }
 
-export class RealDigitalBurnDTO {
+export class RealDigitalBurnDTO extends ParfinContractInteractDTO {
   @ApiProperty({ description: 'Quantidade a ser queimada' })
   @IsNumber()
   @IsNotEmpty()
   amount: number;
 }
 
-export class RealDigitalTransferDTO {
+export class RealDigitalTransferDTO extends ParfinContractInteractDTO {
   @ApiProperty({ description: 'CNPJ do destinatário' })
   @IsString()
   @IsNotEmpty()

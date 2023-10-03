@@ -4,9 +4,9 @@ import { Document } from 'mongoose';
 import {
   AssetTypes,
   BlockchainNetwork,
-  Priority,
   TransactionOperations,
-} from './dtos/transaction.dto';
+} from './types/transactions.types';
+import { Priority } from 'src/parfin/types/parfin.types';
 
 @Schema()
 class Source {

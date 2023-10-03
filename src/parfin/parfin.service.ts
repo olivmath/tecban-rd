@@ -3,51 +3,23 @@ import { parfinApi } from 'src/config/parfin-api-client';
 import { PreRequest } from 'src/helpers/pre-request';
 import {
   ParfinDeployContractDTO,
-  ParfinDeployContractResDTO,
   ParfinRegisterContractDTO,
-  ParfinRegisterContractResDTO,
-  ParfinContractCallDTO,
-  ParfinContractCallResDTO,
-  ParfinContractSendDTO,
-  ParfinContractSendResDTO,
-  ParfinContractDTO,
+  ParfinContractInteractDTO,
 } from './dtos/parfin.dto';
+import {
+  ParfinSuccessRes,
+  ParfinRegisterContractSuccessRes,
+  ParfinGetAllContractsSuccessRes,
+  ParfinContractCallSuccessRes,
+  ParfinErrorRes,
+} from 'src/res/parfin.responses';
 
 @Injectable()
 export class ParfinService {
-  constructor(private readonly preRequest: PreRequest) {}
+  constructor(private readonly preRequest: PreRequest) { }
 
-  // Função para realizar o deploy do contrato e retornar o ID do contrato e o hash da transação
-  async deployContract(
-    deployContractDTO: ParfinDeployContractDTO,
-  ): Promise<ParfinDeployContractResDTO> {
-    // Aqui você pode implementar a lógica para realizar o deploy do contrato
-    // Por enquanto, vamos apenas simular o deploy e retornar um objeto com o ID do contrato e o hash da transação
-    const contractId = 'CONTRACT_ID_EXAMPLE';
-    const transactionHash = 'TRANSACTION_HASH_EXAMPLE';
-
-    return {
-      contractId,
-      transactionHash,
-    };
-  }
-
-  async registerContract(
-    registerContractDTO: ParfinRegisterContractDTO,
-  ): Promise<ParfinRegisterContractResDTO> {
-    try {
-      await this.preRequest.setAuthorizationToken();
-      const url = `/custody/web3/contract`;
-      const response = await parfinApi.post(url, registerContractDTO);
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        `Erro ao tentar registrar o contrato ${registerContractDTO.contractAddress}!`,
-      );
-    }
-  }
-
-  async getAllContracts(): Promise<ParfinContractDTO[]> {
+  //--- Web3 Endpoints
+  async getAllContracts(): Promise<ParfinGetAllContractsSuccessRes[] | ParfinErrorRes> {
     try {
       await this.preRequest.setAuthorizationToken();
       const response = await parfinApi.get(`/custody/web3/contracts`);
@@ -58,34 +30,84 @@ export class ParfinService {
     }
   }
 
-  async smartContractCall(
-    contractId,
-    data: ParfinContractCallDTO,
-  ): Promise<ParfinContractCallResDTO> {
+  async deployContract(
+    dto: ParfinDeployContractDTO,
+  ): Promise<ParfinSuccessRes | ParfinErrorRes> {
+    // Aqui você pode implementar a lógica para realizar o deploy do contrato
+    // Por enquanto, vamos apenas simular o deploy e retornar um objeto com o ID do contrato e o hash da transação
+    const id = 'TRANSACTION_ID_EXAMPLE';
+
+    return {
+      id
+    };
+  }
+
+  async registerContract(
+    dto: ParfinRegisterContractDTO,
+  ): Promise<ParfinRegisterContractSuccessRes | ParfinErrorRes> {
+    const { contractAddress } = dto;
     try {
       await this.preRequest.setAuthorizationToken();
-      const url = `/custody/web3/contract/call`;
-      const response = await parfinApi.post(url, data);
+      const url = `/custody/web3/contract`;
+      const response = await parfinApi.post(url, dto);
       return response.data;
     } catch (error) {
       throw new Error(
-        `Erro ao tentar visualizar informações do contrato ${contractId}!`,
+        `Erro ao tentar registrar o contrato: ${contractAddress}`,
+      );
+    }
+  }
+
+  async smartContractCall(
+    dto: ParfinContractInteractDTO,
+  ): Promise<ParfinContractCallSuccessRes | ParfinErrorRes> {
+    const { callMetadata: { contractAddress } } = dto;
+    try {
+      await this.preRequest.setAuthorizationToken();
+      const url = `/custody/web3/contract/call`;
+      const response = await parfinApi.post(url, dto);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        `Erro ao tentar visualizar informações do contrato: ${contractAddress}`,
       );
     }
   }
 
   async smartContractSend(
-    contractId: string,
-    data: ParfinContractSendDTO,
-  ): Promise<ParfinContractSendResDTO> {
+    dto: ParfinContractInteractDTO,
+  ): Promise<ParfinSuccessRes | ParfinErrorRes> {
+    const { sendMetadata: { contractAddress } } = dto;
     try {
       await this.preRequest.setAuthorizationToken();
       const url = `/custody/web3/contract/send`;
-      const response = await parfinApi.post(url, data);
-
+      const response = await parfinApi.post(url, dto);
       return response.data;
     } catch (error) {
-      throw new Error(`Erro ao tentar interagir com o contrato ${contractId}!`);
+      throw new Error(`Erro ao tentar interagir com o contrato: ${contractAddress}`);
+    }
+  }
+
+  //--- Transaction Endpoints
+  async transactionSignAndPush(id: string) {
+    try {
+      await this.preRequest.setAuthorizationToken();
+      const url = `/transaction/${id}/sign-and-push`;
+      const response = await parfinApi.put(url, id);
+      return response.data;
+    } catch (error) {
+      throw new Error(`Erro ao tentar assinar a transação ${id}!`);
+    }
+  }
+
+  async getTransactionById(id: string) {
+    try {
+      await this.preRequest.setAuthorizationToken();
+      const url = `/transaction/${id}/`;
+      const response = await parfinApi.get(url);
+      return response.data;
+    } catch (error) {
+      throw new Error(`Erro ao tentar solicitar a transação ${id}!`);
     }
   }
 }

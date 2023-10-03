@@ -6,14 +6,13 @@ import {
 import {
   RealTokenizadoMintDTO,
   RealTokenizadoBurnDTO,
-  RealTokenizadoTransferDTO
+  RealTokenizadoInternalTransferDTO
 } from 'src/real-tokenizado/dtos/real-tokenizado.dto';
-export interface IService {
+export interface IServiceDTO {
   dto: RealDigitalMintDTO |
   RealDigitalBurnDTO |
   RealDigitalTransferDTO |
   RealTokenizadoMintDTO |
   RealTokenizadoBurnDTO |
-  RealTokenizadoTransferDTO;
-  contractId?: string;
+  RealTokenizadoInternalTransferDTO;
 }

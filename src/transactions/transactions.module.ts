@@ -6,9 +6,11 @@ import { TransactionsService } from './transactions.service';
 import { Transaction, TransactionSchema } from './transactions.schema';
 import { PreRequest } from 'src/helpers/pre-request';
 import { TransactionsRepository } from './transactions.repository';
+import { ParfinModule } from 'src/parfin/parfin.module';
 
 @Module({
   imports: [
+    ParfinModule,
     MongooseModule.forFeature([
       {
         name: Transaction.name,
@@ -19,6 +21,6 @@ import { TransactionsRepository } from './transactions.repository';
   ],
   controllers: [TransactionsController],
   providers: [TransactionsService, PreRequest, TransactionsRepository],
-  exports:[TransactionsService]
+  exports: [TransactionsService]
 })
-export class TransactionsModule {}
+export class TransactionsModule { }
