@@ -31,7 +31,7 @@ export class WalletService {
     dto: WalletCreateDTO;
   }): Promise<Wallet> {
     //chamando a criação de wallet na parfin
-    const resp = await this.walletRepository.createWallet(
+    const resp = await this.parfinService.createWallet(
       createInstitutionWalletDTO,
     );
     //salvamos o retorno da parfin no banco

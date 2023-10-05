@@ -13,10 +13,33 @@ import {
   ParfinContractCallSuccessRes,
   ParfinErrorRes,
 } from 'src/res/parfin.responses';
+import { WalletCreateDTO } from 'src/wallet/dto/wallet.dto';
 
 @Injectable()
 export class ParfinService {
   constructor(private readonly preRequest: PreRequest) { }
+
+  //--- Wallet Endpoints
+  async createWallet({ walletName, blockchainId, walletType }: WalletCreateDTO) {
+    const data = {
+      walletName,
+      blockchainId,
+      walletType,
+    }
+    try {
+      await this.preRequest.setAuthorizationToken();
+      const url = `/wallet`;
+      const response = await parfinApi.post(url, data, {
+        headers: {
+          'x-api-key': process.env.X_API_KEY,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      throw new Error(`Erro ao tentar criar uma nova carteira!`);
+    }
+  }
 
   //--- Web3 Endpoints
   async getAllContracts(): Promise<ParfinGetAllContractsSuccessRes[] | ParfinErrorRes> {
