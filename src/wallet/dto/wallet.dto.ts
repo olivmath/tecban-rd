@@ -4,6 +4,7 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { BlockchainId, WalletType } from '../types/wallet.types';
+import { ParfinContractInteractDTO } from 'src/parfin/dtos/parfin.dto';
 export class WalletCreateDTO {
   @ApiProperty({ description: 'Nome da carteira' })
   @IsString()
@@ -30,10 +31,10 @@ export class WalletCreateDTO {
   @IsNotEmpty()
   walletType: WalletType = WalletType.CUSTODY;
 }
-export class WalletEnableDTO {
+export class WalletEnableDTO extends ParfinContractInteractDTO {
   @ApiProperty({ description: 'Ativo da carteira' })
   asset: string;
 
   @ApiProperty({ description: 'Endereço da carteira' })
-  address: string;
+  walletAddress: string;
 }

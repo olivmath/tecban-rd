@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { RealTokenizadoController } from './real-tokenizado.controller';
 import { RealTokenizadoService } from './real-tokenizado.service';
-import { ContractHelper } from 'src/helpers/contract';
+import { ContractHelper } from 'src/helpers/contract/contract';
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import { ParfinModule } from 'src/parfin/parfin.module';
 
@@ -10,4 +10,4 @@ import { ParfinModule } from 'src/parfin/parfin.module';
   controllers: [RealTokenizadoController],
   providers: [RealTokenizadoService, ContractHelper],
 })
-export class RealTokenizadoModule {}
+export class RealTokenizadoModule { }

@@ -1,11 +1,10 @@
 import { ParfinContractInteractDTO } from 'src/parfin/dtos/parfin.dto';
-import ParfinContractWrapper from '../ParfinContractWrapper';
+import ParfinContractWrapper from '../../utils/contract/contract-wrapper';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { Contract } from 'web3-eth-contract';
 import { Injectable } from '@nestjs/common';
-import abiLoader from '../abiLoader';
+import abiLoader from '../abi-loader';
 import Web3 from 'web3';
-import { PreRequest } from '../pre-request';
 
 export const discoveryAddress = process.env['ADDRESS_DISCOVERY_ADDRESS'];
 export type ContractName =

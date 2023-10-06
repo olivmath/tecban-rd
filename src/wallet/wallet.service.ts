@@ -7,13 +7,14 @@ import { WalletCreateDTO, WalletEnableDTO } from './dto/wallet.dto';
 import realDigitalEnableAccountABI from '../ABI/RealDigitalEnableAccount.abi.json';
 import realTokenizadoABI from '../ABI/RealTokenizado.abi.json';
 
-import { ContractHelper } from 'src/helpers/contract';
+import { ContractHelper } from 'src/helpers/contract/contract';
 import { TransactionsService } from 'src/transactions/transactions.service';
 import {
   AssetTypes,
   TransactionOperations,
 } from 'src/transactions/types/transactions.types';
 import { ParfinService } from 'src/parfin/parfin.service';
+import { ParfinSuccessRes } from 'src/res/parfin.responses';
 
 @Injectable()
 export class WalletService {
@@ -51,21 +52,21 @@ export class WalletService {
 
     // this.contractHelper.setContract(keyDictionaryABI);
 
-    // parfinSendData.metadata = this.contractHelper
+    // parfinDTO.metadata = this.contractHelper
     //   .getContract()
     //   .methods.addAccount('lorem')
     //   .encodeABI();
 
     // const { id: transactionId } = await this.parfinService.smartContractSend(
-    //   contractId,
-    //   parfinSendData,
+    //   contractAddress,
+    //   parfinDTO,
     // );
 
     // const transactionData = {
     //   parfinTransactionId: transactionId,
     //   operation: TransactionOperations.CREATE_WALLET,
     //   asset: null,
-    //   ...parfinSendData,
+    //   ...parfinDTO,
     // };
     // const { id: dbTransactionId } = await this.transactionService.create(
     //   transactionData,
@@ -84,32 +85,33 @@ export class WalletService {
   }
 
   // Função para habilitar uma carteira
-  async enableWallet({
-    contractId,
-    dto,
-  }: {
-    contractId: string;
+  async enableWallet({ dto }: {
     dto: WalletEnableDTO;
   }): Promise<any> {
-    const { asset, address } = dto as WalletEnableDTO;
+    const { asset, walletAddress } = dto as WalletEnableDTO;
+    const parfinDTO = dto as Omit<
+      WalletEnableDTO, 'asset' | 'walletAddress' | 'callMetadata' | 'blockchainId'
+    >;
+    const { contractAddress } = parfinDTO.sendMetadata; // TODO: usar o AddressDiscovery.sol
+
     if (asset === 'RD') {
-      await this.contractHelper.setContract(
+      this.contractHelper.setContract(
         realDigitalEnableAccountABI,
-        contractId,
+        contractAddress,
       );
-      parfinSendData.metadata = this.contractHelper
+      parfinDTO.sendMetadata = this.contractHelper
         .getContract()
-        .methods.enableAccount(address)
+        .methods.enableAccount(walletAddress)
         .encodeABI();
-      const { id: transactionId } = await this.parfinService.smartContractSend(
-        contractId,
-        parfinSendData,
-      );
+
+      const parfinSendRes = await this.parfinService.smartContractSend(parfinDTO);
+      const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+
       const transactionData = {
         parfinTransactionId: transactionId,
         operation: TransactionOperations.ENABLE_ACCOUNT,
         asset: AssetTypes.RD,
-        ...parfinSendData,
+        ...parfinDTO,
       };
       const { id: dbTransactionId } = await this.transactionService.create(
         transactionData,
@@ -120,20 +122,20 @@ export class WalletService {
         dbTransactionId,
       );
     } else if (asset === 'RT') {
-      await this.contractHelper.setContract(realTokenizadoABI, contractId);
-      parfinSendData.metadata = this.contractHelper
+      this.contractHelper.setContract(realTokenizadoABI, contractAddress);
+      parfinDTO.sendMetadata = this.contractHelper
         .getContract()
-        .methods.enableAccount(address)
+        .methods.enableAccount(walletAddress)
         .encodeABI();
-      const { id: transactionId } = await this.parfinService.smartContractSend(
-        contractId,
-        parfinSendData,
-      );
+
+      const parfinSendRes = await this.parfinService.smartContractSend(parfinDTO);
+      const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+
       const transactionData = {
         parfinTransactionId: transactionId,
         operation: TransactionOperations.ENABLE_ACCOUNT,
         asset: AssetTypes.RT,
-        ...parfinSendData,
+        ...parfinDTO,
       };
       const { id: dbTransactionId } = await this.transactionService.create(
         transactionData,

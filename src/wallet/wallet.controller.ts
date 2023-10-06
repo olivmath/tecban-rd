@@ -31,21 +31,17 @@ export class WalletController {
 
   // Rota para criar uma nova carteira de um cliente
   @Post('client-create')
-  createClientWallet(@Body() createClientWalletDTO: WalletCreateDTO) {
+  createClientWallet(@Body() dto: WalletCreateDTO) {
     // Chama o serviço para criar uma nova carteira
-    return this.walletService.createClientWallet({ dto: createClientWalletDTO });
+    return this.walletService.createClientWallet({ dto });
   }
 
   // Rota para habilitar uma nova
   @Post('enable')
   enableWallet(
-    @Param('contractId') contractId: string,
-    @Body() enableWalletDTO: WalletEnableDTO,
+    @Body() dto: WalletEnableDTO,
   ) {
     // Chama o serviço para habilitar uma carteira
-    return this.walletService.enableWallet({
-      contractId,
-      dto: enableWalletDTO,
-    });
+    return this.walletService.enableWallet({ dto });
   }
 }

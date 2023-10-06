@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { RealDigitalController } from './real-digital.controller';
 import { RealDigitalService } from './real-digital.service';
-import { ContractHelper } from 'src/helpers/contract';
+import { ContractHelper } from 'src/helpers/contract/contract';
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import { ParfinModule } from 'src/parfin/parfin.module';
 
@@ -10,4 +10,4 @@ import { ParfinModule } from 'src/parfin/parfin.module';
   controllers: [RealDigitalController],
   providers: [RealDigitalService, ContractHelper],
 })
-export class RealDigitalModule {}
+export class RealDigitalModule { }

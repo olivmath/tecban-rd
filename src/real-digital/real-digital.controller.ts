@@ -29,7 +29,6 @@ export class RealDigitalController {
   // Rota para executar a transferência do token
   @Post('rd/external-transfer')
   transfer(
-    @Param('contractId') contractId: string,
     @Body() dto: RealDigitalTransferDTO,
   ) {
     // Chama o serviço para lidar com a transferência

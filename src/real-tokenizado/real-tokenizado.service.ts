@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ContractHelper } from 'src/helpers/contract';
+import { ContractHelper } from 'src/helpers/contract/contract';
 import { IServiceDTO } from 'src/interfaces/service';
 import realTokenizadoABI from '../ABI/RealTokenizado.abi.json';
 import keyDictionaryABI from '../ABI/KeyDictionary.abi.json';

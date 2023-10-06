@@ -1,5 +1,5 @@
-import ParfinContractWrapper from '.';
-import abiLoader from '../abiLoader';
+import ParfinContractWrapper from './contract-wrapper';
+import abiLoader from '../../helpers/abi-loader';
 
 describe('ParfinContractWrapper', () => {
     let parfinContractWrapper: ParfinContractWrapper;
