@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Get, Param } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WalletService } from './wallet.service';
 import {
   WalletCreateDTO,
@@ -7,41 +7,37 @@ import {
 } from './dto/wallet.dto';
 
 @Controller('wallet')
-@ApiTags('Wallet')
+@ApiTags('Wallet Operations')
 export class WalletController {
   constructor(private readonly walletService: WalletService) { }
 
   @Get('wallets')
+  @ApiOperation({ summary: 'Get all', description: 'Get all wallets' })
   getAllWallets() {
     return this.walletService.getAllWallets();
   }
 
   @Get(':walletId')
+  @ApiOperation({ summary: 'Get wallet by id', description: 'Get a single wallet by id' })
   getWalletById(walletId: string) {
     return this.walletService.getWalletById(walletId);
   }
 
-  // Rota para criar uma nova carteira da instituição
   @Post('institution-create')
+  @ApiOperation({ summary: 'Create an institution wallet', description: 'Create a wallet for a financial institution' })
   createInstitutionWallet(@Body() createInstitutuionWalletDTO: WalletCreateDTO) {
-    // Chama o serviço para criar uma nova carteira
-
     return this.walletService.createInstitutionWallet({ dto: createInstitutuionWalletDTO });
   }
 
-  // Rota para criar uma nova carteira de um cliente
   @Post('client-create')
+  @ApiOperation({ summary: 'Create a client wallet', description: 'Create a wallet for a client of a financial institution' })
   createClientWallet(@Body() dto: WalletCreateDTO) {
-    // Chama o serviço para criar uma nova carteira
     return this.walletService.createClientWallet({ dto });
   }
 
-  // Rota para habilitar uma nova
   @Post('enable')
-  enableWallet(
-    @Body() dto: WalletEnableDTO,
-  ) {
-    // Chama o serviço para habilitar uma carteira
+  @ApiOperation({ summary: 'Enable a wallet', description: 'Enable a wallet to transact a specific asset' })
+  enableWallet(@Body() dto: WalletEnableDTO) {
     return this.walletService.enableWallet({ dto });
   }
 }

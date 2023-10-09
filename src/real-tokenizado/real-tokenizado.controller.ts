@@ -1,5 +1,5 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   RealTokenizadoMintDTO,
   RealTokenizadoBurnDTO,
@@ -8,28 +8,25 @@ import {
 import { RealTokenizadoService } from './real-tokenizado.service';
 
 @Controller('real-tokenizado')
-@ApiTags('Real Tokenizado Token')
+@ApiTags('Real Tokenizado Operations')
 export class RealTokenizadoController {
   constructor(private readonly realTokenizadoService: RealTokenizadoService) { }
 
-  //Rota para executar a emissão do token
-  @Post('rt/mint')
+  @Post('mint')
+  @ApiOperation({ summary: 'Mint Real Tokenizado', description: 'Mint Real Tokenizado token to an enabled wallet' })
   mint(@Body() dto: RealTokenizadoMintDTO) {
-    // Chama o serviço para executar a emissão (mint)
     return this.realTokenizadoService.mint({ dto });
   }
 
-  // Rota para executar o resgate do token
-  @Post('rt/burn')
+  @Post('burn')
+  @ApiOperation({ summary: 'Burn Real Tokenizado', description: 'Burn Real Tokenizado token from an enabled wallet' })
   burn(@Body() dto: RealTokenizadoBurnDTO) {
-    // Chama o serviço para executar o resgate (burn)
     this.realTokenizadoService.burn({ dto });
   }
 
-  // Rota para executar a transferência do token entre clientes da mesma insituição
-  @Post('rt/internal-transfer')
+  @Post('internal-transfer')
+  @ApiOperation({ summary: 'Tranfer Real Tokenizado (Internal)', description: 'Transfer Real Tokenizado token between clients from the same financial institution' })
   transfer(@Body() dto: RealTokenizadoInternalTransferDTO,) {
-    // Chama o serviço para lidar com a transferência
     return this.realTokenizadoService.internalTransfer({ dto });
   }
 }
