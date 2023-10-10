@@ -8,21 +8,19 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { ParfinModule } from './parfin/parfin.module';
 import { RealDigitalModule } from './real-digital/real-digital.module';
 import { RealTokenizadoModule } from './real-tokenizado/real-tokenizado.module';
-import { ContractHelperModule } from './helpers/contract/module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
-    MongooseModule.forRoot(process.env.DATABASE_URL),
-    TerminusModule,
-    ParfinModule,
-    RealDigitalModule,
-    RealTokenizadoModule,
-    TransactionsModule,
-    WalletModule,
-    ContractHelperModule,
-  ],
+    imports: [
+        ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+        MongooseModule.forRoot(process.env.DATABASE_URL),
+        TerminusModule,
+        ParfinModule,
+        RealDigitalModule,
+        RealTokenizadoModule,
+        TransactionsModule,
+        WalletModule,
+    ],
 
-  controllers: [HealthController],
+    controllers: [HealthController],
 })
-export class AppModule { }
+export class AppModule {}

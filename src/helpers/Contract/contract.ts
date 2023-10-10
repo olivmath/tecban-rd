@@ -62,7 +62,7 @@ export class ContractHelper {
 
         // mount Parfin's payload
         const payload = new ParfinContractInteractDTO();
-        payload.callMetadata = {
+        payload.metadata = {
             data: data,
             contractAddress: discoveryAddress,
         };

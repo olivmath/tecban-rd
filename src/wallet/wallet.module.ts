@@ -6,20 +6,20 @@ import { WalletController } from './wallet.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Wallet, WalletSchema } from './wallet.schema';
 import { PreRequest } from 'src/helpers/pre-request';
-import { ContractHelper } from 'src/helpers/contract/contract';
+import { ContractHelper } from 'src/helpers/Contract/contract';
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import { ParfinModule } from 'src/parfin/parfin.module';
 
 @Module({
-  imports: [
-    ParfinModule,
-    TransactionsModule,
-    MongooseModule.forFeature([
-      { name: Wallet.name, schema: WalletSchema, collection: 'Wallet' },
-    ]),
-  ],
-  controllers: [WalletController],
-  providers: [WalletService, WalletRepository, PreRequest, ContractHelper],
-  exports: [WalletService],
+    imports: [
+        ParfinModule,
+        TransactionsModule,
+        MongooseModule.forFeature([
+            { name: Wallet.name, schema: WalletSchema, collection: 'Wallet' },
+        ]),
+    ],
+    controllers: [WalletController],
+    providers: [WalletService, WalletRepository, PreRequest, ContractHelper],
+    exports: [WalletService],
 })
-export class WalletModule { }
+export class WalletModule {}
