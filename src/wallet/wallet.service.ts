@@ -1,29 +1,38 @@
+import { TransactionsService } from 'src/transactions/transactions.service';
+import ParfinContractWrapper from 'src/utils/contract/contract-wrapper';
+import {
+    AccountCreateDTO,
+    WalletCreateDTO,
+    WalletEnableDTO,
+} from './dto/wallet.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ContractHelper } from 'src/helpers/contract/contract';
+import { ParfinSuccessRes } from 'src/res/parfin.responses';
+import { ParfinService } from 'src/parfin/parfin.service';
 import { WalletRepository } from './wallet.repository';
 import { Wallet } from './wallet.schema';
-import { WalletCreateDTO, WalletEnableDTO } from './dto/wallet.dto';
-
-// import keyDictionaryABI from '../ABI/KeyDictionary.abi.json';
-import realDigitalEnableAccountABI from '../ABI/RealDigitalEnableAccount.abi.json';
-import realTokenizadoABI from '../ABI/RealTokenizado.abi.json';
-
-import { ContractHelper } from 'src/helpers/Contract/contract';
-import { TransactionsService } from 'src/transactions/transactions.service';
 import {
     AssetTypes,
     TransactionOperations,
 } from 'src/transactions/types/transactions.types';
-import { ParfinService } from 'src/parfin/parfin.service';
-import { ParfinSuccessRes } from 'src/res/parfin.responses';
 
 @Injectable()
 export class WalletService {
+    keyDictionary: ParfinContractWrapper;
+    realDigitalEnableAccount: ParfinContractWrapper;
+    realTokenizado: ParfinContractWrapper;
     constructor(
         private readonly walletRepository: WalletRepository,
         private readonly contractHelper: ContractHelper,
         private readonly parfinService: ParfinService,
         private readonly transactionService: TransactionsService,
-    ) {}
+    ) {
+        this.keyDictionary = this.contractHelper.getContract('KeyDictionary');
+        this.realTokenizado = this.contractHelper.getContract('RealTokenizado');
+        this.realDigitalEnableAccount = this.contractHelper.getContract(
+            'RealDigitalEnableAccount',
+        );
+    }
 
     // Gravação: Create a new Wallet
     async createInstitutionWallet({
@@ -36,52 +45,83 @@ export class WalletService {
             createInstitutionWalletDTO,
         );
         //salvamos o retorno da parfin no banco
-        const wallet = await this.walletRepository.create(resp);
-
-        return wallet;
+        return await this.walletRepository.create(resp);
     }
 
-    // Função para criar uma nova carteira do cliente
     async createClientWallet({
         dto: createClientWalletDTO,
     }: {
-        dto: WalletCreateDTO;
-    }): Promise<any> {
-        //TODO: Implementar lógica para criação de uma nova carteira para um cliente com o contrato KeyDictionary.sol
-        // const { walletName, blockchainId, walletType } = createClientWalletDTO;
+        dto: AccountCreateDTO;
+    }) {
+        const { key, taxId, bankNumber, account, branch, wallet } =
+            createClientWalletDTO;
+        const parfinDTO = createClientWalletDTO as Omit<
+            AccountCreateDTO,
+            | 'blockchainId'
+            | 'key'
+            | 'taxId'
+            | 'bankNumber'
+            | 'account'
+            | 'branch'
+            | 'wallet'
+        >;
 
-        // this.contractHelper.setContract(keyDictionaryABI);
+        // 1 - pegar endereço do contrato `Key Dictionary`
+        parfinDTO.metadata.contractAddress =
+            await this.contractHelper.addressDiscovery('KeyDictionary');
+        // 2 - codificar a chamada do contrato `Key Dictionary`
+        parfinDTO.metadata.data = this.keyDictionary.addAccount(
+            key,
+            taxId,
+            bankNumber,
+            account,
+            branch,
+            wallet,
+        )[0];
 
-        // parfinDTO.metadata = this.contractHelper
-        //   .getContract()
-        //   .methods.addAccount('lorem')
-        //   .encodeABI();
+        try {
+            // 3 - Interagir com o contrato usando o endpoint send/write
+            const parfinSendRes = await this.parfinService.smartContractSend(
+                parfinDTO,
+            );
+            const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 
-        // const { id: transactionId } = await this.parfinService.smartContractSend(
-        //   contractAddress,
-        //   parfinDTO,
-        // );
+            if (transactionId) {
+                try {
+                    // 4 - Salvar transação no banco
+                    const transactionData = {
+                        parfinTransactionId: transactionId,
+                        operation: TransactionOperations.CREATE_WALLET,
+                        asset: null,
+                        ...parfinDTO,
+                    };
+                    const { id: dbTransactionId } =
+                        await this.transactionService.create(transactionData);
 
-        // const transactionData = {
-        //   parfinTransactionId: transactionId,
-        //   operation: TransactionOperations.CREATE_WALLET,
-        //   asset: null,
-        //   ...parfinDTO,
-        // };
-        // const { id: dbTransactionId } = await this.transactionService.create(
-        //   transactionData,
-        // );
-
-        // await this.transactionService.transactionSignAndPush(
-        //   transactionId,
-        //   dbTransactionId,
-        // );
-        // return await this.walletRepository.createWallet({
-        //   walletName,
-        //   blockchainId,
-        //   walletType,
-        // });
-        console.log();
+                    if (dbTransactionId) {
+                        try {
+                            // 5 - Assinar transação e inserir na blockchain
+                            await this.transactionService.transactionSignAndPush(
+                                transactionId,
+                                dbTransactionId,
+                            );
+                        } catch (error) {
+                            throw new Error(
+                                `Erro ao tentar assinar transação ${transactionId} de queima de Real Digital / Erro: ${error}`,
+                            );
+                        }
+                    }
+                } catch (error) {
+                    throw new Error(
+                        `Erro ao tentar salvar transação ${transactionId} de queima no banco / Erro: ${error}`,
+                    );
+                }
+            }
+        } catch (error) {
+            throw new Error(
+                `Erro ao tentar criar transação de queima de Real Digital / Erro: ${error}`,
+            );
+        }
     }
 
     // Função para habilitar uma carteira
@@ -89,19 +129,16 @@ export class WalletService {
         const { asset, walletAddress } = dto as WalletEnableDTO;
         const parfinDTO = dto as Omit<
             WalletEnableDTO,
-            'asset' | 'walletAddress' | 'blockchainId'
+            'asset' | 'walletAddress' | 'callMetadata' | 'blockchainId'
         >;
-        const { contractAddress } = parfinDTO.metadata; // TODO: usar o AddressDiscovery.sol
 
         if (asset === 'RD') {
-            this.contractHelper.setContract(
-                realDigitalEnableAccountABI,
-                contractAddress,
-            );
-            parfinDTO.metadata = this.contractHelper
-                .getContract()
-                .methods.enableAccount(walletAddress)
-                .encodeABI();
+            parfinDTO.metadata.contractAddress =
+                await this.contractHelper.addressDiscovery(
+                    'RealDigitalEnableAccount',
+                );
+            parfinDTO.metadata.data =
+                this.realDigitalEnableAccount.enableAccount(walletAddress)[0];
 
             const parfinSendRes = await this.parfinService.smartContractSend(
                 parfinDTO,
@@ -122,11 +159,10 @@ export class WalletService {
                 dbTransactionId,
             );
         } else if (asset === 'RT') {
-            this.contractHelper.setContract(realTokenizadoABI, contractAddress);
-            parfinDTO.metadata = this.contractHelper
-                .getContract()
-                .methods.enableAccount(walletAddress)
-                .encodeABI();
+            parfinDTO.metadata.contractAddress =
+                await this.contractHelper.addressDiscovery('RealTokenizado');
+            parfinDTO.metadata.data =
+                this.realTokenizado.enableAccount(walletAddress)[0];
 
             const parfinSendRes = await this.parfinService.smartContractSend(
                 parfinDTO,

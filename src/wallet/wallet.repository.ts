@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Wallet, WalletDocument } from '../wallet/wallet.schema';
 import { Model } from 'mongoose';
 import {
-  WalletCreateDTO
+    AccountCreateDTO,
 } from './dto/wallet.dto';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class WalletRepository {
     private walletModel: Model<WalletDocument>,
   ) { }
 
-  async create(createWallet: WalletCreateDTO): Promise<Wallet> {
+  async create(createWallet: AccountCreateDTO): Promise<Wallet> {
     const walletModel = new this.walletModel(createWallet);
     return await walletModel.save();
   }

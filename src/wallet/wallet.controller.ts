@@ -2,6 +2,7 @@ import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WalletService } from './wallet.service';
 import {
+    AccountCreateDTO,
   WalletCreateDTO,
   WalletEnableDTO,
 } from './dto/wallet.dto';
@@ -31,8 +32,8 @@ export class WalletController {
 
   @Post('client-create')
   @ApiOperation({ summary: 'Create a client wallet', description: 'Create a wallet for a client of a financial institution' })
-  createClientWallet(@Body() dto: WalletCreateDTO) {
-    return this.walletService.createClientWallet({ dto });
+  createClientWallet(@Body() createClientWalletDTO: AccountCreateDTO) {
+    return this.walletService.createClientWallet({ dto: createClientWalletDTO });
   }
 
   @Post('enable')
