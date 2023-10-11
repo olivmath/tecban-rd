@@ -1,7 +1,6 @@
 import { ParfinContractInteractDTO } from 'src/parfin/dtos/parfin.dto';
 import ParfinContractWrapper from '../../utils/contract/contract-wrapper';
 import { ParfinService } from 'src/parfin/parfin.service';
-import { Contract } from 'web3-eth-contract';
 import { Injectable } from '@nestjs/common';
 import abiLoader from '../abi-loader';
 import Web3 from 'web3';
@@ -25,33 +24,10 @@ export type ContractName =
 
 @Injectable()
 export class ContractHelper {
-    private web3: any;
-    private contractAddress: string;
-    private contract: Contract | any;
-    constructor(private readonly parfinService: ParfinService) {
-        this.web3 = new Web3();
-    }
+    constructor(private readonly parfinService: ParfinService) {}
 
-    public getWeb3(): Web3 {
-        return this.web3;
-    }
-
-    public getContractAddress(): string {
-        return this.contractAddress;
-    }
-
-    public getContract(): Contract | any {
-        return this.contract;
-    }
-
-    setContract(abiInterface: Array<any>, contractAddress?: string) {
-        if (contractAddress) {
-        }
-        this.contract = new this.web3.eth.Contract(
-            abiInterface,
-            contractAddress,
-        );
-        return this;
+    getContract(contractName: ContractName): ParfinContractWrapper {
+        return new ParfinContractWrapper(abiLoader[contractName]);
     }
 
     async addressDiscovery(contractName: ContractName): Promise<string> {

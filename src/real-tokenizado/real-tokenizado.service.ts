@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-
+import { TransactionsService } from 'src/transactions/transactions.service';
+import ParfinContractWrapper from 'src/utils/contract/contract-wrapper';
+import { ContractHelper } from 'src/helpers/Contract/contract';
+import { ParfinService } from 'src/parfin/parfin.service';
 import { IServiceDTO } from 'src/interfaces/service';
-import realTokenizadoABI from '../ABI/RealTokenizado.abi.json';
-import keyDictionaryABI from '../ABI/KeyDictionary.abi.json';
-
+import { Injectable } from '@nestjs/common';
 import {
     AssetTypes,
     TransactionOperations,
@@ -13,45 +13,45 @@ import {
     RealTokenizadoBurnDTO,
     RealTokenizadoInternalTransferDTO,
 } from './dtos/real-tokenizado.dto';
-import { TransactionsService } from 'src/transactions/transactions.service';
-import { ParfinService } from 'src/parfin/parfin.service';
 import {
     ParfinContractCallSuccessRes,
     ParfinSuccessRes,
 } from 'src/res/parfin.responses';
-import { ContractHelper } from 'src/helpers/Contract/contract';
-
-// TODO: verificar a necessidade do 'await' antes do 'this
 
 @Injectable()
 export class RealTokenizadoService {
+    realDigitalDefaultAccount: ParfinContractWrapper;
+    realTokenizado: ParfinContractWrapper;
+    keyDictionary: ParfinContractWrapper;
     constructor(
-        private readonly contractHelper: ContractHelper,
         private readonly transactionService: TransactionsService,
+        private readonly contractHelper: ContractHelper,
         private readonly parfinService: ParfinService,
-    ) {}
+    ) {
+        this.realTokenizado = this.contractHelper.getContract('RealTokenizado');
+        this.keyDictionary = this.contractHelper.getContract('KeyDictionary');
+        this.realDigitalDefaultAccount = this.contractHelper.getContract(
+            'RealDigitalDefaultAccount',
+        );
+    }
 
     async mint({ dto }: IServiceDTO): Promise<any> {
         const { to, amount } = dto as RealTokenizadoMintDTO;
-        const parfinSendDTO = dto as Omit<
+        const parfinDTO = dto as Omit<
             RealTokenizadoMintDTO,
             'to' | 'amount' | 'blockchainId'
         >;
-        const { contractAddress } = parfinSendDTO.metadata; // TODO: usar o AddressDiscovery.sol
 
-        // 1 - Criar instância do contrato
-        this.contractHelper.setContract(realTokenizadoABI, contractAddress);
-
-        // 2 - Criar o metadata usando o método e os parâmetros do método chamado no contrato
-        parfinSendDTO.metadata.data = this.contractHelper
-            .getContract()
-            .methods.requestToMint(to, amount)
-            .encodeABI();
+        // 1 - pegar endereço do contrato `Real Tokenizado`
+        parfinDTO.metadata.contractAddress =
+            await this.contractHelper.addressDiscovery('RealTokenizado');
+        // 2 - codificar a chamada do contrato `Real Tokenizado`
+        parfinDTO.metadata.data = this.realTokenizado.mint(to, amount)[0];
 
         try {
             // 3 - Interagir com o contrato usando o endpoint send/write
             const parfinSendRes = await this.parfinService.smartContractSend(
-                parfinSendDTO,
+                parfinDTO,
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 
@@ -62,7 +62,7 @@ export class RealTokenizadoService {
                         parfinTransactionId: transactionId,
                         operation: TransactionOperations.MINT,
                         asset: AssetTypes.RD,
-                        ...parfinSendDTO,
+                        ...parfinDTO,
                     };
                     const { id: dbTransactionId } =
                         await this.transactionService.create(transactionData);
@@ -95,25 +95,21 @@ export class RealTokenizadoService {
 
     async burn({ dto }: IServiceDTO): Promise<any> {
         const { amount } = dto as RealTokenizadoBurnDTO;
-        const parfinSendDTO = dto as Omit<
+        const parfinDTO = dto as Omit<
             RealTokenizadoBurnDTO,
             'amount' | 'blockchainId'
         >;
-        const { contractAddress } = parfinSendDTO.metadata; // TODO: usar o AddressDiscovery.sol
 
-        // 1 - Criar instância do contrato
-        this.contractHelper.setContract(realTokenizadoABI, contractAddress);
-
-        // 2 - Criar o metadata usando o método e os parâmetros do método chamado no contrato
-        parfinSendDTO.metadata.data = this.contractHelper
-            .getContract()
-            .methods.requestToBurn(amount)
-            .encodeABI();
+        // 1 - pegar endereço do contrato `Real Tokenizado`
+        parfinDTO.metadata.contractAddress =
+            await this.contractHelper.addressDiscovery('RealTokenizado');
+        // 2 - codificar a chamada do contrato `Real Tokenizado`
+        parfinDTO.metadata.data = this.realTokenizado.burn(amount)[0];
 
         try {
             // 3 - Interagir com o contrato usando o endpoint send/write
             const parfinSendRes = await this.parfinService.smartContractSend(
-                parfinSendDTO,
+                parfinDTO,
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 
@@ -124,7 +120,7 @@ export class RealTokenizadoService {
                         parfinTransactionId: transactionId,
                         operation: TransactionOperations.BURN,
                         asset: AssetTypes.RD,
-                        ...parfinSendDTO,
+                        ...parfinDTO,
                     };
                     const { id: dbTransactionId } =
                         await this.transactionService.create(transactionData);
@@ -155,74 +151,63 @@ export class RealTokenizadoService {
 
     async internalTransfer({ dto }: IServiceDTO): Promise<any> {
         const { key, amount } = dto as RealTokenizadoInternalTransferDTO;
-        const parfinCallDTO = dto as Pick<
+        const parfinDTO = dto as Omit<
             RealTokenizadoInternalTransferDTO,
-            'metadata' | 'blockchainId'
+            'blockchainId' | 'key' | 'amount'
         >;
 
-        //TODO: Refatorar a criação de todos os metadata.data
-
-        // 1 - Buscar carteira do destinatário usando o CPF do cliente da instituição
-
-        // 1.1 - Buscar endereço do contrato KeyDictionary.sol
-        const { contractAddress } = parfinCallDTO.metadata; // TODO: usar o AddressDiscovery.sol
-
-        // 1.2 - Criar instância do contrato KeyDictionary.sol
-        this.contractHelper.setContract(keyDictionaryABI, contractAddress);
-
-        // 1.3 - Criar o metadata usando o método e os parâmetros do método chamado no contrato
-        parfinCallDTO.metadata.data = this.contractHelper
-            .getContract()
-            .methods.getWallet(key)
-            .encodeABI();
+        // 1 - pegar endereço do contrato `Key Dictionary`
+        parfinDTO.metadata.contractAddress =
+            await this.contractHelper.addressDiscovery('KeyDictionary');
+        // 2 - codificar a chamada do contrato `Key Dictionary`
+        parfinDTO.metadata.data = this.keyDictionary.getWallet(key)[0];
 
         try {
-            // 1.4 - Interagir com o contrato usando o endpoint call/read
+            // 3 - Interagir com o contrato usando o endpoint call/read
             const parfinCallRes = await this.parfinService.smartContractCall(
-                parfinCallDTO,
+                parfinDTO,
             );
             const { data } = parfinCallRes as ParfinContractCallSuccessRes;
 
             if (data) {
-                // 1.5 - Recuperar o CPF das informações consultdas no contrato
-                const receiverAddress = '';
+                // 3.1 - Recuperar o address das informações consultadas no contrato
+                const receiverAddress = this.keyDictionary.getWallet({
+                    returned: data,
+                })[0];
 
-                // 2 - Executar a transferência
-                const parfinSendDTO = dto as Omit<
+                // 4 - Executar a transferência
+                const parfinDTO = dto as Omit<
                     RealTokenizadoInternalTransferDTO,
                     'key' | 'amount' | 'blockchainId'
                 >;
-                const { contractAddress } = parfinSendDTO.metadata;
 
-                // 2.1 - Criar instância do contrato RealTokenizado.sol
-                this.contractHelper.setContract(
-                    realTokenizadoABI,
-                    contractAddress,
-                );
+                // 5 - pegar endereço do contrato `Real Tokenizado`
+                parfinDTO.metadata.contractAddress =
+                    await this.contractHelper.addressDiscovery(
+                        'RealTokenizado',
+                    );
 
-                // 2.2 - Criar o metadata usando o método e os parâmetros do método chamado no contrato
-                parfinSendDTO.metadata.data = this.contractHelper
-                    .getContract()
-                    .methods.transfer(receiverAddress, amount)
-                    .encodeABI();
+                // 6 - codificar a chamada do contrato `Real Tokenizado`
+                parfinDTO.metadata.data = this.realTokenizado.transfer(
+                    receiverAddress,
+                    amount,
+                )[0];
 
                 try {
-                    // 2.3 - Interagir com o contrato usando o endpoint send/write
+                    // 7 - Interagir com o contrato usando o endpoint send/write
                     const parfinSendRes =
-                        await this.parfinService.smartContractSend(
-                            parfinSendDTO,
-                        );
+                        await this.parfinService.smartContractSend(parfinDTO);
                     const { id: transactionId } =
                         parfinSendRes as ParfinSuccessRes;
 
                     if (transactionId) {
                         try {
-                            // 2.4 - Salvar transação no banco
+                            // 8 - Salvar transação no banco
                             const transactionData = {
                                 parfinTransactionId: transactionId,
                                 operation: TransactionOperations.TRANSFER,
                                 asset: AssetTypes.RD,
-                                ...parfinSendDTO,
+                                ...parfinDTO,
                             };
                             const { id: dbTransactionId } =
                                 await this.transactionService.create(
@@ -231,7 +216,7 @@ export class RealTokenizadoService {
 
                             if (dbTransactionId) {
                                 try {
-                                    // 2.5 - Assinar transação e inserir na blockchain
+                                    // 9 - Assinar transação e inserir na blockchain
                                     return await this.transactionService.transactionSignAndPush(
                                         transactionId,
                                         dbTransactionId,

@@ -22,13 +22,13 @@ export class RealTokenizadoBurnDTO extends ParfinContractInteractDTO {
 }
 
 export class RealTokenizadoInternalTransferDTO extends ParfinContractInteractDTO {
-  @ApiProperty({ description: 'CPF do destinatário' })
-  @IsString()
-  @IsNotEmpty()
-  key: string;
+    @ApiProperty({ description: 'Key do destinatário' })
+    @IsString()
+    @IsNotEmpty()
+    key: string;
 
-  @ApiProperty({ description: 'Quantidade a ser transferida' })
-  @IsNumber()
-  @IsNotEmpty()
-  amount: number;
+    @ApiProperty({ description: 'Quantidade a ser transferida' })
+    @IsNumber()
+    @IsNotEmpty()
+    amount: number;
 }
