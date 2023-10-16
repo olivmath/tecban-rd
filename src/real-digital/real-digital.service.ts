@@ -1,6 +1,6 @@
 import { TransactionsService } from 'src/transactions/transactions.service';
+import { ContractService } from 'src/helpers/Contract/contract.service';
 import ContractWrapper from 'src/utils/contract/contract-wrapper';
-import { ContractHelper } from 'src/helpers/contract/contract';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { Injectable } from '@nestjs/common';
 import {
@@ -24,7 +24,7 @@ export class RealDigitalService {
     realDigital: ContractWrapper;
     constructor(
         private readonly transactionService: TransactionsService,
-        private readonly contractHelper: ContractHelper,
+        private readonly contractHelper: ContractService,
         private readonly parfinService: ParfinService,
     ) {
         this.str = this.contractHelper.getContractMethods('STR');

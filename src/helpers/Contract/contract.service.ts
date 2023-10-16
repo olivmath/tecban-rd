@@ -24,7 +24,7 @@ export type ContractName =
     | 'STR';
 
 @Injectable()
-export class ContractHelper {
+export class ContractService {
     constructor(private readonly parfinService: ParfinService) { }
 
     // Função que busca todos os métodos de um contrato

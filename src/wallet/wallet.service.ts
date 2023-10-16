@@ -6,7 +6,7 @@ import {
     WalletEnableDTO,
 } from './dto/wallet.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ContractHelper } from 'src/helpers/contract/contract';
+import { ContractService } from 'src/helpers/Contract/contract.service';
 import { ParfinSuccessRes } from 'src/res/parfin.responses';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { WalletRepository } from './wallet.repository';
@@ -23,7 +23,7 @@ export class WalletService {
     realTokenizado: ParfinContractWrapper;
     constructor(
         private readonly walletRepository: WalletRepository,
-        private readonly contractHelper: ContractHelper,
+        private readonly contractHelper: ContractService,
         private readonly parfinService: ParfinService,
         private readonly transactionService: TransactionsService,
     ) {

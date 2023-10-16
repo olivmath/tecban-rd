@@ -6,7 +6,7 @@ import { WalletController } from './wallet.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Wallet, WalletSchema } from './wallet.schema';
 import { PreRequest } from 'src/helpers/pre-request';
-import { ContractHelper } from 'src/helpers/Contract/contract';
+import { ContractService } from 'src/helpers/Contract/contract.service';
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import { ParfinModule } from 'src/parfin/parfin.module';
 
@@ -19,7 +19,7 @@ import { ParfinModule } from 'src/parfin/parfin.module';
         ]),
     ],
     controllers: [WalletController],
-    providers: [WalletService, WalletRepository, PreRequest, ContractHelper],
+    providers: [WalletService, WalletRepository, PreRequest, ContractService],
     exports: [WalletService],
 })
 export class WalletModule {}
