@@ -2,26 +2,47 @@ import { ApiProperty } from '@nestjs/swagger';
 import { BlockchainNetwork } from 'src/transactions/types/transactions.types';
 import { WalletAsset } from 'src/wallet/types/wallet.types';
 
+//--- Success
 export class ParfinSuccessRes {
-    @ApiProperty({ description: 'ID da transação de deploy da Parfin' })
-    id: string;
+    @ApiProperty() id: string;
 }
 
 export class ParfinCreateWalletSuccessRes {
     @ApiProperty({ description: 'ID da transação de deploy da Parfin' })
     blockchainNetwork: string;
+
     @ApiProperty({ description: 'ID da transação de deploy da Parfin' })
     walletId: string;
+
     @ApiProperty({ description: 'ID da transação de deploy da Parfin' })
     address: string;
+
     @ApiProperty({ description: 'ID da transação de deploy da Parfin' })
     name: string;
+
     @ApiProperty({ description: 'ID da transação de deploy da Parfin' })
     isBlocked: boolean;
+
     @ApiProperty({ description: 'ID da transação de deploy da Parfin' })
     blockedMetadataHistory: string[];
+
     @ApiProperty({ description: 'ID da transação de deploy da Parfin' })
     assets: WalletAsset[];
+}
+
+export class ParfinGetWalletSuccessRes {
+    @ApiProperty() id: string;
+    @ApiProperty() blockchainNetwork: string;
+    @ApiProperty() blockchainName: string;
+    @ApiProperty() blockchainId: string;
+    @ApiProperty() walletId: string;
+    @ApiProperty() address: string;
+    @ApiProperty() name: string;
+    @ApiProperty() assets: WalletAsset[];
+    @ApiProperty() enabled: boolean;
+    @ApiProperty() isBlocked: boolean;
+    @ApiProperty() blockedMetadataHistory: string[];
+    @ApiProperty() walletType: string;
 }
 
 export class ParfinGetAllContractsSuccessRes {
@@ -31,9 +52,7 @@ export class ParfinGetAllContractsSuccessRes {
     @ApiProperty({ description: 'Endereço do contrato' })
     contractAddress: string;
 
-    @ApiProperty({
-        description: 'ID para representar a insituição cliente da aplicação',
-    })
+    @ApiProperty({ description: 'ID para representar a insituição cliente da aplicação' })
     customerId: string;
 
     @ApiProperty({ description: 'ID da blockchain onde foi criado o contrato' })
@@ -50,9 +69,7 @@ export class ParfinRegisterContractSuccessRes extends ParfinSuccessRes {
     @ApiProperty({ description: 'Endereço do contrato para registro' })
     contractAddress: string;
 
-    @ApiProperty({
-        description: 'ID para representar a insituição cliente da aplicação',
-    })
+    @ApiProperty({ description: 'ID para representar a insituição cliente da aplicação' })
     customerId: string;
 
     @ApiProperty({ description: 'ID da blockchain onde foi criado o contrato' })
@@ -68,7 +85,7 @@ export class ParfinContractCallSuccessRes {
 }
 
 export class ParfinGetTransactionSuccessRes {
-    @ApiProperty({ description: 'ID da Parfin' })
+    @ApiProperty({ description: 'ID da transação registrada na Parfin' })
     parfinId: string;
 
     @ApiProperty({ description: 'ID do usuário que criou a transação' })
@@ -89,7 +106,7 @@ export class ParfinGetTransactionSuccessRes {
     @ApiProperty({ description: 'Data de criação da transação' })
     createdAt: string;
 
-    @ApiProperty({ description: 'Quantidade da transação' })
+    @ApiProperty({ description: 'Valor da transação' })
     amount: number;
 
     @ApiProperty({ description: 'Taxa da transação' })
@@ -134,7 +151,7 @@ export class ParfinGetTransactionSuccessRes {
     @ApiProperty({ description: 'Carga da transação Parfin' })
     parfinTransactionPayload: string;
 }
-
+//--- Errors
 export class ParfinErrorRes {
     @ApiProperty({ description: 'Mensagem de erro' })
     message: string;

@@ -14,7 +14,7 @@ import {
     ParfinErrorRes,
     ParfinGetTransactionSuccessRes,
     ParfinCreateWalletSuccessRes,
-} from 'src/res/parfin.responses';
+} from 'src/res/app/parfin.responses';
 import {
     WalletInstitutionCreateDTO,
     WalletClientCreateDTO

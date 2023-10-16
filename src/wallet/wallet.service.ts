@@ -7,7 +7,7 @@ import {
 } from './dto/wallet.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ContractService } from 'src/helpers/Contract/contract.service';
-import { ParfinSuccessRes } from 'src/res/parfin.responses';
+import { ParfinCreateWalletSuccessRes, ParfinErrorRes, ParfinSuccessRes } from 'src/res/app/parfin.responses';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { WalletRepository } from './wallet.repository';
 import { Wallet } from './wallet.schema';
@@ -35,7 +35,9 @@ export class WalletService {
     }
 
     // Gravação: Create a new Wallet
-    async createInstitutionWallet(dto: WalletInstitutionCreateDTO): Promise<any> {
+    async createInstitutionWallet(dto: WalletInstitutionCreateDTO): Promise<
+        ParfinCreateWalletSuccessRes | ParfinErrorRes
+    > {
         try {
             //chamando a criação de wallet na parfin
             const parfinCreateRes = await this.parfinService.createWallet(dto);
@@ -51,7 +53,9 @@ export class WalletService {
         // return await this.walletRepository.create(parfinCreateRes);
     }
 
-    async createClientWallet(dto: WalletClientCreateDTO) {
+    async createClientWallet(dto: WalletClientCreateDTO): Promise<
+        ParfinCreateWalletSuccessRes | ParfinErrorRes
+    > {
         //TODO: Errado, corrigir
         const { key, taxId, bankNumber, account, branch, wallet } =
             dto;
@@ -97,6 +101,8 @@ export class WalletService {
                     };
                     const { id: dbTransactionId } =
                         await this.transactionService.create(transactionData);
+                    //chamando a criação de wallet na parfin
+                    const parfinCreateRes = await this.parfinService.createWallet(dto);
 
                     if (dbTransactionId) {
                         try {
@@ -105,6 +111,9 @@ export class WalletService {
                                 transactionId,
                                 dbTransactionId,
                             );
+                            return {
+                                ...parfinCreateRes
+                            };
                         } catch (error) {
                             throw new Error(
                                 `Erro ao tentar assinar transação ${transactionId} de queima de Real Digital / Erro: ${error}`,

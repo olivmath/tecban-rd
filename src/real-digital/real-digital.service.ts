@@ -15,7 +15,7 @@ import {
 import {
     ParfinContractCallSuccessRes,
     ParfinSuccessRes,
-} from 'src/res/parfin.responses';
+} from 'src/res/app/parfin.responses';
 
 @Injectable()
 export class RealDigitalService {

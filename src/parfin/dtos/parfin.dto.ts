@@ -32,21 +32,27 @@ export class ParfinDeployContractDTO {
     @IsOptional()
     description?: string;
 
-    @ApiProperty({ description: 'Informações sobre o ativo do contrato' })
+    @ApiProperty({
+        description: 'Informações sobre o ativo do contrato',
+        type: Source,
+    })
+    @IsNotEmpty()
     @IsObject()
     source: Source;
 
-    @ApiProperty({ description: 'Metadata do contrato para o deploy' })
+    @ApiProperty({
+        description: 'Metadata do contrato para o deploy',
+        type: DeployMetadata,
+    })
+    @IsNotEmpty()
     @IsObject()
     metadata: DeployMetadata;
 
     @ApiProperty({
         description: 'Prioridade da chamada',
-        enum: Priority,
-        enumName: 'Priority',
+        enum: ['LOW', 'MEDIUM', 'HIGH'],
         default: Priority.HIGH,
     })
-    @IsString()
     @IsNotEmpty()
     priority: Priority = Priority.HIGH;
 }
@@ -70,7 +76,7 @@ export class ParfinContractInteractDTO {
     })
     @IsString()
     @IsOptional()
-    customerTag? = 'Banco Arbi';
+    customerTag?= 'Banco Arbi';
 
     @ApiProperty({
         description: 'ID para representar a insituição cliente da aplicação',
@@ -78,7 +84,7 @@ export class ParfinContractInteractDTO {
     })
     @IsString()
     @IsOptional()
-    customerRefId? = '3401602e-2953-4790-9109-11d16b844bf4';
+    customerRefId?= '3401602e-2953-4790-9109-11d16b844bf4';
 
     @ApiProperty({
         description: 'Descrição da interação com o contrato',
@@ -88,34 +94,34 @@ export class ParfinContractInteractDTO {
     @IsOptional()
     description?: string;
 
-    @ApiProperty({ description: 'Metadata para a interação com o contrato' })
+    @ApiProperty({
+        description: 'Metadata para a interação com o contrato',
+        type: InteractMetadata,
+    })
     @IsObject()
     @IsOptional()
     metadata: InteractMetadata;
 
     @ApiProperty({
         description: 'ID da blocklchain onde será utilizada a carteira',
-        enum: BlockchainId,
-        enumName: 'BlockchainId',
+        enum: ['BLOCKCHAIN_ID'],
         default: BlockchainId.BLOCKCHAIN_ID,
     })
-    @IsString()
     @IsOptional()
     blockchainId?: BlockchainId = BlockchainId.BLOCKCHAIN_ID;
 
-    @ApiProperty({ description: 'Informações sobre o ativo do contrato' })
+    @ApiProperty({
+        description: 'Informações sobre o ativo do contrato',
+        type: Source
+    })
     @IsOptional()
     source?: Source;
 
     @ApiProperty({
         description: 'Prioridade da chamada',
-        enum: Priority,
-        enumName: 'Priority',
+        enum: ['LOW', 'MEDIUM', 'HIGH'],
         default: Priority.HIGH,
     })
-    @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     priority?: Priority = Priority.HIGH;
 }
-
-

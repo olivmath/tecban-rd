@@ -4,8 +4,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Transaction } from './transactions.schema';
 import { TransactionDTO } from './dtos/transaction.dto';
-import { PreRequest } from 'src/helpers/pre-request';
-import { parfinApi } from 'src/config/parfin-api-client';
 
 @Injectable()
 export class TransactionsRepository {

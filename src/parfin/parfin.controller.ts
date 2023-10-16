@@ -10,7 +10,7 @@ import {
   ParfinRegisterContractSuccessRes,
   ParfinGetAllContractsSuccessRes,
   ParfinErrorRes,
-} from 'src/res/parfin.responses';
+} from 'src/res/app/parfin.responses';
 
 @Controller('parfin')
 @ApiTags('Parfin Operations')

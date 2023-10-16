@@ -1,5 +1,5 @@
 // transactions.module.ts
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TransactionsController } from './transactions.controller';
 import { TransactionsService } from './transactions.service';
