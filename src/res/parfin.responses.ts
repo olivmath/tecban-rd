@@ -67,28 +67,8 @@ export class ParfinContractCallSuccessRes {
     data: string;
 }
 
-export class ParfinErrorRes {
-    @ApiProperty({ description: 'Mensagem de erro' })
-    message: string;
-
-    @ApiProperty({ description: 'Detalhe do erro' })
-    detail: string;
-
-    @ApiProperty({ description: 'Horário do erro' })
-    timestamp: string;
-
-    @ApiProperty({ description: 'Path da requisição' })
-    path: string;
-
-    @ApiProperty({ description: 'Código do erro' })
-    errorCode: string;
-
-    @ApiProperty({ description: 'Mensagens de erro' })
-    errors: string[];
-}
-
-export class ParfinTransaction {
-    @ApiProperty({ description: 'ID do Parfin' })
+export class ParfinGetTransactionSuccessRes {
+    @ApiProperty({ description: 'ID da Parfin' })
     parfinId: string;
 
     @ApiProperty({ description: 'ID do usuário que criou a transação' })
@@ -153,4 +133,24 @@ export class ParfinTransaction {
 
     @ApiProperty({ description: 'Carga da transação Parfin' })
     parfinTransactionPayload: string;
+}
+
+export class ParfinErrorRes {
+    @ApiProperty({ description: 'Mensagem de erro' })
+    message: string;
+
+    @ApiProperty({ description: 'Detalhe do erro' })
+    detail: string;
+
+    @ApiProperty({ description: 'Horário do erro' })
+    timestamp: string;
+
+    @ApiProperty({ description: 'Path da requisição' })
+    path: string;
+
+    @ApiProperty({ description: 'Código do erro' })
+    errorCode: string;
+
+    @ApiProperty({ description: 'Mensagens de erro' })
+    errors: string[];
 }

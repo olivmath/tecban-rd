@@ -1,8 +1,8 @@
 import { TransactionsService } from 'src/transactions/transactions.service';
 import ParfinContractWrapper from 'src/utils/contract/contract-wrapper';
 import {
-    AccountCreateDTO,
-    WalletCreateDTO,
+    WalletInstitutionCreateDTO,
+    WalletClientCreateDTO,
     WalletEnableDTO,
 } from './dto/wallet.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -27,36 +27,36 @@ export class WalletService {
         private readonly parfinService: ParfinService,
         private readonly transactionService: TransactionsService,
     ) {
-        this.keyDictionary = this.contractHelper.getContract('KeyDictionary');
-        this.realTokenizado = this.contractHelper.getContract('RealTokenizado');
-        this.realDigitalEnableAccount = this.contractHelper.getContract(
+        this.keyDictionary = this.contractHelper.getContractMethods('KeyDictionary');
+        this.realTokenizado = this.contractHelper.getContractMethods('RealTokenizado');
+        this.realDigitalEnableAccount = this.contractHelper.getContractMethods(
             'RealDigitalEnableAccount',
         );
     }
 
     // Gravação: Create a new Wallet
-    async createInstitutionWallet({
-        dto: createInstitutionWalletDTO,
-    }: {
-        dto: WalletCreateDTO;
-    }): Promise<Wallet> {
-        //chamando a criação de wallet na parfin
-        const resp = await this.parfinService.createWallet(
-            createInstitutionWalletDTO,
-        );
+    async createInstitutionWallet(dto: WalletInstitutionCreateDTO): Promise<any> {
+        try {
+            //chamando a criação de wallet na parfin
+            const parfinCreateRes = await this.parfinService.createWallet(dto);
+            return {
+                ...parfinCreateRes
+            };
+        } catch (error) {
+            throw new Error(
+                `Erro ao tentar criar uma carteira para uma insituição: ${dto.walletName} / Erro: ${error}`,
+            );
+        }
         //salvamos o retorno da parfin no banco
-        return await this.walletRepository.create(resp);
+        // return await this.walletRepository.create(parfinCreateRes);
     }
 
-    async createClientWallet({
-        dto: createClientWalletDTO,
-    }: {
-        dto: AccountCreateDTO;
-    }) {
+    async createClientWallet(dto: WalletClientCreateDTO) {
+        //TODO: Errado, corrigir
         const { key, taxId, bankNumber, account, branch, wallet } =
-            createClientWalletDTO;
-        const parfinDTO = createClientWalletDTO as Omit<
-            AccountCreateDTO,
+            dto;
+        const parfinDTO = dto as Omit<
+            WalletClientCreateDTO,
             | 'blockchainId'
             | 'key'
             | 'taxId'
@@ -68,7 +68,7 @@ export class WalletService {
 
         // 1 - pegar endereço do contrato `Key Dictionary`
         parfinDTO.metadata.contractAddress =
-            await this.contractHelper.addressDiscovery('KeyDictionary');
+            await this.contractHelper.getContractAddress('KeyDictionary');
         // 2 - codificar a chamada do contrato `Key Dictionary`
         parfinDTO.metadata.data = this.keyDictionary.addAccount(
             key,
@@ -125,16 +125,16 @@ export class WalletService {
     }
 
     // Função para habilitar uma carteira
-    async enableWallet({ dto }: { dto: WalletEnableDTO }): Promise<any> {
+    async enableWallet(dto: WalletEnableDTO): Promise<any> {
         const { asset, walletAddress } = dto as WalletEnableDTO;
         const parfinDTO = dto as Omit<
             WalletEnableDTO,
-            'asset' | 'walletAddress' | 'callMetadata' | 'blockchainId'
+            'asset' | 'walletAddress' | 'blockchainId'
         >;
 
         if (asset === 'RD') {
             parfinDTO.metadata.contractAddress =
-                await this.contractHelper.addressDiscovery(
+                await this.contractHelper.getContractAddress(
                     'RealDigitalEnableAccount',
                 );
             parfinDTO.metadata.data =
@@ -160,7 +160,7 @@ export class WalletService {
             );
         } else if (asset === 'RT') {
             parfinDTO.metadata.contractAddress =
-                await this.contractHelper.addressDiscovery('RealTokenizado');
+                await this.contractHelper.getContractAddress('RealTokenizado');
             parfinDTO.metadata.data =
                 this.realTokenizado.enableAccount(walletAddress)[0];
 

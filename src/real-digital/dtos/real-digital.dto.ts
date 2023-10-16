@@ -3,32 +3,32 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { ParfinContractInteractDTO } from 'src/parfin/dtos/parfin.dto';
 
 export class RealDigitalMintDTO extends ParfinContractInteractDTO {
-  @ApiProperty({ description: 'Endereço do destinatário' })
+  @ApiProperty({ description: 'Endereço da carteira do destinatário' })
   @IsString()
   @IsNotEmpty()
   to: string;
 
-  @ApiProperty({ description: 'Quantidade a ser emitida' })
+  @ApiProperty({ description: 'Quantidade uint256 a ser emitida' })
   @IsNumber()
   @IsNotEmpty()
   amount: number;
 }
 
 export class RealDigitalBurnDTO extends ParfinContractInteractDTO {
-    @ApiProperty({ description: 'Quantidade a ser queimada' })
-    @IsNumber()
-    @IsNotEmpty()
-    amount: number;
+  @ApiProperty({ description: 'Quantidade uint256 a ser queimada' })
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
 }
 
 export class RealDigitalTransferDTO extends ParfinContractInteractDTO {
-    @ApiProperty({ description: 'CNPJ do destinatário' })
-    @IsString()
-    @IsNotEmpty()
-    cnpj: string;
+  @ApiProperty({ description: 'CNPJ uint256 do destinatário (8 primeiros dígitos)' })
+  @IsString()
+  @IsNotEmpty()
+  cnpj: number;
 
-    @ApiProperty({ description: 'Quantidade a ser transferida' })
-    @IsNumber()
-    @IsNotEmpty()
-    amount: number;
+  @ApiProperty({ description: 'Quantidade uint256 a ser transferida' })
+  @IsNumber()
+  @IsNotEmpty()
+  amount: number;
 }

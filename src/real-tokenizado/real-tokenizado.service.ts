@@ -1,8 +1,7 @@
 import { TransactionsService } from 'src/transactions/transactions.service';
-import ParfinContractWrapper from 'src/utils/contract/contract-wrapper';
+import ContractWrapper from 'src/utils/contract/contract-wrapper';
 import { ContractHelper } from 'src/helpers/Contract/contract';
 import { ParfinService } from 'src/parfin/parfin.service';
-import { IServiceDTO } from 'src/interfaces/service';
 import { Injectable } from '@nestjs/common';
 import {
     AssetTypes,
@@ -20,22 +19,18 @@ import {
 
 @Injectable()
 export class RealTokenizadoService {
-    realDigitalDefaultAccount: ParfinContractWrapper;
-    realTokenizado: ParfinContractWrapper;
-    keyDictionary: ParfinContractWrapper;
+    keyDictionary: ContractWrapper;
+    realTokenizado: ContractWrapper;
     constructor(
         private readonly transactionService: TransactionsService,
         private readonly contractHelper: ContractHelper,
         private readonly parfinService: ParfinService,
     ) {
-        this.realTokenizado = this.contractHelper.getContract('RealTokenizado');
-        this.keyDictionary = this.contractHelper.getContract('KeyDictionary');
-        this.realDigitalDefaultAccount = this.contractHelper.getContract(
-            'RealDigitalDefaultAccount',
-        );
+        this.realTokenizado = this.contractHelper.getContractMethods('RealTokenizado');
+        this.keyDictionary = this.contractHelper.getContractMethods('KeyDictionary');
     }
 
-    async mint({ dto }: IServiceDTO): Promise<any> {
+    async mint(dto: RealTokenizadoMintDTO): Promise<any> {
         const { to, amount } = dto as RealTokenizadoMintDTO;
         const parfinDTO = dto as Omit<
             RealTokenizadoMintDTO,
@@ -44,7 +39,7 @@ export class RealTokenizadoService {
 
         // 1 - pegar endereço do contrato `Real Tokenizado`
         parfinDTO.metadata.contractAddress =
-            await this.contractHelper.addressDiscovery('RealTokenizado');
+            await this.contractHelper.getContractAddress('RealTokenizado');
         // 2 - codificar a chamada do contrato `Real Tokenizado`
         parfinDTO.metadata.data = this.realTokenizado.mint(to, amount)[0];
 
@@ -93,7 +88,7 @@ export class RealTokenizadoService {
         }
     }
 
-    async burn({ dto }: IServiceDTO): Promise<any> {
+    async burn(dto: RealTokenizadoBurnDTO): Promise<any> {
         const { amount } = dto as RealTokenizadoBurnDTO;
         const parfinDTO = dto as Omit<
             RealTokenizadoBurnDTO,
@@ -102,7 +97,7 @@ export class RealTokenizadoService {
 
         // 1 - pegar endereço do contrato `Real Tokenizado`
         parfinDTO.metadata.contractAddress =
-            await this.contractHelper.addressDiscovery('RealTokenizado');
+            await this.contractHelper.getContractAddress('RealTokenizado');
         // 2 - codificar a chamada do contrato `Real Tokenizado`
         parfinDTO.metadata.data = this.realTokenizado.burn(amount)[0];
 
@@ -149,7 +144,7 @@ export class RealTokenizadoService {
         }
     }
 
-    async internalTransfer({ dto }: IServiceDTO): Promise<any> {
+    async internalTransfer(dto: RealTokenizadoInternalTransferDTO): Promise<any> {
         const { key, amount } = dto as RealTokenizadoInternalTransferDTO;
         const parfinDTO = dto as Omit<
             RealTokenizadoInternalTransferDTO,
@@ -158,7 +153,7 @@ export class RealTokenizadoService {
 
         // 1 - pegar endereço do contrato `Key Dictionary`
         parfinDTO.metadata.contractAddress =
-            await this.contractHelper.addressDiscovery('KeyDictionary');
+            await this.contractHelper.getContractAddress('KeyDictionary');
         // 2 - codificar a chamada do contrato `Key Dictionary`
         parfinDTO.metadata.data = this.keyDictionary.getWallet(key)[0];
 
@@ -183,7 +178,7 @@ export class RealTokenizadoService {
 
                 // 5 - pegar endereço do contrato `Real Tokenizado`
                 parfinDTO.metadata.contractAddress =
-                    await this.contractHelper.addressDiscovery(
+                    await this.contractHelper.getContractAddress(
                         'RealTokenizado',
                     );
 

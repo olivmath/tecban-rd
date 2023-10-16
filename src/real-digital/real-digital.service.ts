@@ -1,8 +1,7 @@
 import { TransactionsService } from 'src/transactions/transactions.service';
-import ParfinContractWrapper from 'src/utils/contract/contract-wrapper';
+import ContractWrapper from 'src/utils/contract/contract-wrapper';
 import { ContractHelper } from 'src/helpers/contract/contract';
 import { ParfinService } from 'src/parfin/parfin.service';
-import { IServiceDTO } from 'src/interfaces/service';
 import { Injectable } from '@nestjs/common';
 import {
     AssetTypes,
@@ -20,31 +19,33 @@ import {
 
 @Injectable()
 export class RealDigitalService {
-    realDigitalDefaultAccount: ParfinContractWrapper;
-    realDigital: ParfinContractWrapper;
+    str: ContractWrapper;
+    realDigitalDefaultAccount: ContractWrapper;
+    realDigital: ContractWrapper;
     constructor(
         private readonly transactionService: TransactionsService,
         private readonly contractHelper: ContractHelper,
         private readonly parfinService: ParfinService,
     ) {
-        this.realDigital = this.contractHelper.getContract('RealDigital');
-        this.realDigitalDefaultAccount = this.contractHelper.getContract(
+        this.str = this.contractHelper.getContractMethods('STR');
+        this.realDigital = this.contractHelper.getContractMethods('RealDigital');
+        this.realDigitalDefaultAccount = this.contractHelper.getContractMethods(
             'RealDigitalDefaultAccount',
         );
     }
 
-    async mint({ dto }: IServiceDTO): Promise<any> {
+    async mint(dto: RealDigitalMintDTO): Promise<any> {
         const { to, amount } = dto as RealDigitalMintDTO;
         const parfinDTO = dto as Omit<
             RealDigitalMintDTO,
-            'amount' | 'blockchainId' | 'to'
+            'to' | 'amount' | 'blockchainId'
         >;
 
         // 1 - pegar endereço do contrato `Real Digital`
         parfinDTO.metadata.contractAddress =
-            await this.contractHelper.addressDiscovery('RealDigital');
+            await this.contractHelper.getContractAddress('STR');
         // 2 - codificar a chamada do contrato `Real Digital`
-        parfinDTO.metadata.data = this.realDigital.mint(to, amount)[0];
+        parfinDTO.metadata.data = this.str.requestToMint(to, amount)[0];
 
         // 3 - Interagir com o contrato usando o endpoint send/write
         try {
@@ -92,7 +93,7 @@ export class RealDigitalService {
         }
     }
 
-    async burn({ dto }: IServiceDTO): Promise<any> {
+    async burn(dto: RealDigitalBurnDTO): Promise<any> {
         const { amount } = dto as RealDigitalBurnDTO;
         const parfinDTO = dto as Omit<
             RealDigitalBurnDTO,
@@ -101,9 +102,9 @@ export class RealDigitalService {
 
         // 1 - pegar endereço do contrato `Real Digital`
         parfinDTO.metadata.contractAddress =
-            await this.contractHelper.addressDiscovery('RealDigital');
+            await this.contractHelper.getContractAddress('STR');
         // 2 - codificar a chamada do contrato `Real Digital`
-        parfinDTO.metadata.data = this.realDigital.burn(amount)[0];
+        parfinDTO.metadata.data = this.str.requestToBurn(amount)[0];
 
         try {
             // 3 - Interagir com o contrato usando o endpoint send/write
@@ -150,27 +151,25 @@ export class RealDigitalService {
         }
     }
 
-    async transfer({ dto }: IServiceDTO): Promise<any> {
+    async transfer(dto: RealDigitalTransferDTO): Promise<any> {
         const { cnpj, amount } = dto as RealDigitalTransferDTO;
-        const parfinDTO = dto as Omit<
+        const parfinCallDTO = dto as Pick<
             RealDigitalTransferDTO,
-            'blockchainId' | 'amount' | 'cnpj'
+            'metadata' | 'blockchainId'
         >;
 
         // 1 - pegar endereço do contrato `Real Digital Default Account`
-        parfinDTO.metadata.contractAddress =
-            await this.contractHelper.addressDiscovery(
+        parfinCallDTO.metadata.contractAddress =
+            await this.contractHelper.getContractAddress(
                 'RealDigitalDefaultAccount',
             );
         // 2 - codificar a chamada do contrato `Real Digital Default Account`
-        parfinDTO.metadata.data =
+        parfinCallDTO.metadata.data =
             this.realDigitalDefaultAccount.defaultAccount(cnpj)[0];
 
         try {
             // 3 - Interagir com o contrato usando o endpoint call/read para obter o endereço de destino
-            const parfinCallRes = (await this.parfinService.smartContractCall(
-                parfinDTO,
-            )) as ParfinContractCallSuccessRes;
+            const parfinCallRes = await this.parfinService.smartContractCall(parfinCallDTO);
             const { data } = parfinCallRes as ParfinContractCallSuccessRes;
 
             if (data) {
@@ -178,7 +177,7 @@ export class RealDigitalService {
                 const receiverAddress =
                     this.realDigitalDefaultAccount.defaultAccount({
                         returned: data,
-                    })[0];
+                    })[0] as string;
 
                 // 4 - Executar a transferência
                 const parfinSendDTO = dto as Omit<
@@ -188,7 +187,7 @@ export class RealDigitalService {
 
                 // 5 - pegar endereço do contrato `Real Digital`
                 parfinSendDTO.metadata.contractAddress =
-                    await this.contractHelper.addressDiscovery('RealDigital');
+                    await this.contractHelper.getContractAddress('RealDigital');
                 // 6 - codificar a chamada do contrato `Real Digital`
                 parfinSendDTO.metadata.data = this.realDigital.transfer(
                     receiverAddress,

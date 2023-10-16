@@ -4,6 +4,7 @@ import { Transaction } from './transactions.schema';
 import { TransactionDTO } from './dtos/transaction.dto';
 import { TransactionsRepository } from './transactions.repository';
 import { ParfinService } from 'src/parfin/parfin.service';
+import { ParfinGetTransactionSuccessRes } from 'src/res/parfin.responses';
 
 export enum InteractionEnum {
     CALL = 'Call',
@@ -15,7 +16,7 @@ export class TransactionsService {
     constructor(
         private readonly transactionsRepository: TransactionsRepository,
         private readonly parfinService: ParfinService,
-    ) {}
+    ) { }
 
     async create(createTransactionDto: TransactionDTO): Promise<Transaction> {
         return this.transactionsRepository.create(createTransactionDto);
@@ -71,7 +72,10 @@ export class TransactionsService {
                 await this.parfinService.getTransactionById(id);
 
             //update a transaction
-            const { blockchainNetwork, statusDescription } = parfinTransaction;
+            const {
+                blockchainNetwork,
+                statusDescription
+            } = parfinTransaction as ParfinGetTransactionSuccessRes;
             await this.update(dbTransactionId, {
                 blockchainNetwork,
                 statusDescription,

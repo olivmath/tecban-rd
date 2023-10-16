@@ -2,8 +2,8 @@ import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WalletService } from './wallet.service';
 import {
-    AccountCreateDTO,
-  WalletCreateDTO,
+  WalletInstitutionCreateDTO,
+  WalletClientCreateDTO,
   WalletEnableDTO,
 } from './dto/wallet.dto';
 
@@ -26,19 +26,19 @@ export class WalletController {
 
   @Post('institution-create')
   @ApiOperation({ summary: 'Create an institution wallet', description: 'Create a wallet for a financial institution' })
-  createInstitutionWallet(@Body() createInstitutuionWalletDTO: WalletCreateDTO) {
-    return this.walletService.createInstitutionWallet({ dto: createInstitutuionWalletDTO });
+  createInstitutionWallet(@Body() dto: WalletInstitutionCreateDTO) {
+    return this.walletService.createInstitutionWallet(dto);
   }
 
   @Post('client-create')
   @ApiOperation({ summary: 'Create a client wallet', description: 'Create a wallet for a client of a financial institution' })
-  createClientWallet(@Body() createClientWalletDTO: AccountCreateDTO) {
-    return this.walletService.createClientWallet({ dto: createClientWalletDTO });
+  createClientWallet(@Body() dto: WalletClientCreateDTO) {
+    return this.walletService.createClientWallet(dto);
   }
 
   @Post('enable')
   @ApiOperation({ summary: 'Enable a wallet', description: 'Enable a wallet to transact a specific asset' })
   enableWallet(@Body() dto: WalletEnableDTO) {
-    return this.walletService.enableWallet({ dto });
+    return this.walletService.enableWallet(dto);
   }
 }

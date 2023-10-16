@@ -12,20 +12,25 @@ import {
     ParfinGetAllContractsSuccessRes,
     ParfinContractCallSuccessRes,
     ParfinErrorRes,
-    ParfinTransaction,
+    ParfinGetTransactionSuccessRes,
+    ParfinCreateWalletSuccessRes,
 } from 'src/res/parfin.responses';
-import { WalletCreateDTO } from 'src/wallet/dto/wallet.dto';
+import {
+    WalletInstitutionCreateDTO,
+    WalletClientCreateDTO
+} from 'src/wallet/dto/wallet.dto';
 
 @Injectable()
 export class ParfinService {
-    constructor(private readonly preRequest: PreRequest) {}
+    constructor(private readonly preRequest: PreRequest) { }
 
     //--- Wallet Endpoints
     async createWallet({
         walletName,
         blockchainId,
         walletType,
-    }: WalletCreateDTO) {
+    }: WalletInstitutionCreateDTO | WalletClientCreateDTO):
+        Promise<ParfinCreateWalletSuccessRes | ParfinErrorRes> {
         const data = {
             walletName,
             blockchainId,
@@ -125,7 +130,7 @@ export class ParfinService {
     }
 
     //--- Transaction Endpoints
-    async transactionSignAndPush(id: string): Promise<any | ParfinErrorRes > {
+    async transactionSignAndPush(id: string): Promise<any | ParfinErrorRes> {
         try {
             await this.preRequest.setAuthorizationToken();
             const url = `/transaction/${id}/sign-and-push`;
@@ -136,7 +141,9 @@ export class ParfinService {
         }
     }
 
-    async getTransactionById(id: string): Promise<ParfinTransaction> {
+    async getTransactionById(id: string): Promise<
+        ParfinGetTransactionSuccessRes | ParfinErrorRes
+    > {
         try {
             await this.preRequest.setAuthorizationToken();
             const url = `/transaction/${id}/`;

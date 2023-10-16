@@ -15,18 +15,18 @@ export class RealDigitalController {
   @Post('mint')
   @ApiOperation({ summary: 'Mint Real Digital', description: 'Mint Real Digital token to an enabled wallet' })
   mint(@Body() dto: RealDigitalMintDTO) {
-    return this.realDigitalService.mint({ dto });
+    return this.realDigitalService.mint(dto);
   }
 
   @Post('burn')
   @ApiOperation({ summary: 'Burn Real Digital', description: 'Burn Real Digital token from an enabled wallet' })
   burn(@Body() dto: RealDigitalBurnDTO) {
-    this.realDigitalService.burn({ dto });
+    this.realDigitalService.burn(dto);
   }
 
   @Post('external-transfer')
   @ApiOperation({ summary: 'Tranfer Real Digital (External)', description: 'Transfer Real Digital token between different financial institutions' })
   transfer(@Body() dto: RealDigitalTransferDTO) {
-    return this.realDigitalService.transfer({ dto });
+    return this.realDigitalService.transfer(dto);
   }
 }

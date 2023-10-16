@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 
-type Abi = Array<any>;
+type ABI = Array<any>;
 type inputOutput = {
     internalType: string;
     name: string;
@@ -15,7 +15,7 @@ interface Item {
 }
 
 export default class {
-    constructor(abi: Abi) {
+    constructor(abi: ABI) {
         const web3 = new Web3();
 
         // create a method for each function describe in ABI
