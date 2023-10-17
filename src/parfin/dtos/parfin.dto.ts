@@ -69,6 +69,21 @@ export class ParfinRegisterContractDTO {
     blockchainId: string;
 }
 
+export class ParfinRegisterERC20TokenDTO {
+    @ApiProperty({ description: 'Endereço do contrato para registro do token' })
+    @IsString()
+    @IsNotEmpty()
+    smartContractAddress: string;
+
+    @ApiProperty({
+        description: 'ID da blockchain onde foi criado o contrato',
+        enum: ['BLOCKCHAIN_ID'],
+        default: BlockchainId.BLOCKCHAIN_ID,
+    })
+    @IsNotEmpty()
+    blockchainId: BlockchainId = BlockchainId.BLOCKCHAIN_ID;
+}
+
 export class ParfinContractInteractDTO {
     @ApiProperty({
         description: 'Tag para representar a insituição cliente da aplicação',

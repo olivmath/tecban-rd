@@ -5,6 +5,7 @@ import {
     ParfinDeployContractDTO,
     ParfinRegisterContractDTO,
     ParfinContractInteractDTO,
+    ParfinRegisterERC20TokenDTO,
 } from './dtos/parfin.dto';
 import {
     ParfinSuccessRes,
@@ -14,6 +15,7 @@ import {
     ParfinErrorRes,
     ParfinGetTransactionSuccessRes,
     ParfinCreateWalletSuccessRes,
+    ParfinRegisterERC20TokenSuccessRes,
 } from 'src/res/app/parfin.responses';
 import {
     WalletInstitutionCreateDTO,
@@ -48,6 +50,24 @@ export class ParfinService {
             return response.data;
         } catch (error) {
             throw new Error(`Erro ao tentar criar uma nova carteira!`);
+        }
+    }
+
+    //--- Blockchain Token Endpoints
+    async registerERC20Token(dto: ParfinRegisterERC20TokenDTO): Promise<
+        ParfinRegisterERC20TokenSuccessRes | ParfinErrorRes
+    > {
+        try {
+            await this.preRequest.setAuthorizationToken();
+            const url = '/blockchain-token/evm';
+            const data = {
+                ...dto
+            };
+            const response = await parfinApi.post(url, data);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            throw new Error('Erro ao registrar um novo token ERC20!');
         }
     }
 

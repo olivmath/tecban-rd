@@ -4,7 +4,8 @@ import { WalletAsset } from 'src/wallet/types/wallet.types';
 
 //--- Success
 export class ParfinSuccessRes {
-    @ApiProperty() id: string;
+    @ApiProperty({ description: 'ID da transação' })
+    id: string;
 }
 
 export class ParfinCreateWalletSuccessRes {
@@ -77,6 +78,29 @@ export class ParfinRegisterContractSuccessRes extends ParfinSuccessRes {
 
     @ApiProperty({ description: 'Data de criação de chamada' })
     createdAt: string;
+}
+
+export class ParfinRegisterERC20TokenSuccessRes {
+    @ApiProperty({ description: 'ID da transação' })
+    id: string;
+
+    @ApiProperty({ description: 'ID da blockchain onde foi criado o contrato' })
+    blockchainId: string;
+
+    @ApiProperty({ description: 'Diz se o token é o token nativo da blockchain' })
+    isMainBlockchainToken: boolean;
+
+    @ApiProperty({ description: 'Abreviação do token (BTC, ETH, USDT, etc.)' })
+    tokenCode: string;
+
+    @ApiProperty({ description: 'Nome do token (Bitcoin, Ethereum, Tether, etc.)' })
+    tokenName: string;
+
+    @ApiProperty({ description: 'ID da rede a qual o token pertence' })
+    networkTokenId: string;
+
+    @ApiProperty({ description: 'Número de decimais do token' })
+    decimals: number;
 }
 
 export class ParfinContractCallSuccessRes {
