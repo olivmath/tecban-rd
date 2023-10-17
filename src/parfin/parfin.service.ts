@@ -19,8 +19,10 @@ import {
 } from 'src/res/app/parfin.responses';
 import {
     WalletInstitutionCreateDTO,
-    WalletClientCreateDTO
+    WalletClientCreateDTO,
+    WalletNewAssetDTO,
 } from 'src/wallet/dto/wallet.dto';
+import { WalletAddNewAssetSuccessRes } from 'src/res/app/wallet.responses';
 
 @Injectable()
 export class ParfinService {
@@ -171,6 +173,22 @@ export class ParfinService {
             return response.data;
         } catch (error) {
             throw new Error(`Erro ao tentar solicitar a transação ${id}!`);
+        }
+    }
+    
+    async addNewAsset(
+        dto: WalletNewAssetDTO,
+    ): Promise<WalletAddNewAssetSuccessRes | ParfinErrorRes> {
+        try {
+            const data = { ...dto };
+            await this.preRequest.setAuthorizationToken();
+            const url = '/wallet/add-asset';
+            const response = await parfinApi.post(url, data);
+            return response.data;
+        } catch (error) {
+            throw new Error(
+                `Erro ao tentar adicionar o Token: ${dto.blockchainTokenId} na carteira: ${dto.walletId} / Erro: ${error}`,
+            );
         }
     }
 }

@@ -4,6 +4,7 @@ import {
     WalletInstitutionCreateDTO,
     WalletClientCreateDTO,
     WalletEnableDTO,
+    WalletNewAssetDTO,
 } from './dto/wallet.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ContractService } from 'src/helpers/Contract/contract.service';
@@ -15,6 +16,7 @@ import {
     AssetTypes,
     TransactionOperations,
 } from 'src/transactions/types/transactions.types';
+import { WalletAddNewAssetSuccessRes } from 'src/res/app/wallet.responses';
 
 @Injectable()
 export class WalletService {
@@ -209,5 +211,20 @@ export class WalletService {
     // Listagem: List all Wallets
     async getAllWallets(): Promise<Wallet[]> {
         return await this.walletRepository.findAll();
+    }
+
+    async addNewAsset(
+        dto: WalletNewAssetDTO,
+    ): Promise<WalletAddNewAssetSuccessRes | ParfinErrorRes> {
+        try {
+            const parfinCreateRes = await this.parfinService.addNewAsset(dto);
+            return {
+                ...parfinCreateRes,
+            };
+        } catch (error) {
+            throw new Error(
+                `Erro ao tentar adicionar o Token: ${dto.blockchainTokenId} na carteira: ${dto.walletId} / Erro: ${error}`,
+            );
+        }
     }
 }

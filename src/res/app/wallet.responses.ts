@@ -86,3 +86,7 @@ export class WalletSuccessRes {
   })
   userId?: string;
 }
+export class WalletAddNewAssetSuccessRes {
+    @ApiProperty({ description: 'ID do asset adicionado na carteira' })
+    assetId: string;
+}

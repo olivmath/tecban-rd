@@ -5,8 +5,9 @@ import {
   WalletInstitutionCreateDTO,
   WalletClientCreateDTO,
   WalletEnableDTO,
+  WalletNewAssetDTO,
 } from './dto/wallet.dto';
-import { createWallet201, enableWallet200, getAllWallets200, getWalletById200 } from 'src/res/swagger/wallet.swagger';
+import { createWallet201, enableWallet200, getAllWallets200, getWalletById200, newAssetAdded201 } from 'src/res/swagger/wallet.swagger';
 import { parfinError400, parfinError500 } from 'src/res/swagger/error.swagger';
 
 @Controller('wallet')
@@ -64,5 +65,17 @@ export class WalletController {
   @enableWallet200
   enableWallet(@Body() dto: WalletEnableDTO) {
     return this.walletService.enableWallet(dto);
+  }
+
+  @Post('add-asset')
+  @ApiOperation({
+    summary: 'Add asset',
+    description: 'Add a new asset in a wallet to consult balance and etc...'
+  })
+  @newAssetAdded201
+  @parfinError400
+  @parfinError500
+  addNewAsset(@Body() dto: WalletNewAssetDTO) {
+    return this.walletService.addNewAsset(dto);
   }
 }
