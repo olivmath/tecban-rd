@@ -3,10 +3,6 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { ParfinContractInteractDTO } from 'src/parfin/dtos/parfin.dto';
 
 export class RealDigitalMintDTO extends ParfinContractInteractDTO {
-  @ApiProperty({ description: 'Endereço da carteira do destinatário' })
-  @IsString()
-  @IsNotEmpty()
-  to: string;
 
   @ApiProperty({ description: 'Quantidade uint256 a ser emitida' })
   @IsNumber()

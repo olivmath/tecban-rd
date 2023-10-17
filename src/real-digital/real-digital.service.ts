@@ -35,17 +35,17 @@ export class RealDigitalService {
     }
 
     async mint(dto: RealDigitalMintDTO): Promise<any> {
-        const { to, amount } = dto as RealDigitalMintDTO;
+        const { amount } = dto as RealDigitalMintDTO;
         const parfinDTO = dto as Omit<
             RealDigitalMintDTO,
-            'to' | 'amount' | 'blockchainId'
+            'amount' | 'blockchainId'
         >;
 
         // 1 - pegar endereço do contrato `Real Digital`
         parfinDTO.metadata.contractAddress =
             await this.contractHelper.getContractAddress('STR');
         // 2 - codificar a chamada do contrato `Real Digital`
-        parfinDTO.metadata.data = this.str.requestToMint(to, amount)[0];
+        parfinDTO.metadata.data = this.str.requestToMint(amount)[0];
 
         // 3 - Interagir com o contrato usando o endpoint send/write
         try {
