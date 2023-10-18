@@ -45,18 +45,19 @@ export class WalletService {
     > {
         try {
             //chamando a criação de wallet na parfin
-            const parfinCreateRes = await this.parfinService.createWallet(dto);
-            return {
-                ...parfinCreateRes
-            };
+            const parfinCreateRes = (await this.parfinService.createWallet(
+                dto,
+            )) as ParfinCreateWalletSuccessRes;
+
+            return await this.walletRepository.create(
+                parfinCreateRes as Wallet,
+            );
         } catch (error) {
             this.logger.error(error)
             throw new Error(
                 `Erro ao tentar criar uma carteira para uma insituição: ${dto.walletName}`,
             );
         }
-        //salvamos o retorno da parfin no banco
-        // return await this.walletRepository.create(parfinCreateRes);
     }
 
     async createClientWallet(dto: WalletClientCreateDTO): Promise<

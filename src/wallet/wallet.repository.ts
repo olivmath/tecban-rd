@@ -2,9 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Wallet, WalletDocument } from '../wallet/wallet.schema';
 import { Model } from 'mongoose';
-import {
-  WalletInstitutionCreateDTO, WalletClientCreateDTO,
-} from './dto/wallet.dto';
 
 @Injectable()
 export class WalletRepository {
@@ -13,10 +10,10 @@ export class WalletRepository {
     private walletModel: Model<WalletDocument>,
   ) { }
 
-  async create(createWallet: WalletInstitutionCreateDTO | WalletClientCreateDTO): Promise<Wallet> {
-    const walletModel = new this.walletModel(createWallet);
-    return await walletModel.save();
-  }
+    async create(createWallet: Wallet): Promise<Wallet> {
+        const walletModel = new this.walletModel(createWallet);
+        return await walletModel.save();
+    }
 
   async findAll(): Promise<Wallet[]> {
     return await this.walletModel.find({ enabled: true }).exec();

@@ -15,14 +15,14 @@ import { parfinError400, parfinError500 } from 'src/res/swagger/error.swagger';
 export class WalletController {
   constructor(private readonly walletService: WalletService) { }
 
-  @Get('wallets')
-  @ApiOperation({ summary: 'Get all', description: 'Get all wallets' })
-  @getAllWallets200
-  @parfinError400
-  @parfinError500
-  getAllWallets() {
-    return this.walletService.getAllWallets();
-  }
+    @Get()
+    @ApiOperation({ summary: 'Get all', description: 'Get all wallets' })
+    @getAllWallets200
+    @parfinError400
+    @parfinError500
+    getAllWallets() {
+        return this.walletService.getAllWallets();
+    }
 
   @Get(':walletId')
   @ApiOperation({ summary: 'Get wallet by id', description: 'Get a single wallet by id' })
