@@ -16,6 +16,7 @@ import {
     ParfinContractCallSuccessRes,
     ParfinSuccessRes,
 } from 'src/res/app/parfin.responses';
+import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class RealDigitalService {
@@ -26,12 +27,15 @@ export class RealDigitalService {
         private readonly transactionService: TransactionsService,
         private readonly contractHelper: ContractService,
         private readonly parfinService: ParfinService,
+        private readonly logger: LoggerService,
     ) {
         this.str = this.contractHelper.getContractMethods('STR');
-        this.realDigital = this.contractHelper.getContractMethods('RealDigital');
+        this.realDigital =
+            this.contractHelper.getContractMethods('RealDigital');
         this.realDigitalDefaultAccount = this.contractHelper.getContractMethods(
             'RealDigitalDefaultAccount',
         );
+        this.logger.setContext('RealDigitalService');
     }
 
     async mint(dto: RealDigitalMintDTO): Promise<any> {
@@ -75,20 +79,25 @@ export class RealDigitalService {
                                 dbTransactionId,
                             );
                         } catch (error) {
+                            this.logger.error(error);
                             throw new Error(
-                                `Erro ao tentar assinar transação ${transactionId} de emissão de Real Digital / Erro: ${error}`,
+                                `Erro ao tentar assinar transação ${transactionId} de emissão de Real Digital`,
                             );
                         }
                     }
                 } catch (error) {
+                    this.logger.error(error);
+
                     throw new Error(
-                        `Erro ao tentar salvar transação ${transactionId} de emissão de Real Digital no banco / Erro: ${error}`,
+                        `Erro ao tentar salvar transação ${transactionId} de emissão de Real Digital no banco`,
                     );
                 }
             }
         } catch (error) {
+            this.logger.error(error);
+
             throw new Error(
-                `Erro ao tentar criar transação de emissão de Real Digital / Erro: ${error}`,
+                `Erro ao tentar criar transação de emissão de Real Digital`,
             );
         }
     }
@@ -133,20 +142,26 @@ export class RealDigitalService {
                                 dbTransactionId,
                             );
                         } catch (error) {
+                            this.logger.error(error);
+
                             throw new Error(
-                                `Erro ao tentar assinar transação ${transactionId} de queima de Real Digital / Erro: ${error}`,
+                                `Erro ao tentar assinar transação ${transactionId} de queima de Real Digital`,
                             );
                         }
                     }
                 } catch (error) {
+                    this.logger.error(error);
+
                     throw new Error(
-                        `Erro ao tentar salvar transação ${transactionId} de queima no banco / Erro: ${error}`,
+                        `Erro ao tentar salvar transação ${transactionId} de queima no banco`,
                     );
                 }
             }
         } catch (error) {
+            this.logger.error(error);
+
             throw new Error(
-                `Erro ao tentar criar transação de queima de Real Digital / Erro: ${error}`,
+                `Erro ao tentar criar transação de queima de Real Digital`,
             );
         }
     }
@@ -169,7 +184,9 @@ export class RealDigitalService {
 
         try {
             // 3 - Interagir com o contrato usando o endpoint call/read para obter o endereço de destino
-            const parfinCallRes = await this.parfinService.smartContractCall(parfinCallDTO);
+            const parfinCallRes = await this.parfinService.smartContractCall(
+                parfinCallDTO,
+            );
             const { data } = parfinCallRes as ParfinContractCallSuccessRes;
 
             if (data) {
@@ -225,26 +242,34 @@ export class RealDigitalService {
                                         dbTransactionId,
                                     );
                                 } catch (error) {
+                                    this.logger.error(error);
+
                                     throw new Error(
-                                        `Erro ao tentar assinar transação ${transactionId} de transferência de Real Digital / Erro: ${error}`,
+                                        `Erro ao tentar assinar transação ${transactionId} de transferência de Real Digital`,
                                     );
                                 }
                             }
                         } catch (error) {
+                            this.logger.error(error);
+
                             throw new Error(
-                                `Erro ao tentar salvar transação ${transactionId} de transferência de Real Digital no banco / Erro: ${error}`,
+                                `Erro ao tentar salvar transação ${transactionId} de transferência de Real Digital no banco`,
                             );
                         }
                     }
                 } catch (error) {
+                    this.logger.error(error);
+
                     throw new Error(
-                        `Erro ao tentar criar transação de transferência de Real Digital / Erro: ${error}`,
+                        `Erro ao tentar criar transação de transferência de Real Digital`,
                     );
                 }
             }
         } catch (error) {
+            this.logger.error(error);
+
             throw new Error(
-                `Erro ao tentar buscar carteira do destinatário com documento: ${cnpj} / Erro: ${error}`,
+                `Erro ao tentar buscar carteira do destinatário com documento: ${cnpj}`,
             );
         }
     }

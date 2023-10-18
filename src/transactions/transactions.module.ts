@@ -7,6 +7,7 @@ import { Transaction, TransactionSchema } from './transactions.schema';
 import { PreRequest } from 'src/helpers/pre-request';
 import { TransactionsRepository } from './transactions.repository';
 import { ParfinModule } from 'src/parfin/parfin.module';
+import { LoggerService } from 'src/logger/logger.service';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { ParfinModule } from 'src/parfin/parfin.module';
     ]),
   ],
   controllers: [TransactionsController],
-  providers: [TransactionsService, PreRequest, TransactionsRepository],
+  providers: [TransactionsService, PreRequest, TransactionsRepository, LoggerService],
   exports: [TransactionsService]
 })
 export class TransactionsModule { }

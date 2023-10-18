@@ -9,6 +9,7 @@ import { PreRequest } from 'src/helpers/pre-request';
 import { ContractService } from 'src/helpers/Contract/contract.service';
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import { ParfinModule } from 'src/parfin/parfin.module';
+import { LoggerService } from 'src/logger/logger.service';
 
 @Module({
     imports: [
@@ -19,7 +20,7 @@ import { ParfinModule } from 'src/parfin/parfin.module';
         ]),
     ],
     controllers: [WalletController],
-    providers: [WalletService, WalletRepository, PreRequest, ContractService],
+    providers: [WalletService, WalletRepository, PreRequest, ContractService, LoggerService],
     exports: [WalletService],
 })
 export class WalletModule {}

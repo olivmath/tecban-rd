@@ -3,9 +3,12 @@ import { AppModule } from './app.module';
 import { VersioningType, ValidationPipe, Logger } from '@nestjs/common';
 import { json, urlencoded } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LoggerService } from './logger/logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+      logger: new LoggerService(),
+  });
   app.enableShutdownHooks();
   app.enableCors({
     origin: '*',

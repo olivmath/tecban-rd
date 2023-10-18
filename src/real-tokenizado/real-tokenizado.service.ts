@@ -16,6 +16,7 @@ import {
     ParfinContractCallSuccessRes,
     ParfinSuccessRes,
 } from 'src/res/app/parfin.responses';
+import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class RealTokenizadoService {
@@ -25,9 +26,13 @@ export class RealTokenizadoService {
         private readonly transactionService: TransactionsService,
         private readonly contractHelper: ContractService,
         private readonly parfinService: ParfinService,
+        private readonly logger: LoggerService,
     ) {
-        this.realTokenizado = this.contractHelper.getContractMethods('RealTokenizado');
-        this.keyDictionary = this.contractHelper.getContractMethods('KeyDictionary');
+        this.realTokenizado =
+            this.contractHelper.getContractMethods('RealTokenizado');
+        this.keyDictionary =
+            this.contractHelper.getContractMethods('KeyDictionary');
+        this.logger.setContext('RealTokenizadoService');
     }
 
     async mint(dto: RealTokenizadoMintDTO): Promise<any> {
@@ -70,20 +75,23 @@ export class RealTokenizadoService {
                                 dbTransactionId,
                             );
                         } catch (error) {
+                            this.logger.error(error);
                             throw new Error(
-                                `Erro ao tentar assinar transação ${transactionId} de emissão de Real Tokenizado / Erro: ${error}`,
+                                `Erro ao tentar assinar transação ${transactionId} de emissão de Real Tokenizado`,
                             );
                         }
                     }
                 } catch (error) {
+                    this.logger.error(error);
                     throw new Error(
-                        `Erro ao tentar salvar transação ${transactionId} de emissão de Real Tokenizado no banco / Erro: ${error}`,
+                        `Erro ao tentar salvar transação ${transactionId} de emissão de Real Tokenizado no banco`,
                     );
                 }
             }
         } catch (error) {
+            this.logger.error(error);
             throw new Error(
-                `Erro ao tentar criar transação de emissão de Real Tokenizado / Erro: ${error}`,
+                `Erro ao tentar criar transação de emissão de Real Tokenizado`,
             );
         }
     }
@@ -127,24 +135,29 @@ export class RealTokenizadoService {
                             dbTransactionId,
                         );
                     } catch (error) {
+                        this.logger.error(error);
                         throw new Error(
-                            `Erro ao tentar assinar transação ${transactionId} de queima de Real Tokenizado / Erro: ${error}`,
+                            `Erro ao tentar assinar transação ${transactionId} de queima de Real Tokenizado`,
                         );
                     }
                 } catch (error) {
+                    this.logger.error(error);
                     throw new Error(
-                        `Erro ao tentar salvar transação ${transactionId} de queima de Real Tokenizado no banco / Erro: ${error}`,
+                        `Erro ao tentar salvar transação ${transactionId} de queima de Real Tokenizado no banco`,
                     );
                 }
             }
         } catch (error) {
+            this.logger.error(error);
             throw new Error(
-                `Erro ao tentar criar transação de queima de Real Tokenizado / Erro: ${error}`,
+                `Erro ao tentar criar transação de queima de Real Tokenizado`,
             );
         }
     }
 
-    async internalTransfer(dto: RealTokenizadoInternalTransferDTO): Promise<any> {
+    async internalTransfer(
+        dto: RealTokenizadoInternalTransferDTO,
+    ): Promise<any> {
         const { key, amount } = dto as RealTokenizadoInternalTransferDTO;
         const parfinDTO = dto as Omit<
             RealTokenizadoInternalTransferDTO,
@@ -217,26 +230,30 @@ export class RealTokenizadoService {
                                         dbTransactionId,
                                     );
                                 } catch (error) {
+                                    this.logger.error(error);
                                     throw new Error(
-                                        `Erro ao tentar assinar transação ${transactionId} de transferência interna de Real Tokenizado / Erro: ${error}`,
+                                        `Erro ao tentar assinar transação ${transactionId} de transferência interna de Real Tokenizado`,
                                     );
                                 }
                             }
                         } catch (error) {
+                            this.logger.error(error);
                             throw new Error(
-                                `Erro ao tentar salvar transação ${transactionId} de transferência de Real Tokenizado no banco / Erro: ${error}`,
+                                `Erro ao tentar salvar transação ${transactionId} de transferência de Real Tokenizado no banco`,
                             );
                         }
                     }
                 } catch (error) {
+                    this.logger.error(error);
                     throw new Error(
-                        `Erro ao tentar criar transação de transferência de Real Tokenizado / Erro: ${error}`,
+                        `Erro ao tentar criar transação de transferência de Real Tokenizado`,
                     );
                 }
             }
         } catch (error) {
+            this.logger.error(error);
             throw new Error(
-                `Erro ao tentar buscar carteira do destinatário com documento: ${key} / Erro: ${error}`,
+                `Erro ao tentar buscar carteira do destinatário com documento: ${key}`,
             );
         }
     }

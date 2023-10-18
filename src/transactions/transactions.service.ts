@@ -5,6 +5,7 @@ import { TransactionDTO } from './dtos/transaction.dto';
 import { TransactionsRepository } from './transactions.repository';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { ParfinGetTransactionSuccessRes } from 'src/res/app/parfin.responses';
+import { LoggerService } from 'src/logger/logger.service';
 
 export enum InteractionEnum {
     CALL = 'Call',
@@ -16,7 +17,10 @@ export class TransactionsService {
     constructor(
         private readonly transactionsRepository: TransactionsRepository,
         private readonly parfinService: ParfinService,
-    ) { }
+        private readonly logger: LoggerService,
+    ) {
+        this.logger.setContext('TransactionsService');
+    }
 
     async create(createTransactionDto: TransactionDTO): Promise<Transaction> {
         return this.transactionsRepository.create(createTransactionDto);
@@ -39,6 +43,9 @@ export class TransactionsService {
         );
 
         if (!existingTransaction) {
+            this.logger.error(
+                new Error(`Transação com ID ${id} não encontrada.`),
+            );
             throw new Error(`Transação com ID ${id} não encontrada.`);
         }
 
@@ -61,6 +68,9 @@ export class TransactionsService {
                 await this.transactionsRepository.findOne(dbTransactionId);
 
             if (!existingTransaction) {
+                this.logger.error(
+                    new Error(`Transação com ID ${id} não encontrada.`),
+                );
                 throw new Error(`Transação com ID ${id} não encontrada.`);
             }
 
@@ -72,10 +82,8 @@ export class TransactionsService {
                 await this.parfinService.getTransactionById(id);
 
             //update a transaction
-            const {
-                blockchainNetwork,
-                statusDescription
-            } = parfinTransaction as ParfinGetTransactionSuccessRes;
+            const { blockchainNetwork, statusDescription } =
+                parfinTransaction as ParfinGetTransactionSuccessRes;
             await this.update(dbTransactionId, {
                 blockchainNetwork,
                 statusDescription,

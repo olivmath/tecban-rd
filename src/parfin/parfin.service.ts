@@ -23,68 +23,72 @@ import {
     WalletNewAssetDTO,
 } from 'src/wallet/dto/wallet.dto';
 import { WalletAddNewAssetSuccessRes } from 'src/res/app/wallet.responses';
+import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class ParfinService {
-    constructor(private readonly preRequest: PreRequest) { }
+    constructor(
+        private readonly preRequest: PreRequest,
+        private readonly logger: LoggerService,
+    ) {
+        this.logger.setContext('ParfinService');
+    }
 
     //--- Wallet Endpoints
     async createWallet({
         walletName,
         blockchainId,
         walletType,
-    }: WalletInstitutionCreateDTO | WalletClientCreateDTO):
-        Promise<ParfinCreateWalletSuccessRes | ParfinErrorRes> {
+    }: WalletInstitutionCreateDTO | WalletClientCreateDTO): Promise<
+        ParfinCreateWalletSuccessRes | ParfinErrorRes
+    > {
         const data = {
             walletName,
             blockchainId,
             walletType,
         };
+        const url = '/wallet';
+        let response;
         try {
-            await this.preRequest.setAuthorizationToken();
-            const url = `/wallet`;
-            const response = await parfinApi.post(url, data, {
-                headers: {
-                    'x-api-key': process.env.X_API_KEY,
-                },
-            });
-
-            return response.data;
+            await this.preRequest.setAuthorizationToken('/wallet');
+            response = await parfinApi.post(url, data);
         } catch (error) {
-            throw new Error(`Erro ao tentar criar uma nova carteira!`);
+            this.logger.error(error);
+            throw new Error('Erro ao tentar criar uma nova carteira!');
         }
+        return response.data;
     }
 
     //--- Blockchain Token Endpoints
-    async registerERC20Token(dto: ParfinRegisterERC20TokenDTO): Promise<
-        ParfinRegisterERC20TokenSuccessRes | ParfinErrorRes
-    > {
+    async registerERC20Token(
+        dto: ParfinRegisterERC20TokenDTO,
+    ): Promise<ParfinRegisterERC20TokenSuccessRes | ParfinErrorRes> {
+        const url = '/blockchain-token/evm';
+        let response;
         try {
-            await this.preRequest.setAuthorizationToken();
-            const url = '/blockchain-token/evm';
-            const data = {
-                ...dto
-            };
-            const response = await parfinApi.post(url, data);
-            return response.data;
+            await this.preRequest.setAuthorizationToken(url);
+            const response = await parfinApi.post(url, dto);
         } catch (error) {
-            console.log(error);
+            this.logger.error(error);
             throw new Error('Erro ao registrar um novo token ERC20!');
         }
+        return response.data;
     }
 
     //--- Web3 Endpoints
     async getAllContracts(): Promise<
         ParfinGetAllContractsSuccessRes[] | ParfinErrorRes
     > {
+        const url = '/custody/web3/contracts';
+        let response;
         try {
-            await this.preRequest.setAuthorizationToken();
-            const response = await parfinApi.get(`/custody/web3/contracts`);
-            return response.data;
+            await this.preRequest.setAuthorizationToken(url);
+            response = await parfinApi.get(url);
         } catch (error) {
-            console.log(error);
-            throw new Error('Erro ao listar os contratos!');
+            this.logger.error(error);
+            throw new Error(`Erro ao listar os contratos!}`);
         }
+        return response.data;
     }
 
     async deployContract(
@@ -102,93 +106,97 @@ export class ParfinService {
     async registerContract(
         dto: ParfinRegisterContractDTO,
     ): Promise<ParfinRegisterContractSuccessRes | ParfinErrorRes> {
-        const { contractAddress } = dto;
+        const url = '/custody/web3/contract';
+        let response;
         try {
-            await this.preRequest.setAuthorizationToken();
-            const url = `/custody/web3/contract`;
-            const response = await parfinApi.post(url, dto);
-            return response.data;
+            await this.preRequest.setAuthorizationToken(url);
+            response = await parfinApi.post(url, dto);
         } catch (error) {
+            this.logger.error(error);
             throw new Error(
-                `Erro ao tentar registrar o contrato: ${contractAddress}`,
+                `Erro ao tentar registrar o contrato: ${dto.contractAddress}`,
             );
         }
+        return response.data;
     }
 
     async smartContractCall(
         dto: ParfinContractInteractDTO,
     ): Promise<ParfinContractCallSuccessRes | ParfinErrorRes> {
-        const {
-            metadata: { contractAddress },
-        } = dto;
+        const url = '/custody/web3/contract/call';
+        let response;
         try {
-            await this.preRequest.setAuthorizationToken();
-            const url = `/custody/web3/contract/call`;
-            const response = await parfinApi.post(url, dto);
-            return response.data;
+            await this.preRequest.setAuthorizationToken(url);
+            response = await parfinApi.post(url, dto);
         } catch (error) {
+            this.logger.error(error);
             throw new Error(
-                `Erro ao tentar visualizar informações do contrato: ${contractAddress}`,
+                `Erro ao tentar visualizar informações do contrato: ${dto.metadata.contractAddress}`,
             );
         }
+        return response.data;
     }
 
     async smartContractSend(
         dto: ParfinContractInteractDTO,
     ): Promise<ParfinSuccessRes | ParfinErrorRes> {
-        const {
-            metadata: { contractAddress },
-        } = dto;
+        const url = '/custody/web3/contract/send';
+        let response;
         try {
-            await this.preRequest.setAuthorizationToken();
-            const url = `/custody/web3/contract/send`;
-            const response = await parfinApi.post(url, dto);
-            return response.data;
+            await this.preRequest.setAuthorizationToken(url);
+            response = await parfinApi.post(url, dto);
         } catch (error) {
+            this.logger.error(error);
             throw new Error(
-                `Erro ao tentar interagir com o contrato: ${contractAddress}`,
+                `Erro ao tentar interagir com o contrato: ${dto.metadata.contractAddress}`,
             );
         }
+        return response.data;
     }
 
     //--- Transaction Endpoints
     async transactionSignAndPush(id: string): Promise<any | ParfinErrorRes> {
+        const url = `/transaction/${id}/sign-and-push`;
+        let response;
         try {
-            await this.preRequest.setAuthorizationToken();
-            const url = `/transaction/${id}/sign-and-push`;
-            const response = await parfinApi.put(url, id);
-            return response.data;
+            await this.preRequest.setAuthorizationToken(url);
+            response = await parfinApi.put(url, id);
         } catch (error) {
+            this.logger.error(error);
             throw new Error(`Erro ao tentar assinar a transação ${id}!`);
         }
+        return response.data;
     }
 
-    async getTransactionById(id: string): Promise<
-        ParfinGetTransactionSuccessRes | ParfinErrorRes
-    > {
+    async getTransactionById(
+        id: string,
+    ): Promise<ParfinGetTransactionSuccessRes | ParfinErrorRes> {
+        const url = `/transaction/${id}/`;
+        let response;
         try {
-            await this.preRequest.setAuthorizationToken();
-            const url = `/transaction/${id}/`;
-            const response = await parfinApi.get(url);
-            return response.data;
+            await this.preRequest.setAuthorizationToken(url);
+            response = await parfinApi.get(url);
         } catch (error) {
+            this.logger.error(error);
             throw new Error(`Erro ao tentar solicitar a transação ${id}!`);
         }
+        return response.data;
     }
-    
+
     async addNewAsset(
         dto: WalletNewAssetDTO,
     ): Promise<WalletAddNewAssetSuccessRes | ParfinErrorRes> {
+        const url = '/wallet/add-asset';
+        let response;
         try {
-            const data = { ...dto };
-            await this.preRequest.setAuthorizationToken();
-            const url = '/wallet/add-asset';
-            const response = await parfinApi.post(url, data);
-            return response.data;
+            await this.preRequest.setAuthorizationToken(url);
+            response = await parfinApi.post(url, dto);
         } catch (error) {
+            this.logger.error(error);
             throw new Error(
-                `Erro ao tentar adicionar o Token: ${dto.blockchainTokenId} na carteira: ${dto.walletId} / Erro: ${error}`,
+                `Erro ao tentar adicionar o Token: ${dto.blockchainTokenId} na carteira: ${dto.walletId}`,
             );
         }
+        return response.data;
     }
 }

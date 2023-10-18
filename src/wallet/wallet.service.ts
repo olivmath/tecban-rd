@@ -17,6 +17,7 @@ import {
     TransactionOperations,
 } from 'src/transactions/types/transactions.types';
 import { WalletAddNewAssetSuccessRes } from 'src/res/app/wallet.responses';
+import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class WalletService {
@@ -28,12 +29,14 @@ export class WalletService {
         private readonly contractHelper: ContractService,
         private readonly parfinService: ParfinService,
         private readonly transactionService: TransactionsService,
+        private readonly logger: LoggerService,
     ) {
         this.keyDictionary = this.contractHelper.getContractMethods('KeyDictionary');
         this.realTokenizado = this.contractHelper.getContractMethods('RealTokenizado');
         this.realDigitalEnableAccount = this.contractHelper.getContractMethods(
             'RealDigitalEnableAccount',
         );
+        this.logger.setContext('WalletService');
     }
 
     // Gravação: Create a new Wallet
@@ -47,8 +50,9 @@ export class WalletService {
                 ...parfinCreateRes
             };
         } catch (error) {
+            this.logger.error(error)
             throw new Error(
-                `Erro ao tentar criar uma carteira para uma insituição: ${dto.walletName} / Erro: ${error}`,
+                `Erro ao tentar criar uma carteira para uma insituição: ${dto.walletName}`,
             );
         }
         //salvamos o retorno da parfin no banco
@@ -117,20 +121,23 @@ export class WalletService {
                                 ...parfinCreateRes
                             };
                         } catch (error) {
+                            this.logger.error(error)
                             throw new Error(
-                                `Erro ao tentar assinar transação ${transactionId} de queima de Real Digital / Erro: ${error}`,
+                                `Erro ao tentar assinar transação ${transactionId} de queima de Real Digital`,
                             );
                         }
                     }
                 } catch (error) {
+                    this.logger.error(error)
                     throw new Error(
-                        `Erro ao tentar salvar transação ${transactionId} de queima no banco / Erro: ${error}`,
+                        `Erro ao tentar salvar transação ${transactionId} de queima no banco`,
                     );
                 }
             }
         } catch (error) {
+            this.logger.error(error)
             throw new Error(
-                `Erro ao tentar criar transação de queima de Real Digital / Erro: ${error}`,
+                `Erro ao tentar criar transação de queima de Real Digital`,
             );
         }
     }
@@ -222,8 +229,9 @@ export class WalletService {
                 ...parfinCreateRes,
             };
         } catch (error) {
+            this.logger.error(error)
             throw new Error(
-                `Erro ao tentar adicionar o Token: ${dto.blockchainTokenId} na carteira: ${dto.walletId} / Erro: ${error}`,
+                `Erro ao tentar adicionar o Token: ${dto.blockchainTokenId} na carteira: ${dto.walletId}`,
             );
         }
     }
