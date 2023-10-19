@@ -4,10 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TransactionsController } from './transactions.controller';
 import { TransactionsService } from './transactions.service';
 import { Transaction, TransactionSchema } from './transactions.schema';
-import { PreRequest } from 'src/helpers/pre-request';
 import { TransactionsRepository } from './transactions.repository';
 import { ParfinModule } from 'src/parfin/parfin.module';
 import { LoggerService } from 'src/logger/logger.service';
+import { ParfinAuth } from 'src/auth/parfin.auth';
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { LoggerService } from 'src/logger/logger.service';
     ]),
   ],
   controllers: [TransactionsController],
-  providers: [TransactionsService, PreRequest, TransactionsRepository, LoggerService],
+  providers: [TransactionsService, TransactionsRepository, LoggerService],
   exports: [TransactionsService]
 })
 export class TransactionsModule { }

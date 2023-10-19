@@ -27,10 +27,6 @@ export class WalletAsset {
     @IsString()
     assetId: string;
 
-    @ApiProperty({ description: 'ID da blockchain que o ativo pertence' })
-    @IsString()
-    blockchainTokenId: string;
-
     @ApiProperty({ description: 'Saldo disponível do ativo' })
     @IsString()
     availableBalance: string;
@@ -50,6 +46,10 @@ export class WalletAsset {
     @ApiProperty({ description: 'Nome do ativo' })
     @IsString()
     blockchainTokenName: string;
+
+    @ApiProperty({ description: 'ID da blockchain que o ativo pertence' })
+    @IsString()
+    blockchainTokenId: string;
 }
 
 export class Wallet {

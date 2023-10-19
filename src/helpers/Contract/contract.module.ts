@@ -1,11 +1,10 @@
 import { ParfinService } from 'src/parfin/parfin.service';
 import { Module } from '@nestjs/common';
-import { PreRequest } from '../pre-request';
 import { ContractService } from './contract.service';
 
 @Module({
     controllers: [],
-    providers: [ParfinService, PreRequest],
+    providers: [ParfinService],
     exports: [ContractService],
 })
-export class ContractHelperModule {}
+export class ContractHelperModule { }

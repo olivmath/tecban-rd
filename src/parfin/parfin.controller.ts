@@ -12,9 +12,11 @@ import {
   ParfinGetAllContractsSuccessRes,
   ParfinErrorRes,
   ParfinRegisterERC20TokenSuccessRes,
+  ParfinGetWalletSuccessRes,
 } from 'src/res/app/parfin.responses';
 import { registerERC20Token200 } from 'src/res/swagger/parfin.swagger';
 import { parfinError400, parfinError500 } from 'src/res/swagger/error.swagger';
+import { getAllWallets200 } from 'src/res/swagger/wallet.swagger';
 
 @Controller('parfin')
 @ApiTags('Parfin Operations')
@@ -38,7 +40,7 @@ export class ParfinController {
   }
 
   @Get('contracts')
-  @ApiOperation({ summary: 'Get all', description: 'Get all smart contracts deployed using the Parfin API' })
+  @ApiOperation({ summary: 'Get all contracts', description: 'Get all smart contracts deployed using the Parfin API' })
   getAllContracts(): Promise<ParfinGetAllContractsSuccessRes[] | ParfinErrorRes> {
     return this.parfinService.getAllContracts();
   }
@@ -52,5 +54,16 @@ export class ParfinController {
     ParfinRegisterERC20TokenSuccessRes | ParfinErrorRes
   > {
     return this.parfinService.registerERC20Token(dto);
+  }
+
+  @Get('wallets')
+  @ApiOperation({ summary: 'Get all Parfin wallets', description: 'Get all wallets registered in the Parfin platform' })
+  @getAllWallets200
+  @parfinError400
+  @parfinError500
+  getAllWallets(): Promise<
+    ParfinGetWalletSuccessRes[] | ParfinErrorRes
+  > {
+    return this.parfinService.getAllWallets();
   }
 }

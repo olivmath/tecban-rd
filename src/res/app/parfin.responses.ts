@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BlockchainNetwork } from 'src/transactions/types/transactions.types';
-import { WalletAsset } from 'src/wallet/types/wallet.types';
+import { WalletAsset, WalletType } from 'src/wallet/types/wallet.types';
 
 //--- Success
 export class ParfinSuccessRes {
@@ -32,18 +32,31 @@ export class ParfinCreateWalletSuccessRes {
 }
 
 export class ParfinGetWalletSuccessRes {
-    @ApiProperty() id: string;
-    @ApiProperty() blockchainNetwork: string;
-    @ApiProperty() blockchainName: string;
-    @ApiProperty() blockchainId: string;
-    @ApiProperty() walletId: string;
-    @ApiProperty() address: string;
-    @ApiProperty() name: string;
-    @ApiProperty() assets: WalletAsset[];
-    @ApiProperty() enabled: boolean;
-    @ApiProperty() isBlocked: boolean;
-    @ApiProperty() blockedMetadataHistory: string[];
-    @ApiProperty() walletType: string;
+    @ApiProperty({ description: 'Rede da blockchain a qual a carteira está vinculada' })
+    blockchainNetwork: string;
+    @ApiProperty({ description: 'Nome da blockchain a qual a carteira está vinculada' })
+    blockchainName: string;
+    @ApiProperty({ description: 'ID da blockchain a qual a carteira está vinculada' })
+    blockchainId: string;
+    @ApiProperty({ description: 'ID da carteira na Parfin' })
+    walletId: string;
+    @ApiProperty({ description: 'Endereço da carteira' })
+    address: string;
+    @ApiProperty({ description: 'Nome da carteira' })
+    name: string;
+    @ApiProperty({ description: 'Lista de ativos da carteira' })
+    assets: WalletAsset[];
+    @ApiProperty({ description: 'Diz se a carteira está habilitada ou não' })
+    enabled: boolean;
+    @ApiProperty({ description: 'Diz se a carteira está bloqueada ou não' })
+    isBlocked: boolean;
+    @ApiProperty({ description: 'Histórico de metadata bloqueado' })
+    blockedMetadataHistory: string[];
+    @ApiProperty({
+        description: 'Tipo de carteira',
+        enum: ['CUSTODY', 'HOTWALLET']
+    })
+    walletType: WalletType;
 }
 
 export class ParfinGetAllContractsSuccessRes {

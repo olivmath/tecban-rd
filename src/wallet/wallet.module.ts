@@ -5,11 +5,11 @@ import { WalletController } from './wallet.controller';
 
 import { MongooseModule } from '@nestjs/mongoose';
 import { Wallet, WalletSchema } from './wallet.schema';
-import { PreRequest } from 'src/helpers/pre-request';
 import { ContractService } from 'src/helpers/Contract/contract.service';
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import { ParfinModule } from 'src/parfin/parfin.module';
 import { LoggerService } from 'src/logger/logger.service';
+import { ParfinAuth } from 'src/auth/parfin.auth';
 
 @Module({
     imports: [
@@ -20,7 +20,7 @@ import { LoggerService } from 'src/logger/logger.service';
         ]),
     ],
     controllers: [WalletController],
-    providers: [WalletService, WalletRepository, PreRequest, ContractService, LoggerService],
+    providers: [WalletService, WalletRepository, ContractService, LoggerService],
     exports: [WalletService],
 })
-export class WalletModule {}
+export class WalletModule { }
