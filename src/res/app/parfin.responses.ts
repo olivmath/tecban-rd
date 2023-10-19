@@ -76,7 +76,7 @@ export class ParfinGetAllContractsSuccessRes {
     createdAt: string;
 
     @ApiProperty({ description: 'Data de atualização do contrato' })
-    updatedAt: string;
+    updatedAt?: string;
 }
 
 export class ParfinRegisterContractSuccessRes extends ParfinSuccessRes {
