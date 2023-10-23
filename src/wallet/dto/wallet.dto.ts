@@ -77,16 +77,24 @@ export class WalletClientCreateDTO extends ParfinContractInteractDTO {
 
 export class WalletEnableDTO extends ParfinContractInteractDTO {
     @ApiProperty({ description: 'Ativo da carteira' })
+    @IsString()
+    @IsNotEmpty()
     asset: string;
 
     @ApiProperty({ description: 'Endereço da carteira' })
+    @IsString()
+    @IsNotEmpty()
     walletAddress: string;
 }
 
 export class WalletNewAssetDTO {
     @ApiProperty({ description: 'ID do Token ERC20' })
+    @IsString()
+    @IsNotEmpty()
     blockchainTokenId: string;
 
     @ApiProperty({ description: 'ID da carteira' })
+    @IsString()
+    @IsNotEmpty()
     walletId: string;
 }

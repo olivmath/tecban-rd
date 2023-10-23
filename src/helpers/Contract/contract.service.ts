@@ -24,7 +24,7 @@ export type ContractName =
     | 'STR';
 
 @Injectable()
-export class ContractService {
+export class ContractHelperService {
     constructor(private readonly parfinService: ParfinService) { }
 
     // Função que busca todos os métodos de um contrato
@@ -36,7 +36,7 @@ export class ContractService {
     async getContractAddress(contractName: ContractName): Promise<string> {
         const w3 = new Web3();
         // build tx data to get address from addressDiscovery
-        const pcw = new ContractWrapper(abiLoader[contractName]);
+        const pcw = new ContractWrapper(abiLoader['AddressDiscovery']);
         const data = pcw.addressDiscovery(w3.utils.sha3(contractName))[0];
 
         // mount Parfin's payload

@@ -8,6 +8,7 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { ParfinModule } from './parfin/parfin.module';
 import { RealDigitalModule } from './real-digital/real-digital.module';
 import { RealTokenizadoModule } from './real-tokenizado/real-tokenizado.module';
+import { ContractHelperModule } from './helpers/Contract/contract.module';
 
 @Module({
     imports: [
@@ -19,8 +20,9 @@ import { RealTokenizadoModule } from './real-tokenizado/real-tokenizado.module';
         RealTokenizadoModule,
         TransactionsModule,
         WalletModule,
+        ContractHelperModule,
     ],
 
     controllers: [HealthController],
 })
-export class AppModule {}
+export class AppModule { }

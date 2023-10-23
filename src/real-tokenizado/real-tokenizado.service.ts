@@ -1,5 +1,5 @@
 import { TransactionsService } from 'src/transactions/transactions.service';
-import { ContractService } from 'src/helpers/Contract/contract.service';
+import { ContractHelperService } from 'src/helpers/Contract/contract.service';
 import ContractWrapper from 'src/utils/contract/contract-wrapper';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { Injectable } from '@nestjs/common';
@@ -24,7 +24,7 @@ export class RealTokenizadoService {
     realTokenizado: ContractWrapper;
     constructor(
         private readonly transactionService: TransactionsService,
-        private readonly contractHelper: ContractService,
+        private readonly contractHelper: ContractHelperService,
         private readonly parfinService: ParfinService,
         private readonly logger: LoggerService,
     ) {

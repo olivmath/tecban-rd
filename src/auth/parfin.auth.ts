@@ -10,7 +10,7 @@ export class ParfinAuth {
   constructor(
     private readonly logger: LoggerService
   ) {
-    this.logger.setContext('PreRequest');
+    this.logger.setContext('ParfinAuth');
   }
   public async setAuth(
     apiUri: string,
