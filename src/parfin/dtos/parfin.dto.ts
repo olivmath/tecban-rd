@@ -103,7 +103,7 @@ export class ParfinContractInteractDTO {
 
     @ApiProperty({
         description: 'Descrição da interação com o contrato',
-        default: null,
+        default: '',
     })
     @IsString()
     @IsOptional()
@@ -118,16 +118,8 @@ export class ParfinContractInteractDTO {
     metadata: InteractMetadata;
 
     @ApiProperty({
-        description: 'ID da blocklchain onde será utilizada a carteira',
-        enum: ['BLOCKCHAIN_ID'],
-        default: BlockchainId.BLOCKCHAIN_ID,
-    })
-    @IsOptional()
-    blockchainId?: BlockchainId = BlockchainId.BLOCKCHAIN_ID;
-
-    @ApiProperty({
-        description: 'Informações sobre o ativo do contrato',
-        type: Source
+        description: 'Informações sobre o ativo do contrato que está sendo interagido com',
+        type: Source,
     })
     @IsOptional()
     source?: Source;
@@ -139,4 +131,12 @@ export class ParfinContractInteractDTO {
     })
     @IsOptional()
     priority?: Priority = Priority.HIGH;
+
+    @ApiProperty({
+        description: 'ID da blocklchain onde será utilizada a carteira',
+        enum: ['BLOCKCHAIN_ID'],
+        default: BlockchainId.BLOCKCHAIN_ID,
+    })
+    @IsOptional()
+    blockchainId?: BlockchainId = BlockchainId.BLOCKCHAIN_ID;
 }

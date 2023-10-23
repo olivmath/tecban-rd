@@ -17,6 +17,8 @@ import {
     ParfinSuccessRes,
 } from 'src/res/app/parfin.responses';
 import { LoggerService } from 'src/logger/logger.service';
+import { ParfinContractInteractDTO } from 'src/parfin/dtos/parfin.dto';
+import { AssetID } from 'src/wallet/types/wallet.types';
 
 @Injectable()
 export class RealDigitalService {
@@ -39,22 +41,26 @@ export class RealDigitalService {
     }
 
     async mint(dto: RealDigitalMintDTO): Promise<any> {
-        const { amount } = dto as RealDigitalMintDTO;
-        const parfinDTO = dto as Omit<
-            RealDigitalMintDTO,
-            'amount' | 'blockchainId'
-        >;
+        const { description, amount } = dto as RealDigitalMintDTO;
+        // const parfinDTO = {} as Omit<ParfinContractInteractDTO, 'blockchainId'>;
+        const parfinDTO = new ParfinContractInteractDTO()
+        const { blockchainId, ...partialDTO } = parfinDTO;
+
+        partialDTO.description = description;
+        partialDTO.source = {
+            assetId: AssetID.realDigital
+        }
+        console.log('>>> Partial DTO source:', partialDTO.source.assetId)
 
         // 1 - pegar endereço do contrato `Real Digital`
-        parfinDTO.metadata.contractAddress =
-            await this.contractHelper.getContractAddress('STR');
+        partialDTO.metadata.contractAddress = await this.contractHelper.getContractAddress('STR');
         // 2 - codificar a chamada do contrato `Real Digital`
-        parfinDTO.metadata.data = this.str.requestToMint(amount)[0];
+        partialDTO.metadata.data = this.str.requestToMint(amount)[0];
 
         // 3 - Interagir com o contrato usando o endpoint send/write
         try {
             const parfinSendRes = await this.parfinService.smartContractSend(
-                parfinDTO,
+                partialDTO,
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
+import { AssetID } from 'src/wallet/types/wallet.types';
 
 export enum Priority {
     LOW = 'LOW',
@@ -8,10 +9,12 @@ export enum Priority {
 }
 
 export class Source {
-    @ApiProperty({ description: 'ID que representa o ativo do contrato' })
-    @IsString()
+    @ApiProperty({
+        description: 'ID que representa o ativo do contrato',
+        enum: ['0430a64a-088a-4346-895e-e78c02a14345', '', ''],
+    })
     @IsNotEmpty()
-    assetId: string;
+    assetId: AssetID;
 }
 
 export class DeployMetadata {

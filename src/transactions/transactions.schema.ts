@@ -7,11 +7,12 @@ import {
   TransactionOperations,
 } from './types/transactions.types';
 import { Priority } from 'src/parfin/types/parfin.types';
+import { AssetID } from 'src/wallet/types/wallet.types';
 
 @Schema()
 class Source {
   @Prop()
-  assetId: string;
+  assetId: AssetID;
 
   @Prop()
   walletId: string;
