@@ -74,7 +74,7 @@ export class ParfinAuth {
       parfinApi.defaults.headers.common['Authorization'] = `${token}`;
     } catch (error) {
       this.logger.error(error)
-      throw new Error(`Erro ao gerar o token de autorização!`);
+      throw new Error('Erro ao gerar o token de autorização!');
     }
   }
 }

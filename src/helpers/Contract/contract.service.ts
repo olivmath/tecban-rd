@@ -4,6 +4,7 @@ import { ParfinService } from 'src/parfin/parfin.service';
 import { Injectable } from '@nestjs/common';
 import abiLoader from '../abi-loader';
 import Web3 from 'web3';
+import { LoggerService } from 'src/logger/logger.service';
 
 export const discoveryAddress = process.env['ADDRESS_DISCOVERY_ADDRESS'];
 
@@ -25,7 +26,12 @@ export type ContractName =
 
 @Injectable()
 export class ContractHelperService {
-    constructor(private readonly parfinService: ParfinService) { }
+    constructor(
+        private readonly parfinService: ParfinService,
+        private readonly logger: LoggerService,
+    ) {
+        this.logger.setContext('ContractHelperService');
+    }
 
     // Função que busca todos os métodos de um contrato
     getContractMethods(contractName: ContractName): ContractWrapper {
@@ -47,11 +53,21 @@ export class ContractHelperService {
         };
 
         // send tx via Parfin
-        const result = await this.parfinService.smartContractCall(payload);
+        let result;
+        try {
+            result = await this.parfinService.smartContractCall(payload);
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(
+                `Erro ao buscar o endereço do contracto: ${contractName}`,
+            );
+        }
 
-        // decode/return response
-        return pcw.addressDiscovery({
+        // decode response
+        const address: string = pcw.addressDiscovery({
             returned: result,
         })[0];
+
+        return address;
     }
 }

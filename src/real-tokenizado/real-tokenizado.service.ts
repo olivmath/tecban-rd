@@ -42,10 +42,18 @@ export class RealTokenizadoService {
             'to' | 'amount' | 'blockchainId'
         >;
 
-        // 1 - pegar endereço do contrato `Real Tokenizado`
-        parfinDTO.metadata.contractAddress =
-            await this.contractHelper.getContractAddress('RealTokenizado');
-        // 2 - codificar a chamada do contrato `Real Tokenizado`
+        // 1 - Pegar o endereço do contrato `Real Tokenizado`
+        try {
+            parfinDTO.metadata.contractAddress =
+                await this.contractHelper.getContractAddress('RealTokenizado');
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(
+                'Erro ao buscar o endereço do contrato: RealTokenizado',
+            );
+        }
+
+        // 2 - Codificar a chamada do contrato `Real Tokenizado`
         parfinDTO.metadata.data = this.realTokenizado.mint(to, amount)[0];
 
         try {
@@ -55,43 +63,39 @@ export class RealTokenizadoService {
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 
-            if (transactionId) {
-                try {
-                    // 4 - Salvar transação no banco
-                    const transactionData = {
-                        parfinTransactionId: transactionId,
-                        operation: TransactionOperations.MINT,
-                        asset: AssetTypes.RD,
-                        ...parfinDTO,
-                    };
-                    const { id: dbTransactionId } =
-                        await this.transactionService.create(transactionData);
+            const transactionData = {
+                parfinTransactionId: transactionId,
+                operation: TransactionOperations.MINT,
+                asset: AssetTypes.RD,
+                ...parfinDTO,
+            };
+            try {
+                // 4 - Salvar a transação no banco
+                const { id: dbTransactionId } =
+                    await this.transactionService.create(transactionData);
 
-                    if (dbTransactionId) {
-                        try {
-                            // 5 - Assinar transação e inserir na blockchain
-                            return await this.transactionService.transactionSignAndPush(
-                                transactionId,
-                                dbTransactionId,
-                            );
-                        } catch (error) {
-                            this.logger.error(error);
-                            throw new Error(
-                                `Erro ao tentar assinar transação ${transactionId} de emissão de Real Tokenizado`,
-                            );
-                        }
-                    }
+                try {
+                    // 5 - Assinar a transação e inserir na blockchain
+                    return await this.transactionService.transactionSignAndPush(
+                        transactionId,
+                        dbTransactionId,
+                    );
                 } catch (error) {
                     this.logger.error(error);
                     throw new Error(
-                        `Erro ao tentar salvar transação ${transactionId} de emissão de Real Tokenizado no banco`,
+                        `Erro ao tentar assinar transação ${transactionId} de emissão de Real Tokenizado na Parfin`,
                     );
                 }
+            } catch (error) {
+                this.logger.error(error);
+                throw new Error(
+                    `Erro ao tentar salvar transação ${transactionId} de emissão de Real Tokenizado no banco`,
+                );
             }
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `Erro ao tentar criar transação de emissão de Real Tokenizado`,
+                'Erro ao tentar criar transação de emissão de Real Tokenizado',
             );
         }
     }
@@ -103,10 +107,18 @@ export class RealTokenizadoService {
             'amount' | 'blockchainId'
         >;
 
-        // 1 - pegar endereço do contrato `Real Tokenizado`
-        parfinDTO.metadata.contractAddress =
-            await this.contractHelper.getContractAddress('RealTokenizado');
-        // 2 - codificar a chamada do contrato `Real Tokenizado`
+        // 1 - Pegar o endereço do contrato `Real Tokenizado`
+        try {
+            parfinDTO.metadata.contractAddress =
+                await this.contractHelper.getContractAddress('RealTokenizado');
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(
+                'Erro ao buscar o endereço do contrato: RealTokenizado',
+            );
+        }
+
+        // 2 - Codificar a chamada do contrato `Real Tokenizado`
         parfinDTO.metadata.data = this.realTokenizado.burn(amount)[0];
 
         try {
@@ -116,41 +128,39 @@ export class RealTokenizadoService {
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 
-            if (transactionId) {
-                try {
-                    // 4 - Salvar transação no banco
-                    const transactionData = {
-                        parfinTransactionId: transactionId,
-                        operation: TransactionOperations.BURN,
-                        asset: AssetTypes.RD,
-                        ...parfinDTO,
-                    };
-                    const { id: dbTransactionId } =
-                        await this.transactionService.create(transactionData);
+            const transactionData = {
+                parfinTransactionId: transactionId,
+                operation: TransactionOperations.BURN,
+                asset: AssetTypes.RD,
+                ...parfinDTO,
+            };
+            try {
+                // 4 - Salvar a transação no banco
+                const { id: dbTransactionId } =
+                    await this.transactionService.create(transactionData);
 
-                    try {
-                        // 5 - Assinar transação e inserir na blockchain
-                        return await this.transactionService.transactionSignAndPush(
-                            transactionId,
-                            dbTransactionId,
-                        );
-                    } catch (error) {
-                        this.logger.error(error);
-                        throw new Error(
-                            `Erro ao tentar assinar transação ${transactionId} de queima de Real Tokenizado`,
-                        );
-                    }
+                try {
+                    // 5 - Assinar a transação e inserir na blockchain
+                    return await this.transactionService.transactionSignAndPush(
+                        transactionId,
+                        dbTransactionId,
+                    );
                 } catch (error) {
                     this.logger.error(error);
                     throw new Error(
-                        `Erro ao tentar salvar transação ${transactionId} de queima de Real Tokenizado no banco`,
+                        `Erro ao tentar assinar transação ${transactionId} de queima de Real Tokenizado na Parfin`,
                     );
                 }
+            } catch (error) {
+                this.logger.error(error);
+                throw new Error(
+                    `Erro ao tentar salvar transação ${transactionId} de queima de Real Tokenizado no banco`,
+                );
             }
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `Erro ao tentar criar transação de queima de Real Tokenizado`,
+                'Erro ao tentar criar transação de queima de Real Tokenizado',
             );
         }
     }
@@ -164,10 +174,18 @@ export class RealTokenizadoService {
             'blockchainId' | 'key' | 'amount'
         >;
 
-        // 1 - pegar endereço do contrato `Key Dictionary`
-        parfinDTO.metadata.contractAddress =
-            await this.contractHelper.getContractAddress('KeyDictionary');
-        // 2 - codificar a chamada do contrato `Key Dictionary`
+        try {
+            // 1 - Pegar o endereço do contrato `Key Dictionary`
+            parfinDTO.metadata.contractAddress =
+                await this.contractHelper.getContractAddress('KeyDictionary');
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(
+                'Erro ao buscar o endereço do contrato: KeyDictionary',
+            );
+        }
+
+        // 2 - Codificar a chamada do contrato `Key Dictionary`
         parfinDTO.metadata.data = this.keyDictionary.getWallet(key)[0];
 
         try {
@@ -177,26 +195,26 @@ export class RealTokenizadoService {
             );
             const { data } = parfinCallRes as ParfinContractCallSuccessRes;
 
-            if (data) {
-                // 3.1 - Recuperar o address das informações consultadas no contrato
-                const receiverAddress = this.keyDictionary.getWallet({
-                    returned: data,
-                })[0];
+            // 3.1 - Recuperar o endereço das informações consultadas no contrato
+            const receiverAddress = this.keyDictionary.getWallet({
+                returned: data,
+            })[0];
 
-                // 4 - Executar a transferência
-                const parfinDTO = dto as Omit<
-                    RealTokenizadoInternalTransferDTO,
-                    'key' | 'amount' | 'blockchainId'
-                >;
+            // 4 - Executar a transferência
+            const parfinTransferDTO = dto as Omit<
+                RealTokenizadoInternalTransferDTO,
+                'key' | 'amount' | 'blockchainId'
+            >;
 
-                // 5 - pegar endereço do contrato `Real Tokenizado`
-                parfinDTO.metadata.contractAddress =
+            try {
+                // 5 - Pegar o endereço do contrato `Real Tokenizado`
+                parfinTransferDTO.metadata.contractAddress =
                     await this.contractHelper.getContractAddress(
                         'RealTokenizado',
                     );
 
-                // 6 - codificar a chamada do contrato `Real Tokenizado`
-                parfinDTO.metadata.data = this.realTokenizado.transfer(
+                // 6 - Codificar a chamada do contrato `Real Tokenizado`
+                parfinTransferDTO.metadata.data = this.realTokenizado.transfer(
                     receiverAddress,
                     amount,
                 )[0];
@@ -204,56 +222,60 @@ export class RealTokenizadoService {
                 try {
                     // 7 - Interagir com o contrato usando o endpoint send/write
                     const parfinSendRes =
-                        await this.parfinService.smartContractSend(parfinDTO);
+                        await this.parfinService.smartContractSend(
+                            parfinTransferDTO,
+                        );
                     const { id: transactionId } =
                         parfinSendRes as ParfinSuccessRes;
 
-                    if (transactionId) {
-                        try {
-                            // 8 - Salvar transação no banco
-                            const transactionData = {
-                                parfinTransactionId: transactionId,
-                                operation: TransactionOperations.TRANSFER,
-                                asset: AssetTypes.RD,
-                                ...parfinDTO,
-                            };
-                            const { id: dbTransactionId } =
-                                await this.transactionService.create(
-                                    transactionData,
-                                );
+                    try {
+                        // 8 - Salvar a transação no banco
+                        const transactionData = {
+                            parfinTransactionId: transactionId,
+                            operation: TransactionOperations.TRANSFER,
+                            asset: AssetTypes.RD,
+                            ...parfinTransferDTO,
+                        };
 
-                            if (dbTransactionId) {
-                                try {
-                                    // 9 - Assinar transação e inserir na blockchain
-                                    return await this.transactionService.transactionSignAndPush(
-                                        transactionId,
-                                        dbTransactionId,
-                                    );
-                                } catch (error) {
-                                    this.logger.error(error);
-                                    throw new Error(
-                                        `Erro ao tentar assinar transação ${transactionId} de transferência interna de Real Tokenizado`,
-                                    );
-                                }
-                            }
+                        const { id: dbTransactionId } =
+                            await this.transactionService.create(
+                                transactionData,
+                            );
+
+                        try {
+                            // 9 - Assinar a transação e inserir na blockchain
+                            return await this.transactionService.transactionSignAndPush(
+                                transactionId,
+                                dbTransactionId,
+                            );
                         } catch (error) {
                             this.logger.error(error);
                             throw new Error(
-                                `Erro ao tentar salvar transação ${transactionId} de transferência de Real Tokenizado no banco`,
+                                `Erro ao tentar assinar transação ${transactionId} de transferência de Real Tokenizado na Parfin`,
                             );
                         }
+                    } catch (error) {
+                        this.logger.error(error);
+                        throw new Error(
+                            `Erro ao tentar salvar transação ${transactionId} de transferência de Real Tokenizado no banco`,
+                        );
                     }
                 } catch (error) {
                     this.logger.error(error);
                     throw new Error(
-                        `Erro ao tentar criar transação de transferência de Real Tokenizado`,
+                        'Erro ao tentar criar transação de transferência de Real Tokenizado',
                     );
                 }
+            } catch (error) {
+                this.logger.error(error);
+                throw new Error(
+                    `Erro ao tentar buscar carteira do destinatário com documento: ${key}`,
+                );
             }
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `Erro ao tentar buscar carteira do destinatário com documento: ${key}`,
+                'Erro durante a execução do processo de transferência de Real Tokenizado',
             );
         }
     }

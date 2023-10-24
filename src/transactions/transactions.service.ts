@@ -23,49 +23,48 @@ export class TransactionsService {
     }
 
     async create(createTransactionDto: TransactionDTO): Promise<Transaction> {
-        return this.transactionsRepository.create(createTransactionDto);
+        let created: Transaction;
+        try {
+            created = await this.transactionsRepository.create(
+                createTransactionDto,
+            );
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(`Erro ao criar a transação!`);
+        }
+        return created;
     }
 
     async findAll(): Promise<Transaction[]> {
-        return this.transactionsRepository.findAll();
+        let all: Transaction[];
+        try {
+            all = await this.transactionsRepository.findAll();
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(`Erro ao buscar todas as transações!`);
+        }
+        return all;
     }
 
     async findOne(id: string): Promise<Transaction> {
-        return this.transactionsRepository.findOne(id);
+        let transaction: Transaction;
+        try {
+            transaction = await this.transactionsRepository.findOne(id);
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(`Erro ao buscar a transação ${id}!`);
+        }
+        return transaction;
     }
 
     async update(
         id: string,
         updateTransactionDto: Partial<TransactionDTO>,
     ): Promise<Transaction> {
-        const existingTransaction = await this.transactionsRepository.findOne(
-            id,
-        );
-
-        if (!existingTransaction) {
-            this.logger.error(
-                new Error(`Transação com ID ${id} não encontrada.`),
+        try {
+            let existingTransaction = await this.transactionsRepository.findOne(
+                id,
             );
-            throw new Error(`Transação com ID ${id} não encontrada.`);
-        }
-
-        Object.assign(existingTransaction, updateTransactionDto);
-        return this.transactionsRepository.update(id, existingTransaction);
-    }
-
-    async remove(id: string): Promise<void> {
-        await this.transactionsRepository.remove(id);
-    }
-
-    async transactionSignAndPush(
-        id: string,
-        dbTransactionId: string,
-        interactionType: InteractionEnum = InteractionEnum.SEND,
-    ) {
-        if (interactionType !== InteractionEnum.CALL) {
-            //verificar se a transactionId existe no banco de dados
-            const existingTransaction =
-                await this.transactionsRepository.findOne(dbTransactionId);
 
             if (!existingTransaction) {
                 this.logger.error(
@@ -74,25 +73,105 @@ export class TransactionsService {
                 throw new Error(`Transação com ID ${id} não encontrada.`);
             }
 
-            //chamar o transaction repository
-            await this.parfinService.transactionSignAndPush(id);
+            Object.assign(existingTransaction, updateTransactionDto);
 
-            //pegar a transação criada pela parfin
-            const parfinTransaction =
-                await this.parfinService.getTransactionById(id);
+            try {
+                let updated = this.transactionsRepository.update(
+                    id,
+                    existingTransaction,
+                );
+                return updated;
+            } catch (error) {
+                this.logger.error(error);
+                throw new Error(`Erro ao atualizar o ID: ${id}`);
+            }
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(`Erro ao buscar o ID: ${id}`);
+        }
+    }
 
-            //update a transaction
-            const { blockchainNetwork, statusDescription } =
-                parfinTransaction as ParfinGetTransactionSuccessRes;
-            await this.update(dbTransactionId, {
-                blockchainNetwork,
-                statusDescription,
-            });
+    async remove(id: string): Promise<void> {
+        try {
+            await this.transactionsRepository.remove(id);
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(`Erro ao remover o ID: ${id}`);
+        }
+    }
 
-            //retornar o status da transaction
-            return { statusDescription };
+    async transactionSignAndPush(
+        id: string,
+        dbTransactionId: string,
+        interactionType: InteractionEnum = InteractionEnum.SEND,
+    ) {
+        if (interactionType !== InteractionEnum.CALL) {
+            try {
+                // Verificar se a transactionId existe no banco de dados
+                const existingTransaction =
+                    await this.transactionsRepository.findOne(dbTransactionId);
+
+                if (!existingTransaction) {
+                    this.logger.error(
+                        new Error(`Transação com ID ${id} não encontrada.`),
+                    );
+                    throw new Error(`Transação com ID ${id} não encontrada.`);
+                }
+
+                // Chamar o transaction repository
+                try {
+                    await this.parfinService.transactionSignAndPush(id);
+
+                    // Pegar a transação criada pela parfin
+                    try {
+                        const parfinTransaction =
+                            await this.parfinService.getTransactionById(id);
+
+                        // Update a transaction
+                        const { blockchainNetwork, statusDescription } =
+                            parfinTransaction as ParfinGetTransactionSuccessRes;
+
+                        try {
+                            await this.update(dbTransactionId, {
+                                blockchainNetwork,
+                                statusDescription,
+                            });
+
+                            // Retornar o status da transaction
+                            return { statusDescription };
+                        } catch (error) {
+                            this.logger.error(error);
+                            throw new Error(
+                                `Erro ao atualizar a transação ${dbTransactionId}`,
+                            );
+                        }
+                    } catch (error) {
+                        this.logger.error(error);
+                        throw new Error(
+                            `Erro ao buscar a transação criada pela parfin: ${error.message}`,
+                        );
+                    }
+                } catch (error) {
+                    this.logger.error(error);
+                    throw new Error(
+                        `Erro ao chamar o transaction repository: ${error.message}`,
+                    );
+                }
+            } catch (error) {
+                this.logger.error(error);
+                throw new Error(
+                    `Erro durante a interação com a transação: ${error.message}`,
+                );
+            }
         } else {
-            await this.parfinService.transactionSignAndPush(id);
+            try {
+                await this.parfinService.transactionSignAndPush(id);
+            } catch (error) {
+                this.logger.error(error);
+                throw new Error(
+                    `Erro ao chamar o transaction repository: ${error.message}`,
+                );
+            }
         }
     }
 }

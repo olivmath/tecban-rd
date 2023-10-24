@@ -12,6 +12,7 @@ export class LoggerService extends ConsoleLogger {
 
             super.error(message, this.context);
         } else {
+            super.error(`Unknow Error: ${error}`, this.context);
         }
     }
 

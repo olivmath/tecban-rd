@@ -52,58 +52,58 @@ export class RealDigitalService {
         }
         console.log('>>> Partial DTO source:', partialDTO.source.assetId)
 
-        // 1 - pegar endereço do contrato `Real Digital`
-        partialDTO.metadata.contractAddress = await this.contractHelper.getContractAddress('STR');
-        // 2 - codificar a chamada do contrato `Real Digital`
-        partialDTO.metadata.data = this.str.requestToMint(amount)[0];
-
-        // 3 - Interagir com o contrato usando o endpoint send/write
         try {
+            // 1 - Pegar o endereço do contrato `Real Digital`
+            parfinDTO.metadata.contractAddress =
+                await this.contractHelper.getContractAddress('STR');
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error('Erro ao buscar o endereço do contrato: STR');
+        }
+
+        // 2 - Codificar a chamada do contrato `Real Digital`
+        parfinDTO.metadata.data = this.str.requestToMint(amount)[0];
+
+        try {
+            // 3 - Interagir com o contrato usando o endpoint write
             const parfinSendRes = await this.parfinService.smartContractSend(
                 partialDTO,
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 
-            if (transactionId) {
+            const transactionData = {
+                parfinTransactionId: transactionId,
+                operation: TransactionOperations.MINT,
+                asset: AssetTypes.RD,
+                ...parfinDTO,
+            };
+            try {
+                // 4 - Salvar a transação no banco
+                const { id: dbTransactionId } =
+                    await this.transactionService.create(transactionData);
+
                 try {
-                    // 4 - Salvar transação no banco
-                    const transactionData = {
-                        parfinTransactionId: transactionId,
-                        operation: TransactionOperations.MINT,
-                        asset: AssetTypes.RD,
-                        ...parfinDTO,
-                    };
-
-                    const { id: dbTransactionId } =
-                        await this.transactionService.create(transactionData);
-
-                    if (dbTransactionId) {
-                        try {
-                            // 5 - Assinar transação e inserir na blockchain
-                            return await this.transactionService.transactionSignAndPush(
-                                transactionId,
-                                dbTransactionId,
-                            );
-                        } catch (error) {
-                            this.logger.error(error);
-                            throw new Error(
-                                `Erro ao tentar assinar transação ${transactionId} de emissão de Real Digital`,
-                            );
-                        }
-                    }
+                    // 5 - Assinar a transação e inseri-la na blockchain
+                    return await this.transactionService.transactionSignAndPush(
+                        transactionId,
+                        dbTransactionId,
+                    );
                 } catch (error) {
                     this.logger.error(error);
-
                     throw new Error(
-                        `Erro ao tentar salvar transação ${transactionId} de emissão de Real Digital no banco`,
+                        `Erro ao tentar assinar a transação ${transactionId} de emissão de Real Digital na Parfin`,
                     );
                 }
+            } catch (error) {
+                this.logger.error(error);
+                throw new Error(
+                    `Erro ao tentar salvar a transação ${transactionId} de emissão de Real Digital no banco`,
+                );
             }
         } catch (error) {
             this.logger.error(error);
-
             throw new Error(
-                `Erro ao tentar criar transação de emissão de Real Digital`,
+                'Erro durante a execução do processo de emissão de Real Digital',
             );
         }
     }
@@ -114,11 +114,16 @@ export class RealDigitalService {
             RealDigitalBurnDTO,
             'amount' | 'blockchainId'
         >;
+        try {
+            // 1 - Pegar o endereço do contrato `Real Digital`
+            parfinDTO.metadata.contractAddress =
+                await this.contractHelper.getContractAddress('STR');
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error('Erro ao buscar o endereço do contrato: STR');
+        }
 
-        // 1 - pegar endereço do contrato `Real Digital`
-        parfinDTO.metadata.contractAddress =
-            await this.contractHelper.getContractAddress('STR');
-        // 2 - codificar a chamada do contrato `Real Digital`
+        // 2 - Codificar a chamada do contrato `Real Digital`
         parfinDTO.metadata.data = this.str.requestToBurn(amount)[0];
 
         try {
@@ -128,46 +133,39 @@ export class RealDigitalService {
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 
-            if (transactionId) {
+            const transactionData = {
+                parfinTransactionId: transactionId,
+                operation: TransactionOperations.BURN,
+                asset: AssetTypes.RD,
+                ...parfinDTO,
+            };
+            try {
+                // 4 - Salvar a transação no banco
+                const { id: dbTransactionId } =
+                    await this.transactionService.create(transactionData);
+
                 try {
-                    // 4 - Salvar transação no banco
-                    const transactionData = {
-                        parfinTransactionId: transactionId,
-                        operation: TransactionOperations.BURN,
-                        asset: AssetTypes.RD,
-                        ...parfinDTO,
-                    };
-                    const { id: dbTransactionId } =
-                        await this.transactionService.create(transactionData);
-
-                    if (dbTransactionId) {
-                        try {
-                            // 5 - Assinar transação e inserir na blockchain
-                            return await this.transactionService.transactionSignAndPush(
-                                transactionId,
-                                dbTransactionId,
-                            );
-                        } catch (error) {
-                            this.logger.error(error);
-
-                            throw new Error(
-                                `Erro ao tentar assinar transação ${transactionId} de queima de Real Digital`,
-                            );
-                        }
-                    }
+                    // 5 - Assinar a transação e inseri-la na blockchain
+                    return await this.transactionService.transactionSignAndPush(
+                        transactionId,
+                        dbTransactionId,
+                    );
                 } catch (error) {
                     this.logger.error(error);
-
                     throw new Error(
-                        `Erro ao tentar salvar transação ${transactionId} de queima no banco`,
+                        `Erro ao tentar assinar a transação ${transactionId} de queima de Real Digital na Parfin`,
                     );
                 }
+            } catch (error) {
+                this.logger.error(error);
+                throw new Error(
+                    `Erro ao tentar salvar a transação ${transactionId} de queima no banco`,
+                );
             }
         } catch (error) {
             this.logger.error(error);
-
             throw new Error(
-                `Erro ao tentar criar transação de queima de Real Digital`,
+                'Erro durante a execução do processo de queima de Real Digital',
             );
         }
     }
@@ -179,12 +177,20 @@ export class RealDigitalService {
             'metadata' | 'blockchainId'
         >;
 
-        // 1 - pegar endereço do contrato `Real Digital Default Account`
-        parfinCallDTO.metadata.contractAddress =
-            await this.contractHelper.getContractAddress(
-                'RealDigitalDefaultAccount',
+        try {
+            // 1 - Pegar o endereço do contrato `Real Digital Default Account`
+            parfinCallDTO.metadata.contractAddress =
+                await this.contractHelper.getContractAddress(
+                    'RealDigitalDefaultAccount',
+                );
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(
+                'Erro ao buscar o endereço do contrato: RealDigitalDefaultAccount',
             );
-        // 2 - codificar a chamada do contrato `Real Digital Default Account`
+        }
+
+        // 2 - Codificar a chamada do contrato `Real Digital Default Account`
         parfinCallDTO.metadata.data =
             this.realDigitalDefaultAccount.defaultAccount(cnpj)[0];
 
@@ -195,23 +201,25 @@ export class RealDigitalService {
             );
             const { data } = parfinCallRes as ParfinContractCallSuccessRes;
 
-            if (data) {
-                // 3.1 - Recuperar o CNPJ das informações consultdas no contrato
-                const receiverAddress =
-                    this.realDigitalDefaultAccount.defaultAccount({
-                        returned: data,
-                    })[0] as string;
+            // 3.1 - Recuperar o CNPJ das informações consultadas no contrato
+            const receiverAddress =
+                this.realDigitalDefaultAccount.defaultAccount({
+                    returned: data,
+                })[0] as string;
 
-                // 4 - Executar a transferência
-                const parfinSendDTO = dto as Omit<
-                    RealDigitalTransferDTO,
-                    'cnpj' | 'amount' | 'blockchainId'
-                >;
+            // 4 - Executar a transferência
+            const parfinSendDTO = dto as Omit<
+                RealDigitalTransferDTO,
+                'cnpj' | 'amount' | 'blockchainId'
+            >;
 
-                // 5 - pegar endereço do contrato `Real Digital`
+            try {
+                // try aqui
+                // 5 - Pegar o endereço do contrato `Real Digital`
                 parfinSendDTO.metadata.contractAddress =
                     await this.contractHelper.getContractAddress('RealDigital');
-                // 6 - codificar a chamada do contrato `Real Digital`
+
+                // 6 - Codificar a chamada do contrato `Real Digital`
                 parfinSendDTO.metadata.data = this.realDigital.transfer(
                     receiverAddress,
                     amount,
@@ -226,56 +234,53 @@ export class RealDigitalService {
                     const { id: transactionId } =
                         parfinSendRes as ParfinSuccessRes;
 
-                    if (transactionId) {
+                    const transactionData = {
+                        parfinTransactionId: transactionId,
+                        operation: TransactionOperations.TRANSFER,
+                        asset: AssetTypes.RD,
+                        ...parfinSendDTO,
+                    };
+                    try {
+                        // 8 - Salvar a transação no banco
+                        const { id: dbTransactionId } =
+                            await this.transactionService.create(
+                                transactionData,
+                            );
+
                         try {
-                            // 8 - Salvar transação no banco
-                            const transactionData = {
-                                parfinTransactionId: transactionId,
-                                operation: TransactionOperations.TRANSFER,
-                                asset: AssetTypes.RD,
-                                ...parfinSendDTO,
-                            };
-                            const { id: dbTransactionId } =
-                                await this.transactionService.create(
-                                    transactionData,
-                                );
-
-                            if (dbTransactionId) {
-                                try {
-                                    // 9 - Assinar transação e inserir na blockchain
-                                    return await this.transactionService.transactionSignAndPush(
-                                        transactionId,
-                                        dbTransactionId,
-                                    );
-                                } catch (error) {
-                                    this.logger.error(error);
-
-                                    throw new Error(
-                                        `Erro ao tentar assinar transação ${transactionId} de transferência de Real Digital`,
-                                    );
-                                }
-                            }
+                            // 9 - Assinar transação e inserir na blockchain
+                            return await this.transactionService.transactionSignAndPush(
+                                transactionId,
+                                dbTransactionId,
+                            );
                         } catch (error) {
                             this.logger.error(error);
-
                             throw new Error(
-                                `Erro ao tentar salvar transação ${transactionId} de transferência de Real Digital no banco`,
+                                `Erro ao tentar assinar transação ${transactionId} de transferência de Real Digital na Parfin`,
                             );
                         }
+                    } catch (error) {
+                        this.logger.error(error);
+                        throw new Error(
+                            `Erro ao tentar salvar transação ${transactionId} de transferência de Real Digital no banco`,
+                        );
                     }
                 } catch (error) {
                     this.logger.error(error);
-
                     throw new Error(
-                        `Erro ao tentar criar transação de transferência de Real Digital`,
+                        'Erro durante a interação com o contrato para executar a transferência de Real Digital',
                     );
                 }
+            } catch (error) {
+                this.logger.error(error);
+                throw new Error(
+                    `Erro ao tentar buscar carteira do destinatário com documento: ${cnpj}`,
+                );
             }
         } catch (error) {
             this.logger.error(error);
-
             throw new Error(
-                `Erro ao tentar buscar carteira do destinatário com documento: ${cnpj}`,
+                'Erro durante a execução do processo de transferência de Real Digital',
             );
         }
     }

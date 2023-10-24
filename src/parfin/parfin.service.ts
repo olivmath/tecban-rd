@@ -144,7 +144,6 @@ export class ParfinService {
     async registerContract(
         dto: ParfinRegisterContractDTO,
     ): Promise<ParfinRegisterContractSuccessRes | ParfinErrorRes> {
-        this.logger.log('>>> SERVICE DTO:', dto)
         const url = '/v1/api/custody/web3/contract';
         const reqBody = dto;
         let response;
