@@ -42,16 +42,24 @@ export class RealDigitalService {
 
     async mint(dto: RealDigitalMintDTO): Promise<any> {
         const { description, amount } = dto as RealDigitalMintDTO;
-        // const parfinDTO = {} as Omit<ParfinContractInteractDTO, 'blockchainId'>;
         const parfinDTO = new ParfinContractInteractDTO()
-        const { blockchainId, ...partialDTO } = parfinDTO;
+        const { blockchainId, ...parfinSendDTO } = parfinDTO;
 
-        partialDTO.description = description;
-        partialDTO.source = {
+        parfinSendDTO.description = description;
+        parfinSendDTO.source = {
             assetId: AssetID.realDigital
         }
-        console.log('>>> Partial DTO source:', partialDTO.source.assetId)
 
+        // 1 - Pegar endereço do contrato `STR`
+        const strAddress = await this.contractHelper.getContractAddress('STR');
+        parfinSendDTO.metadata = {
+            data: '',
+            contractAddress: strAddress,
+        };
+        // 2 - Codificar a chamada do contrato `STR`
+        parfinSendDTO.metadata.data = this.str.requestToMint(amount)[0];
+
+        // 3 - Interagir com o contrato usando o endpoint send/write
         try {
             // 1 - Pegar o endereço do contrato `Real Digital`
             parfinDTO.metadata.contractAddress =
@@ -67,7 +75,7 @@ export class RealDigitalService {
         try {
             // 3 - Interagir com o contrato usando o endpoint write
             const parfinSendRes = await this.parfinService.smartContractSend(
-                partialDTO,
+                parfinSendDTO,
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 
@@ -83,11 +91,35 @@ export class RealDigitalService {
                     await this.transactionService.create(transactionData);
 
                 try {
-                    // 5 - Assinar a transação e inseri-la na blockchain
-                    return await this.transactionService.transactionSignAndPush(
-                        transactionId,
-                        dbTransactionId,
-                    );
+                    // 4 - Salvar transação no banco
+                    const transactionData = {
+                        parfinTransactionId: transactionId,
+                        operation: TransactionOperations.MINT,
+                        asset: AssetTypes.RD,
+                        ...parfinSendDTO,
+                    };
+
+                    const { id: dbTransactionId } =
+                        await this.transactionService.create(transactionData);
+
+                    if (dbTransactionId) {
+                        try {
+                            // 5 - Assinar transação e inserir na blockchain
+                            return await this.transactionService.transactionSignAndPush(
+                                transactionId,
+                                dbTransactionId,
+                            );
+                        } catch (error) {
+                            this.logger.error(error);
+                            throw new Error(
+                                `Erro ao tentar assinar transação ${transactionId} de emissão de Real Digital`,
+                            );
+                        }
+                    } else {
+                        throw new Error(
+                            `Erro ao tentar criar transação ${transactionId} de emissão de Real Digital no banco`,
+                        );
+                    }
                 } catch (error) {
                     this.logger.error(error);
                     throw new Error(

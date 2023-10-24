@@ -178,7 +178,7 @@ export class ParfinService {
     }
 
     async smartContractSend(
-        dto: ParfinContractInteractDTO,
+        dto: Omit<ParfinContractInteractDTO, 'blockchainId'>,
     ): Promise<ParfinSuccessRes | ParfinErrorRes> {
         const url = '/v1/api/custody/web3/contract/send';
         const reqBody = dto;
@@ -196,19 +196,6 @@ export class ParfinService {
     }
 
     //--- Transaction Endpoints
-    async transactionSignAndPush(id: string): Promise<any | ParfinErrorRes> {
-        const url = `/v1/api/transaction/${id}/sign-and-push`;
-        let response;
-        try {
-            await this.parfinAuth.setAuth(url, {});
-            response = await parfinApi.put(url);
-        } catch (error) {
-            this.logger.error(error);
-            throw new Error(`Erro ao tentar assinar a transação ${id}!`);
-        }
-        return response.data;
-    }
-
     async getTransactionById(
         id: string,
     ): Promise<ParfinGetTransactionSuccessRes | ParfinErrorRes> {
@@ -220,6 +207,19 @@ export class ParfinService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(`Erro ao tentar solicitar a transação ${id}!`);
+        }
+        return response.data;
+    }
+
+    async transactionSignAndPush(transactionId: string): Promise<any | ParfinErrorRes> {
+        const url = `/v1/api/transaction/${transactionId}/sign-and-push`;
+        let response;
+        try {
+            await this.parfinAuth.setAuth(url, {});
+            response = await parfinApi.put(url, { headers: { 'Content-Type': 'application/json' } });
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(`Erro ao tentar assinar a transação ${transactionId}!`);
         }
         return response.data;
     }

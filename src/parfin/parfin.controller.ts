@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ParfinService } from './parfin.service';
 import {
@@ -13,6 +13,7 @@ import {
   ParfinErrorRes,
   ParfinRegisterERC20TokenSuccessRes,
   ParfinGetWalletSuccessRes,
+  ParfinGetTransactionSuccessRes,
 } from 'src/res/app/parfin.responses';
 import { registerERC20Token200 } from 'src/res/swagger/parfin.swagger';
 import { parfinError400, parfinError500 } from 'src/res/swagger/error.swagger';
@@ -65,5 +66,20 @@ export class ParfinController {
     ParfinGetWalletSuccessRes[] | ParfinErrorRes
   > {
     return this.parfinService.getAllWallets();
+  }
+
+  //--- Transaction Endpoints
+  @Get('transaction/:id')
+  @ApiOperation({ summary: 'Get a transaction by id', description: 'Get a transaction by ID, registered in the Parfin platform' })
+  getTransactionById(@Param('id') id: string): Promise<
+    ParfinGetTransactionSuccessRes | ParfinErrorRes
+  > {
+    return this.parfinService.getTransactionById(id);
+  }
+
+  @Put('transaction/sign-and-push/:transactionId')
+  @ApiOperation({ summary: 'Sign ans push a transaction', description: 'Sign a transaction using Parfin technology and push it to the blockchain' })
+  transactionSignAndPush(@Param('transactionId') transactionId: string): Promise<any | ParfinErrorRes> {
+    return this.parfinService.transactionSignAndPush(transactionId);
   }
 }
