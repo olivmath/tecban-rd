@@ -7,55 +7,6 @@ import {
     Source,
 } from '../types/parfin.types';
 import { BlockchainId } from '../types/wallet.types';
-export class ParfinDeployContractDTO {
-    @ApiProperty({
-        description: 'Tag para representar a insituição cliente da aplicação',
-        default: null,
-    })
-    @IsString()
-    @IsOptional()
-    customerTag?: string;
-
-    @ApiProperty({
-        description: 'ID para representar a insituição cliente da aplicação',
-        default: null,
-    })
-    @IsString()
-    @IsOptional()
-    customerRefId?: string;
-
-    @ApiProperty({
-        description: 'Descrição do contrato',
-        default: null,
-    })
-    @IsString()
-    @IsOptional()
-    description?: string;
-
-    @ApiProperty({
-        description: 'Informações sobre o ativo do contrato',
-        type: Source,
-    })
-    @IsNotEmpty()
-    @IsObject()
-    source: Source;
-
-    @ApiProperty({
-        description: 'Metadata do contrato para o deploy',
-        type: DeployMetadata,
-    })
-    @IsNotEmpty()
-    @IsObject()
-    metadata: DeployMetadata;
-
-    @ApiProperty({
-        description: 'Prioridade da chamada',
-        enum: ['LOW', 'MEDIUM', 'HIGH'],
-        default: Priority.HIGH,
-    })
-    @IsNotEmpty()
-    priority: Priority = Priority.HIGH;
-}
 
 export class ParfinRegisterContractDTO {
     @ApiProperty({ description: 'Endereço do contrato para registro' })

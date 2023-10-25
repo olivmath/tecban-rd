@@ -1,4 +1,4 @@
-import { ContractName, ContractHelperService } from './contract-helper.service';
+import { ContractHelperService } from './contract-helper.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DecodeDataDTO, EncodeDataDTO } from '../../dtos/contract-helper.dto';
 import { LoggerService } from 'src/logger/logger.service';
@@ -16,8 +16,8 @@ import {
     EncodedDataResponse,
 } from 'src/res/app/contract-helper.responses';
 import { encodeData200, getContractAddress200 } from 'src/res/swagger/contract-helper.swagger';
-import { ContractHelperGetContractDTO } from '../../dtos/contract-helper.dto';
 import { appError400 } from 'src/res/swagger/error.swagger';
+import { ContractName } from 'src/types/contract-helper.types';
 
 @Controller('contract-helper')
 @ApiTags('Contract Helper')

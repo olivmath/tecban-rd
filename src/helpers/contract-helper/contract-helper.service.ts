@@ -5,26 +5,11 @@ import { Injectable } from '@nestjs/common';
 import abiLoader from '../abi-loader';
 import Web3 from 'web3';
 import { LoggerService } from 'src/logger/logger.service';
-import { ContractHelperGetContractDTO } from 'src/dtos/contract-helper.dto';
 import { ContractHelperGetContractSuccessRes } from 'src/res/app/contract-helper.responses';
+import { ParfinContractCallSuccessRes, ParfinErrorRes } from 'src/res/app/parfin.responses';
+import { ContractName } from 'src/types/contract-helper.types';
 
-export const discoveryAddress = process.env['ADDRESS_DISCOVERY_ADDRESS'];
-
-export type ContractName =
-    | 'RealDigitalDefaultAccount'
-    | 'RealDigitalEnableAccount'
-    | 'ApprovedDigitalCurrency'
-    | 'SwapTwoStepsReserve'
-    | 'ITPFtOperation1002'
-    | 'ITPFtOperation1052'
-    | 'AddressDiscovery'
-    | 'RealTokenizado'
-    | 'KeyDictionary'
-    | 'SwapTwoSteps'
-    | 'RealDigital'
-    | 'SwapOneStep'
-    | 'ITPFt'
-    | 'STR';
+export const discoveryAddress = process.env.ADDRESS_DISCOVERY_ADDRESS;
 
 @Injectable()
 export class ContractHelperService {
@@ -45,34 +30,47 @@ export class ContractHelperService {
         ContractHelperGetContractSuccessRes
     > {
         const w3 = new Web3();
-        // build tx data to get address from addressDiscovery
-        const pcw = new ContractWrapper(abiLoader['AddressDiscovery']);
-        const data = pcw.addressDiscovery(w3.utils.sha3(contractName))[0];
 
-        // mount Parfin's payload
-        const payload = new ParfinContractInteractDTO();
-        payload.metadata = {
-            data: data,
-            contractAddress: discoveryAddress,
-        };
-
-        // send tx via Parfin
-        let result;
         try {
-            result = await this.parfinService.smartContractCall(payload);
+            // build tx data to get address from addressDiscovery
+            const contract = new ContractWrapper(abiLoader['AddressDiscovery']);
+            const encodedData = contract.addressDiscovery(w3.utils.sha3(contractName))[0];
+
+            // mount Parfin's payload
+            const parfinDTO = new ParfinContractInteractDTO();
+            const parfinCallDTO = {
+                metadata: parfinDTO.metadata,
+                blockchainId: parfinDTO.blockchainId,
+            };
+
+            parfinCallDTO.metadata = {
+                data: encodedData,
+                contractAddress: discoveryAddress,
+            };
+
+            // send tx via Parfin
+            let parfinCallRes: ParfinContractCallSuccessRes | ParfinErrorRes;
+            parfinCallRes = await this.parfinService.smartContractCall(parfinCallDTO);
+            const { data } = parfinCallRes as ParfinContractCallSuccessRes;
+            if (data) {
+                const payload = JSON.stringify(parfinCallDTO)
+                throw new Error(
+                    `[ERROR]: Erro ao tentar interagir com contrato ${contractName}. Parfin Call DTO: ${payload}`
+                );
+            }
+
+            // decode response
+            const address: string = contract.addressDiscovery({
+                returned: data,
+            })[0];
+
+            return { address };
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `Erro ao buscar o endereço do contracto: ${contractName}`,
+                `[ERROR]: Erro ao buscar o endereço do contrato: ${contractName}`,
             );
         }
-
-        // decode response
-        const address: string = pcw.addressDiscovery({
-            returned: result,
-        })[0];
-
-        return { address };
     }
 
     isContractNameValid(contractName: string): boolean {

@@ -1,13 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNotEmpty, IsString } from "class-validator";
-import { ContractName } from "src/helpers/contract-helper/contract-helper.service";
-
-export class ContractHelperGetContractDTO {
-  @ApiProperty({ description: 'Nome do contrato' })
-  @IsString()
-  @IsNotEmpty()
-  contractName: string;
-}
+import { IsArray, IsString } from "class-validator";
+import { ContractName } from "src/types/contract-helper.types";
 
 export class DecodeDataDTO {
   @ApiProperty({
