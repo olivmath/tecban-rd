@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
 
 export class RealDigitalDTO {
   @ApiProperty({

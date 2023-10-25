@@ -1,5 +1,5 @@
 import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
-import { BlockchainId, WalletType } from '../wallet/types/wallet.types';
+import { BlockchainId, WalletType } from '../types/wallet.types';
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
