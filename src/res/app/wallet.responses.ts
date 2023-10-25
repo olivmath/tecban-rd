@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { WalletAsset } from 'src/wallet/types/wallet.types';
+import { WalletAsset } from '../../types/wallet.types';
 
 export class WalletSuccessRes {
   @ApiProperty({
@@ -87,6 +87,6 @@ export class WalletSuccessRes {
   userId?: string;
 }
 export class WalletAddNewAssetSuccessRes {
-    @ApiProperty({ description: 'ID do asset adicionado na carteira' })
-    assetId: string;
+  @ApiProperty({ description: 'ID do asset adicionado na carteira' })
+  assetId: string;
 }

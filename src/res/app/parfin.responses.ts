@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BlockchainNetwork } from 'src/transactions/types/transactions.types';
-import { WalletAsset, WalletType } from 'src/wallet/types/wallet.types';
+import { BlockchainNetwork } from '../../types/transactions.types';
+import { WalletAsset, WalletType } from '../../types/wallet.types';
 
 //--- Success
 export class ParfinSuccessRes {

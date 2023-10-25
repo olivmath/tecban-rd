@@ -4,13 +4,13 @@ import {
     InteractMetadata,
     Priority,
     Source,
-} from 'src/parfin/types/parfin.types';
+} from '../types/parfin.types';
 import {
     AssetTypes,
     BlockchainNetwork,
     TransactionOperations,
-} from '../transactions/types/transactions.types';
-import { BlockchainId } from 'src/wallet/types/wallet.types';
+} from '../types/transactions.types';
+import { BlockchainId } from '../types/wallet.types';
 
 export class TransactionDTO {
     @IsString()
