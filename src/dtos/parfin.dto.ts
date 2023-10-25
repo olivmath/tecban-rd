@@ -5,7 +5,7 @@ import {
     InteractMetadata,
     Priority,
     Source,
-} from '../types/parfin.types';
+} from '../parfin/types/parfin.types';
 import { BlockchainId } from 'src/wallet/types/wallet.types';
 export class ParfinDeployContractDTO {
     @ApiProperty({

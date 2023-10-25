@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class ContractHelperGetContractSuccessRes {
+    @ApiProperty({
+        description: 'Endereço do contrato',
+        type: String,
+    })
+    address: string;
+}
+
 export class EncodedDataResponse {
     @ApiProperty({
         description: 'Hexdecimal dos dados codificados',

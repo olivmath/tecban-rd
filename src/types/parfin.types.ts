@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { AssetID } from 'src/wallet/types/wallet.types';
+import { AssetID } from '../types/wallet.types';
 
 export enum Priority {
     LOW = 'LOW',

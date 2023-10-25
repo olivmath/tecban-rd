@@ -1,7 +1,7 @@
 // transactions.service.ts
 import { Injectable } from '@nestjs/common';
 import { Transaction } from './transactions.schema';
-import { TransactionDTO } from './dtos/transaction.dto';
+import { TransactionDTO } from '../dtos/transaction.dto';
 import { TransactionsRepository } from './transactions.repository';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { ParfinGetTransactionSuccessRes } from 'src/res/app/parfin.responses';

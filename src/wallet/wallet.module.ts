@@ -5,7 +5,7 @@ import { WalletController } from './wallet.controller';
 
 import { MongooseModule } from '@nestjs/mongoose';
 import { Wallet, WalletSchema } from './wallet.schema';
-import { ContractHelperService } from 'src/helpers/Contract/contract.service';
+import { ContractHelperService } from 'src/helpers/contract-helper/contract-helper.service';
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import { ParfinModule } from 'src/parfin/parfin.module';
 import { LoggerService } from 'src/logger/logger.service';

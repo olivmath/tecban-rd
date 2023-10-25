@@ -1,6 +1,6 @@
-import { ParfinContractInteractDTO } from 'src/parfin/dtos/parfin.dto';
-import { BlockchainId, WalletType } from '../types/wallet.types';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
+import { BlockchainId, WalletType } from '../wallet/types/wallet.types';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class WalletInstitutionCreateDTO {
@@ -75,7 +75,15 @@ export class WalletClientCreateDTO extends ParfinContractInteractDTO {
     wallet: string;
 }
 
-export class WalletEnableDTO extends ParfinContractInteractDTO {
+export class WalletEnableDTO {
+    @ApiProperty({
+        description: 'Descrição da interação com o contrato',
+        default: '',
+    })
+    @IsString()
+    @IsOptional()
+    description?: string;
+
     @ApiProperty({ description: 'Ativo da carteira' })
     @IsString()
     @IsNotEmpty()

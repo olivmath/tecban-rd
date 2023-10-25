@@ -4,7 +4,7 @@ import { RealTokenizadoService } from './real-tokenizado.service';
 
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import { ParfinModule } from 'src/parfin/parfin.module';
-import { ContractHelperService } from 'src/helpers/Contract/contract.service';
+import { ContractHelperService } from 'src/helpers/contract-helper/contract-helper.service';
 import { LoggerService } from 'src/logger/logger.service';
 
 @Module({

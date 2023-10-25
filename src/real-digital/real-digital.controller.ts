@@ -1,10 +1,9 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
-  RealDigitalMintDTO,
-  RealDigitalBurnDTO,
+  RealDigitalDTO,
   RealDigitalTransferDTO,
-} from './dtos/real-digital.dto';
+} from '../dtos/real-digital.dto';
 import { RealDigitalService } from './real-digital.service';
 
 @Controller('real-digital')
@@ -14,13 +13,13 @@ export class RealDigitalController {
 
   @Post('mint')
   @ApiOperation({ summary: 'Mint Real Digital', description: 'Mint Real Digital token to an enabled wallet' })
-  mint(@Body() dto: RealDigitalMintDTO) {
+  mint(@Body() dto: RealDigitalDTO) {
     return this.realDigitalService.mint(dto);
   }
 
   @Post('burn')
   @ApiOperation({ summary: 'Burn Real Digital', description: 'Burn Real Digital token from an enabled wallet' })
-  burn(@Body() dto: RealDigitalBurnDTO) {
+  burn(@Body() dto: RealDigitalDTO) {
     this.realDigitalService.burn(dto);
   }
 

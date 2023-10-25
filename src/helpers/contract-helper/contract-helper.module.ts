@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ContractHelperController } from './contract.controller';
-import { ContractHelperService } from './contract.service';
+import { ContractHelperController } from './contract-helper.controller';
+import { ContractHelperService } from './contract-helper.service';
 import { ParfinModule } from 'src/parfin/parfin.module';
 import { LoggerModule } from 'src/logger/logger.module';
 

@@ -6,8 +6,14 @@ import {
   WalletClientCreateDTO,
   WalletEnableDTO,
   WalletNewAssetDTO,
-} from './dto/wallet.dto';
-import { createWallet201, enableWallet200, getAllWallets200, getWalletById200, newAssetAdded201 } from 'src/res/swagger/wallet.swagger';
+} from '../dtos/wallet.dto';
+import {
+  createWallet201,
+  enableWallet200,
+  getAllWallets200,
+  getWalletById200,
+  newAssetAdded201
+} from 'src/res/swagger/wallet.swagger';
 import { parfinError400, parfinError500 } from 'src/res/swagger/error.swagger';
 
 @Controller('wallet')
@@ -15,14 +21,14 @@ import { parfinError400, parfinError500 } from 'src/res/swagger/error.swagger';
 export class WalletController {
   constructor(private readonly walletService: WalletService) { }
 
-    @Get()
-    @ApiOperation({ summary: 'Get all', description: 'Get all wallets' })
-    @getAllWallets200
-    @parfinError400
-    @parfinError500
-    getAllWallets() {
-        return this.walletService.getAllWallets();
-    }
+  @Get()
+  @ApiOperation({ summary: 'Get all', description: 'Get all wallets' })
+  @getAllWallets200
+  @parfinError400
+  @parfinError500
+  getAllWallets() {
+    return this.walletService.getAllWallets();
+  }
 
   @Get(':walletId')
   @ApiOperation({ summary: 'Get wallet by id', description: 'Get a single wallet by id' })
@@ -54,7 +60,7 @@ export class WalletController {
   @parfinError400
   @parfinError500
   createClientWallet(@Body() dto: WalletClientCreateDTO) {
-    return this.walletService.createClientWallet(dto);
+    return 'ok'
   }
 
   @Post('enable')

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as crypto from 'crypto';
-import { OwnerType, WalletAsset, WalletType } from './types/wallet.types';
+import { OwnerType, WalletAsset, WalletType } from '../types/wallet.types';
 
 export type WalletDocument = Wallet & Document;
 

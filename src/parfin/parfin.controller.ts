@@ -5,7 +5,7 @@ import {
   ParfinDeployContractDTO,
   ParfinRegisterContractDTO,
   ParfinRegisterERC20TokenDTO,
-} from './dtos/parfin.dto';
+} from '../dtos/parfin.dto';
 import {
   ParfinSuccessRes,
   ParfinRegisterContractSuccessRes,

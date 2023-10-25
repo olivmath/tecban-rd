@@ -9,7 +9,7 @@ import {
     AssetTypes,
     BlockchainNetwork,
     TransactionOperations,
-} from '../types/transactions.types';
+} from '../transactions/types/transactions.types';
 import { BlockchainId } from 'src/wallet/types/wallet.types';
 
 export class TransactionDTO {

@@ -1,6 +1,6 @@
-import { ContractName, ContractHelperService } from './contract.service';
+import { ContractName, ContractHelperService } from './contract-helper.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { DecodeDataDTO, EncodeDataDTO } from './contract.dto';
+import { DecodeDataDTO, EncodeDataDTO } from '../../dtos/contract-helper.dto';
 import { LoggerService } from 'src/logger/logger.service';
 import {
     BadRequestException,
@@ -14,9 +14,12 @@ import {
 import {
     DecodedDataResponse,
     EncodedDataResponse,
-} from 'src/res/app/contract.responses';
+} from 'src/res/app/contract-helper.responses';
+import { encodeData200, getContractAddress200 } from 'src/res/swagger/contract-helper.swagger';
+import { ContractHelperGetContractDTO } from '../../dtos/contract-helper.dto';
+import { appError400 } from 'src/res/swagger/error.swagger';
 
-@Controller('contract')
+@Controller('contract-helper')
 @ApiTags('Contract Helper')
 export class ContractHelperController {
     constructor(
@@ -27,32 +30,33 @@ export class ContractHelperController {
     }
 
     @Get('get-contract-address-by-name/:name')
-    async getContractAddressByName(@Param('name') name: ContractName) {
-        if (!this.contractService.isContractNameValid(name)) {
+    @ApiOperation({
+        summary: 'Get a contract address',
+        description: 'Get a contract address using the contract name'
+    })
+    @getContractAddress200
+    async getContractAddressByName(@Param('contractName') contractName: ContractName) {
+        if (!this.contractService.isContractNameValid(contractName)) {
             throw new BadRequestException('Invalid contract name.');
         }
         try {
-            const address = await this.contractService.getContractAddress(name);
+            const address = await this.contractService.getContractAddress(contractName);
             return { address };
         } catch (error) {
             this.logger.error(error);
             throw new NotFoundException(
-                `Contract with name ${name} not found.`,
+                `Contract with name ${contractName} not found.`,
             );
         }
     }
 
     @Post('encode-data')
+    @encodeData200
+    @appError400
     @ApiOperation({
         summary: 'Encode function call to smartcontract',
         description: 'Encode function call to smartcontract for send to Parfin',
     })
-    @ApiResponse({
-        status: 200,
-        description: 'Encoded data',
-        type: EncodedDataResponse,
-    })
-    @ApiResponse({ status: 400, description: 'Bad Request' })
     async encodeData(
         @Body() body: EncodeDataDTO,
     ): Promise<EncodedDataResponse | BadRequestException> {

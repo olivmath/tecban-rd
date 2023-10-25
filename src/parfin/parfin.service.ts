@@ -6,7 +6,7 @@ import {
     ParfinRegisterContractDTO,
     ParfinContractInteractDTO,
     ParfinRegisterERC20TokenDTO,
-} from './dtos/parfin.dto';
+} from '../dtos/parfin.dto';
 import {
     ParfinSuccessRes,
     ParfinRegisterContractSuccessRes,
@@ -22,7 +22,7 @@ import {
     WalletInstitutionCreateDTO,
     WalletClientCreateDTO,
     WalletNewAssetDTO,
-} from 'src/wallet/dto/wallet.dto';
+} from '../dtos/wallet.dto';
 import { WalletAddNewAssetSuccessRes } from 'src/res/app/wallet.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinAuth } from 'src/auth/parfin.auth';

@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ContractHelperController } from '../contract.controller';
-import { ContractHelperService } from '../contract.service';
+import { ContractHelperController } from '../contract-helper.controller';
+import { ContractHelperService } from '../contract-helper.service';
 import { ParfinModule } from 'src/parfin/parfin.module';
 import { LoggerModule } from 'src/logger/logger.module';
-import { DecodeDataDTO } from '../contract.dto';
+import { DecodeDataDTO } from '../../../dtos/contract-helper.dto';
 import {
     DecodedDataResponse,
     EncodedDataResponse,
-} from 'src/res/app/contract.responses';
+} from 'src/res/app/contract-helper.responses';
 
 describe('ContractHelperController', () => {
     let controller: ContractHelperController;

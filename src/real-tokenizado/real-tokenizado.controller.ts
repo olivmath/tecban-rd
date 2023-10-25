@@ -4,7 +4,7 @@ import {
   RealTokenizadoMintDTO,
   RealTokenizadoBurnDTO,
   RealTokenizadoInternalTransferDTO,
-} from './dtos/real-tokenizado.dto';
+} from '../dtos/real-tokenizado.dto';
 import { RealTokenizadoService } from './real-tokenizado.service';
 
 @Controller('real-tokenizado')

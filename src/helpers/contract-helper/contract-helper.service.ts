@@ -1,10 +1,12 @@
-import { ParfinContractInteractDTO } from 'src/parfin/dtos/parfin.dto';
-import ContractWrapper from '../../utils/contract/contract-wrapper';
+import { ParfinContractInteractDTO } from '../../dtos/parfin.dto';
+import ContractWrapper from '../../utils/contract-util/contract-wrapper';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { Injectable } from '@nestjs/common';
 import abiLoader from '../abi-loader';
 import Web3 from 'web3';
 import { LoggerService } from 'src/logger/logger.service';
+import { ContractHelperGetContractDTO } from 'src/dtos/contract-helper.dto';
+import { ContractHelperGetContractSuccessRes } from 'src/res/app/contract-helper.responses';
 
 export const discoveryAddress = process.env['ADDRESS_DISCOVERY_ADDRESS'];
 
@@ -39,7 +41,9 @@ export class ContractHelperService {
     }
 
     // Função que retorna o endereço de um contrato
-    async getContractAddress(contractName: ContractName): Promise<string> {
+    async getContractAddress(contractName: ContractName): Promise<
+        ContractHelperGetContractSuccessRes
+    > {
         const w3 = new Web3();
         // build tx data to get address from addressDiscovery
         const pcw = new ContractWrapper(abiLoader['AddressDiscovery']);
@@ -68,7 +72,7 @@ export class ContractHelperService {
             returned: result,
         })[0];
 
-        return address;
+        return { address };
     }
 
     isContractNameValid(contractName: string): boolean {

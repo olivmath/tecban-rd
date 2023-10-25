@@ -5,9 +5,9 @@ import {
   AssetTypes,
   BlockchainNetwork,
   TransactionOperations,
-} from './types/transactions.types';
-import { Priority } from 'src/parfin/types/parfin.types';
-import { AssetID } from 'src/wallet/types/wallet.types';
+} from '../types/transactions.types';
+import { Priority } from '../types/parfin.types';
+import { AssetID } from '../types/wallet.types';
 
 @Schema()
 class Source {
