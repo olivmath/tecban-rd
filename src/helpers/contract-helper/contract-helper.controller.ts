@@ -29,7 +29,7 @@ export class ContractHelperController {
         this.logger.setContext('ContractHelperController');
     }
 
-    @Get('get-contract-address-by-name/:name')
+    @Get('get-contract-address-by-name/:contractName')
     @ApiOperation({
         summary: 'Get a contract address',
         description: 'Get a contract address using the contract name'
