@@ -63,8 +63,10 @@ export class RealTokenizadoService {
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
             if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado (Banco Arbi). Parfin Send DTO: ${parfinSendDTO}`
+                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado (Banco Arbi). 
+                    Parfin Send DTO: ${payload}`
                 );
             }
 
@@ -96,10 +98,11 @@ export class RealTokenizadoService {
             return statusDescription;
 
         } catch (error) {
+            const payload = JSON.stringify(parfinSendDTO)
             this.logger.log(error);
             throw new Error(
                 `[ERROR]: Erro ao tentar fazer emissão de $${amount} Real Tokenizado para a carteira ${to}. 
-                Parfin Send DTO: ${parfinSendDTO}`
+                Parfin Send DTO: ${payload}`
             );
         }
     }
@@ -130,8 +133,9 @@ export class RealTokenizadoService {
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
             if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${parfinSendDTO}`
+                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${payload}`
                 );
             }
 
@@ -163,9 +167,11 @@ export class RealTokenizadoService {
             return statusDescription;
 
         } catch (error) {
+            const payload = JSON.stringify(parfinSendDTO)
             this.logger.log(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar fazer o resgate de $${amount} Real Tokenizado. Parfin Send DTO: ${parfinSendDTO}`
+                `[ERROR]: Erro ao tentar fazer o resgate de $${amount} Real Tokenizado. 
+                Parfin Send DTO: ${payload}`
             );
         }
     }
@@ -201,8 +207,10 @@ export class RealTokenizadoService {
             );
             const { data } = parfinCallRes as ParfinContractCallSuccessRes;
             if (!data) {
+                const payload = JSON.stringify(parfinCallDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato ${keyDictionary}. Parfin Call DTO: ${parfinCallDTO}`
+                    `[ERROR]: Erro ao tentar interagir com contrato ${keyDictionary}. 
+                    Parfin Call DTO: ${payload}`
                 );
             }
 
@@ -239,8 +247,10 @@ export class RealTokenizadoService {
                 );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
             if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${parfinSendDTO}`
+                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. 
+                    Parfin Send DTO: ${payload}`
                 );
             }
 

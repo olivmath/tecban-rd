@@ -188,6 +188,12 @@ export class ParfinGetTransactionSuccessRes {
     @ApiProperty({ description: 'Carga da transação Parfin' })
     parfinTransactionPayload: string;
 }
+
+export class ParfinGetAllTransactionsSuccessRes {
+    @ApiProperty({ description: 'Transações registradas na Parfin' })
+    transactions: ParfinGetTransactionSuccessRes[];
+}
+
 //--- Errors
 export class ParfinErrorRes {
     @ApiProperty({ description: 'Mensagem de erro' })

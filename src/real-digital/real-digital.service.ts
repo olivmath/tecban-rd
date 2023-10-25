@@ -69,8 +69,9 @@ export class RealDigitalService {
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
             if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato ${str}. Parfin Send DTO: ${parfinSendDTO}`
+                    `[ERROR]: Erro ao tentar interagir com contrato ${str}. Parfin Send DTO: ${payload}`
                 );
             }
 
@@ -102,9 +103,11 @@ export class RealDigitalService {
             return statusDescription;
 
         } catch (error) {
+            const payload = JSON.stringify(parfinSendDTO)
             this.logger.log(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar fazer emissão de $${amount} Real Digital. Parfin Send DTO: ${parfinSendDTO}`
+                `[ERROR]: Erro ao tentar fazer emissão de $${amount} Real Digital. 
+                Parfin Send DTO: ${payload}`
             );
         }
     }
@@ -139,8 +142,9 @@ export class RealDigitalService {
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
             if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato ${str}. Parfin Send DTO: ${parfinSendDTO}`
+                    `[ERROR]: Erro ao tentar interagir com contrato ${str}. Parfin Send DTO: ${payload}`
                 );
             }
 
@@ -172,9 +176,10 @@ export class RealDigitalService {
             return statusDescription;
 
         } catch (error) {
+            const payload = JSON.stringify(parfinSendDTO)
             this.logger.log(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar fazer o resgate de $${amount} Real Digital. Parfin Send DTO: ${parfinSendDTO}`
+                `[ERROR]: Erro ao tentar fazer o resgate de $${amount} Real Digital. Parfin Send DTO: ${payload}`
             );
         }
     }
@@ -209,8 +214,10 @@ export class RealDigitalService {
             );
             const { data } = parfinCallRes as ParfinContractCallSuccessRes;
             if (!data) {
+                const payload = JSON.stringify(parfinCallDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato ${realDigitalDefaultAccount}. Parfin Call DTO: ${parfinCallDTO}`
+                    `[ERROR]: Erro ao tentar interagir com contrato ${realDigitalDefaultAccount}. 
+                    Parfin Call DTO: ${payload}`
                 );
             }
 
@@ -252,8 +259,9 @@ export class RealDigitalService {
                 );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
             if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato ${realDigital}. Parfin Send DTO: ${parfinSendDTO}`
+                    `[ERROR]: Erro ao tentar interagir com contrato ${realDigital}. Parfin Send DTO: ${payload}`
                 );
             }
 

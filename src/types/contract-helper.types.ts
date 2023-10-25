@@ -1,0 +1,15 @@
+export type ContractName =
+  | 'RealDigitalDefaultAccount'
+  | 'RealDigitalEnableAccount'
+  | 'ApprovedDigitalCurrency'
+  | 'SwapTwoStepsReserve'
+  | 'ITPFtOperation1002'
+  | 'ITPFtOperation1052'
+  | 'AddressDiscovery'
+  | 'RealTokenizado'
+  | 'KeyDictionary'
+  | 'SwapTwoSteps'
+  | 'RealDigital'
+  | 'SwapOneStep'
+  | 'ITPFt'
+  | 'STR';
