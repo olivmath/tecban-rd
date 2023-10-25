@@ -5,6 +5,7 @@ type inputOutput = {
     internalType: string;
     name: string;
     type: string;
+    components?: inputOutput[];
 };
 interface Item {
     inputs: inputOutput[];
@@ -25,20 +26,30 @@ export default class {
                 this[item.name] = (...args: any[]) => {
                     // decode function result
                     if (typeof args[0].returned !== 'undefined') {
+                        const types = item.outputs;
+                        const calldata = args[0].returned;
+
                         const result = web3.eth.abi.decodeParameters(
-                            item.outputs.map((i: inputOutput) => i.type),
-                            args[0].returned,
+                            types,
+                            calldata,
                         );
 
-                        return Object.values(result).slice(0, -1);
+                        if (
+                            typeof types[0].components !== 'undefined' &&
+                            types[0].type === 'tuple'
+                        ) {
+                            const structResult = result['0'];
+                            const structObj: Record<string, string> = {};
+                            types[0].components.forEach((component, index) => {
+                                structObj[component.name] = structResult[index];
+                            });
+                            return [structObj];
+                        } else {
+                            return Object.values(result).slice(0, -1);
+                        }
                     }
                     // encode function call
                     else {
-                        const closure = (i: any) =>
-                            typeof i === 'number'
-                                ? web3.utils.toWei(i.toString(), 'ether')
-                                : i;
-
                         return [
                             web3.eth.abi.encodeFunctionCall(
                                 {
@@ -46,7 +57,7 @@ export default class {
                                     type: 'function',
                                     inputs: item.inputs,
                                 },
-                                args.map(closure),
+                                args,
                             ),
                         ];
                     }

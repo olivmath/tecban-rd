@@ -70,4 +70,25 @@ export class ContractHelperService {
 
         return address;
     }
+
+    isContractNameValid(contractName: string): boolean {
+        const validContractNames: ContractName[] = [
+            'RealDigitalDefaultAccount',
+            'RealDigitalEnableAccount',
+            'ApprovedDigitalCurrency',
+            'SwapTwoStepsReserve',
+            'ITPFtOperation1002',
+            'ITPFtOperation1052',
+            'AddressDiscovery',
+            'RealTokenizado',
+            'KeyDictionary',
+            'SwapTwoSteps',
+            'RealDigital',
+            'SwapOneStep',
+            'ITPFt',
+            'STR',
+        ];
+
+        return validContractNames.includes(contractName as ContractName);
+    }
 }
