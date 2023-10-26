@@ -34,7 +34,9 @@ export class ContractHelperService {
         try {
             // build tx data to get address from addressDiscovery
             const contract = new ContractWrapper(abiLoader.AddressDiscovery);
-            const encodedData = contract.addressDiscovery(w3.utils.sha3(contractName))[0];
+            const encodedData = contract['addressDiscovery(bytes32)'](
+                w3.utils.sha3(contractName),
+            )[0];
 
             // mount Parfin's payload
             const parfinDTO = new ParfinContractInteractDTO();
@@ -60,9 +62,7 @@ export class ContractHelperService {
             }
 
             // decode response
-            const address: string = contract.addressDiscovery({
-                returned: data,
-            })[0];
+            const address: string = contract['addressDiscovery'](data)[0];
 
             return { address };
         } catch (error) {

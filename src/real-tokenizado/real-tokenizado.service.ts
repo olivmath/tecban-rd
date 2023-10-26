@@ -55,7 +55,9 @@ export class RealTokenizadoService {
                 data: '',
                 contractAddress: address,
             };
-            parfinSendDTO.metadata.data = this.realTokenizado.mint(to, amount)[0];
+            parfinSendDTO.metadata.data = this.realTokenizado[
+                'mint(address,uint256'
+            ](to, amount)[0];
 
             // 3. ???
             const parfinSendRes = await this.parfinService.smartContractSend(
@@ -125,7 +127,8 @@ export class RealTokenizadoService {
                 data: '',
                 contractAddress: address,
             };
-            parfinSendDTO.metadata.data = this.realTokenizado.burn(amount)[0];
+            parfinSendDTO.metadata.data =
+                this.realTokenizado['burn(uint256)'](amount)[0];
 
             // 3. ???
             const parfinSendRes = await this.parfinService.smartContractSend(
@@ -199,7 +202,8 @@ export class RealTokenizadoService {
                 data: '',
                 contractAddress: keyDictionaryAddress,
             };
-            parfinCallDTO.metadata.data = this.keyDictionary.getWallet(key)[0];
+            parfinCallDTO.metadata.data =
+                this.keyDictionary['getWallet(bytes32)'](key)[0];
 
             // 3. ???
             const parfinCallRes = await this.parfinService.smartContractCall(
@@ -215,9 +219,7 @@ export class RealTokenizadoService {
             }
 
             // 4. ???
-            const receiverAddress = this.keyDictionary.getWallet({
-                returned: data,
-            })[0];
+            const receiverAddress = this.keyDictionary['getWallet'](data)[0];
 
             // 5. ???
             const parfinDTO = new ParfinContractInteractDTO();
@@ -235,10 +237,9 @@ export class RealTokenizadoService {
                 data: '',
                 contractAddress: address,
             };
-            parfinSendDTO.metadata.data = this.realTokenizado.transfer(
-                receiverAddress,
-                amount,
-            )[0];
+            parfinSendDTO.metadata.data = this.realTokenizado[
+                'transfer(address,uint256)'
+            ](receiverAddress, amount)[0];
 
             // 8. ???
             const parfinSendRes =

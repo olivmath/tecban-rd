@@ -20,7 +20,7 @@ export class ParfinAuth {
       const encoder = new TextEncoder();
 
       const bytesApiSecret = encoder.encode(process.env.API_SECRET);
-      const privateKey = process.env.PRIVATE_KEY;
+      const privateKey = process.env.PARFIN_PRIVATE_KEY
       const privateKey64 = btoa(privateKey);
 
       const companyNameIssuer = process.env.ISSUER;
