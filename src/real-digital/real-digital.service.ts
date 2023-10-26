@@ -61,7 +61,8 @@ export class RealDigitalService {
                 data: '',
                 contractAddress: address,
             };
-            parfinSendDTO.metadata.data = this.str.requestToMint(amount)[0];
+            parfinSendDTO.metadata.data =
+                this.str['requestToMint(uint256)'](amount)[0];
 
             // 3. ???
             const parfinSendRes = await this.parfinService.smartContractSend(
@@ -134,7 +135,8 @@ export class RealDigitalService {
                 data: '',
                 contractAddress: address,
             };
-            parfinSendDTO.metadata.data = this.str.requestToBurn(amount)[0];
+            parfinSendDTO.metadata.data =
+                this.str['requestToBurn(uin256)'](amount)[0];
 
             // 3. ???
             const parfinSendRes = await this.parfinService.smartContractSend(
@@ -206,7 +208,9 @@ export class RealDigitalService {
                 contractAddress: realDigitalDefaultAccountAddress,
             };
             parfinCallDTO.metadata.data =
-                this.realDigitalDefaultAccount.defaultAccount(cnpj)[0];
+                this.realDigitalDefaultAccount['defaultAccount(uint256)'](
+                    cnpj,
+                )[0];
 
             // 3. ???
             const parfinCallRes = await this.parfinService.smartContractCall(
@@ -222,10 +226,9 @@ export class RealDigitalService {
             }
 
             // 4. ???
-            const receiverAddress =
-                this.realDigitalDefaultAccount.defaultAccount({
-                    returned: data,
-                })[0] as string;
+            const receiverAddress = this.realDigitalDefaultAccount[
+                'defaultAccount'
+            ](data)[0] as string;
 
             // 5. ???
             const parfinDTO = new ParfinContractInteractDTO();
@@ -247,10 +250,9 @@ export class RealDigitalService {
             }
 
             // 7. ???
-            parfinSendDTO.metadata.data = this.realDigital.transfer(
-                receiverAddress,
-                amount,
-            )[0];
+            parfinSendDTO.metadata.data = this.realDigital[
+                'transfer(address,uint256)'
+            ](receiverAddress, amount)[0];
 
             // 8. ???
             const parfinSendRes =

@@ -4,5 +4,5 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export const parfinApi = axios.create({
-  baseURL: process.env.PARFIN_API_V1_URL,
+    baseURL: process.env.PARFIN_API_V1_URL_SANDBOX,
 });

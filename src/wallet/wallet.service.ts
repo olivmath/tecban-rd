@@ -193,7 +193,7 @@ export class WalletService {
                     contractAddress: address,
                 };
                 parfinSendDTO.metadata.data =
-                    this.realDigitalEnableAccount.enableAccount(
+                    this.realDigitalEnableAccount['enableAccount(address)'](
                         walletAddress,
                     )[0];
 
@@ -255,7 +255,7 @@ export class WalletService {
                     contractAddress: address,
                 };
                 parfinSendDTO.metadata.data =
-                    this.realTokenizado.enableAccount(
+                    this.realTokenizado['enableAccount(address)'](
                         walletAddress,
                     )[0];
 
