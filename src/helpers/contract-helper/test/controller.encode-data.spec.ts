@@ -9,7 +9,7 @@ import { LoggerModule } from 'src/logger/logger.module';
 describe('ContractHelperController', () => {
     let controller: ContractHelperController;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [ContractHelperController],
             providers: [ContractHelperService],
@@ -25,7 +25,7 @@ describe('ContractHelperController', () => {
         it('should encode data for a valid `STR` contract `requestToMint` function', async () => {
             const data: EncodeDataDTO = {
                 contractName: 'STR',
-                functionName: 'requestToMint',
+                functionName: 'requestToMint(uint256)',
                 args: ['100'],
             };
 
@@ -35,14 +35,14 @@ describe('ContractHelperController', () => {
             expect(response.data).toBeDefined();
             expect(response.data).toEqual([
                 '0x7d637f87' +
-                '0000000000000000000000000000000000000000000000000000000000000064',
+                    '0000000000000000000000000000000000000000000000000000000000000064',
             ]);
         });
 
         it('should encode data for a valid `RealDigital` contract `mint` function', async () => {
             const data: EncodeDataDTO = {
                 contractName: 'RealDigital',
-                functionName: 'mint',
+                functionName: 'mint(address,uint256)',
                 args: ['0xCBD6832Ebc203e49E2B771897067fce3c58575ac', '100'],
             };
 
@@ -52,8 +52,8 @@ describe('ContractHelperController', () => {
             expect(response.data).toBeDefined();
             expect(response.data).toEqual([
                 '0x40c10f19' +
-                '000000000000000000000000cbd6832ebc203e49e2b771897067fce3c58575ac' +
-                '0000000000000000000000000000000000000000000000000000000000000064',
+                    '000000000000000000000000cbd6832ebc203e49e2b771897067fce3c58575ac' +
+                    '0000000000000000000000000000000000000000000000000000000000000064',
             ]);
         });
     });
@@ -70,7 +70,8 @@ describe('ContractHelperController', () => {
 
             const data: EncodeDataDTO = {
                 contractName: 'KeyDictionary',
-                functionName: 'addAccount',
+                functionName:
+                    'addAccount(bytes32,uint256,uint256,uint256,uint256,address)',
                 args: [key, taxId, bankNumber, account, branch, wallet],
             };
 
@@ -80,12 +81,12 @@ describe('ContractHelperController', () => {
             expect(response.data).toBeDefined();
             expect(response.data).toEqual([
                 '0xc82d5d86' +
-                '553520fcc65e84ebd405a0a7d7eca26f8467c1e85737afd0b1267ae92f90e40c' +
-                '000000000000000000000000000000000000000000000000000000136fbe7b8e' +
-                '00000000000000000000000000000000000000000000000000000000000000d5' +
-                '000000000000000000000000000000000000000000000000000000003ade68b1' +
-                '000000000000000000000000000000000000000000000000000000000000162e' +
-                '000000000000000000000000f77d5d60c05238b61ed805841f5f82d7803c72f5',
+                    '553520fcc65e84ebd405a0a7d7eca26f8467c1e85737afd0b1267ae92f90e40c' +
+                    '000000000000000000000000000000000000000000000000000000136fbe7b8e' +
+                    '00000000000000000000000000000000000000000000000000000000000000d5' +
+                    '000000000000000000000000000000000000000000000000000000003ade68b1' +
+                    '000000000000000000000000000000000000000000000000000000000000162e' +
+                    '000000000000000000000000f77d5d60c05238b61ed805841f5f82d7803c72f5',
             ]);
         });
 
@@ -108,7 +109,8 @@ describe('ContractHelperController', () => {
 
             const data: EncodeDataDTO = {
                 contractName: 'ITPFtOperation1052',
-                functionName: 'trade',
+                functionName:
+                    'trade(uint256,address,address,address,address,uint8,tuple,uint256,uint256)',
                 args: [
                     calldata.operationId,
                     calldata.sender,
@@ -126,7 +128,25 @@ describe('ContractHelperController', () => {
             const response = result as EncodedDataResponse;
 
             expect(response.data).toBeDefined();
-            expect(response.data).toEqual([]);
+            expect(response.data).toEqual([
+                '0x349c535f' +
+                    '000000000000000000000000000000000000000000000000000000000001e1b9' +
+                    '00000000000000000000000000a82e6cb71af785c65bae54925326bc85b3068d' +
+                    '0000000000000000000000003fc91a3afd70395cd496c647d5a6cc9d4b2b7fad' +
+                    '00000000000000000000000006652404de35f3be183132e526d8b9be0f7db404' +
+                    '000000000000000000000000e0959d39d357debd6b5cb143b30d04078c364c46' +
+                    '0000000000000000000000000000000000000000000000000000000000000000' +
+                    '0000000000000000000000000000000000000000000000000000000000000120' +
+                    '00000000000000000000000000000000000000000000000000000000000186a0' +
+                    '00000000000000000000000000000000000000000000000000000000000001f4' +
+                    '0000000000000000000000000000000000000000000000000000000000000060' +
+                    '00000000000000000000000000000000000000000000000000000000000000a0' +
+                    '0000000000000000000000000000000000000000000000000000000063a35300' +
+                    '0000000000000000000000000000000000000000000000000000000000000003' +
+                    '4142430000000000000000000000000000000000000000000000000000000000' +
+                    '0000000000000000000000000000000000000000000000000000000000000003' +
+                    '58595a0000000000000000000000000000000000000000000000000000000000',
+            ]);
         });
 
         it('should encode data for a valid `ITPFt` contract `createTPFt` function', async () => {
@@ -138,7 +158,7 @@ describe('ContractHelperController', () => {
 
             const data: EncodeDataDTO = {
                 contractName: 'ITPFt',
-                functionName: 'createTPFt',
+                functionName: 'createTPFt(tuple)',
                 args: [tpftData],
             };
 
@@ -148,14 +168,14 @@ describe('ContractHelperController', () => {
             expect(response.data).toBeDefined();
             expect(response.data).toEqual([
                 '0xd2bd0e12' +
-                '0000000000000000000000000000000000000000000000000000000000000020' +
-                '0000000000000000000000000000000000000000000000000000000000000060' +
-                '00000000000000000000000000000000000000000000000000000000000000a0' +
-                '0000000000000000000000000000000000000000000000000000000063a35300' +
-                '0000000000000000000000000000000000000000000000000000000000000003' +
-                '4142430000000000000000000000000000000000000000000000000000000000' +
-                '0000000000000000000000000000000000000000000000000000000000000003' +
-                '58595a0000000000000000000000000000000000000000000000000000000000',
+                    '0000000000000000000000000000000000000000000000000000000000000020' +
+                    '0000000000000000000000000000000000000000000000000000000000000060' +
+                    '00000000000000000000000000000000000000000000000000000000000000a0' +
+                    '0000000000000000000000000000000000000000000000000000000063a35300' +
+                    '0000000000000000000000000000000000000000000000000000000000000003' +
+                    '4142430000000000000000000000000000000000000000000000000000000000' +
+                    '0000000000000000000000000000000000000000000000000000000000000003' +
+                    '58595a0000000000000000000000000000000000000000000000000000000000',
             ]);
         });
     });
