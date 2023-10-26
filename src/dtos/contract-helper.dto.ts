@@ -46,19 +46,19 @@ export class EncodeDataDTO {
         description:
             'Lista de argumentos que vai ser passado como parametro para a `functionName`',
         example: [
-            '0xe0959D39d357deBd6b5Cb143B30d04078C364C46',
+            '123321',
+            '0x00A82e6cB71AF785C65Bae54925326bC85b3068d',
             '0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD',
             '0x06652404DE35F3BE183132e526d8b9be0f7db404',
-            '0x00A82e6cB71AF785C65Bae54925326bC85b3068d',
-            '123321',
-            '100000',
-            '500',
+            '0xe0959D39d357deBd6b5Cb143B30d04078C364C46',
             '0',
             {
                 acronym: 'ABC',
                 code: 'XYZ',
                 maturityDate: '1671648000',
             },
+            '10000',
+            '500',
         ],
     })
     @IsArray()

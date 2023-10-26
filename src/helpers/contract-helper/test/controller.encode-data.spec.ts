@@ -92,19 +92,19 @@ describe('ContractHelperController', () => {
 
         it('should encode data for a valid `ITPFtOperation1052` contract `trade` function', async () => {
             const calldata = {
-                receiverToken: '0xe0959D39d357deBd6b5Cb143B30d04078C364C46',
+                operationId: '123321',
+                sender: '0x00A82e6cB71AF785C65Bae54925326bC85b3068d',
                 senderToken: '0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD',
                 receiver: '0x06652404DE35F3BE183132e526d8b9be0f7db404',
-                sender: '0x00A82e6cB71AF785C65Bae54925326bC85b3068d',
-                operationId: '123321',
-                tpftAmount: '100000',
-                unitPrice: '500',
+                receiverToken: '0xe0959D39d357deBd6b5Cb143B30d04078C364C46',
                 callerPart: '0',
                 tpftData: {
                     acronym: 'ABC',
                     code: 'XYZ',
                     maturityDate: '1671648000',
                 },
+                tpftAmount: '100000',
+                unitPrice: '500',
             };
 
             const data: EncodeDataDTO = {
