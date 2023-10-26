@@ -33,7 +33,7 @@ export class ContractHelperService {
 
         try {
             // build tx data to get address from addressDiscovery
-            const contract = new ContractWrapper(abiLoader['AddressDiscovery']);
+            const contract = new ContractWrapper(abiLoader.AddressDiscovery);
             const encodedData = contract.addressDiscovery(w3.utils.sha3(contractName))[0];
 
             // mount Parfin's payload
