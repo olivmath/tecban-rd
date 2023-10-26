@@ -12,7 +12,7 @@ import {
 describe('ContractHelperController', () => {
     let controller: ContractHelperController;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [ContractHelperController],
             providers: [ContractHelperService],
