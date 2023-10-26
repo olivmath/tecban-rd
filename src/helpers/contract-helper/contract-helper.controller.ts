@@ -15,7 +15,10 @@ import {
     DecodedDataResponse,
     EncodedDataResponse,
 } from 'src/res/app/contract-helper.responses';
-import { encodeData200, getContractAddress200 } from 'src/res/swagger/contract-helper.swagger';
+import {
+    encodeData200,
+    getContractAddress200,
+} from 'src/res/swagger/contract-helper.swagger';
 import { appError400 } from 'src/res/swagger/error.swagger';
 import { ContractName } from 'src/types/contract-helper.types';
 
@@ -32,16 +35,24 @@ export class ContractHelperController {
     @Get('get-contract-address-by-name/:contractName')
     @ApiOperation({
         summary: 'Get a contract address',
-        description: 'Get a contract address using the contract name'
+        description: 'Get a contract address using the contract name',
     })
     @getContractAddress200
-    async getContractAddressByName(@Param('contractName') contractName: ContractName) {
+    async getContractAddressByName(
+        @Param('contractName') contractName: ContractName,
+    ) {
+        this.logger.setContext(
+            'ContractHelperController::getContractAddressByName',
+        );
+
         if (!this.contractService.isContractNameValid(contractName)) {
             throw new BadRequestException('Invalid contract name.');
         }
         try {
-            const address = await this.contractService.getContractAddress(contractName);
-            return address;
+            const address = await this.contractService.getContractAddress(
+                contractName,
+            );
+            return { address };
         } catch (error) {
             this.logger.error(error);
             throw new NotFoundException(
@@ -60,6 +71,8 @@ export class ContractHelperController {
     async encodeData(
         @Body() body: EncodeDataDTO,
     ): Promise<EncodedDataResponse | BadRequestException> {
+        this.logger.setContext('ContractHelperController::encodeData');
+
         try {
             if (!this.contractService.isContractNameValid(body.contractName)) {
                 throw new BadRequestException('Invalid contract name.');
@@ -91,6 +104,8 @@ export class ContractHelperController {
     async decodeData(
         @Body() body: DecodeDataDTO,
     ): Promise<DecodedDataResponse | BadRequestException> {
+        this.logger.setContext('ContractHelperController::decodeData');
+
         try {
             if (!this.contractService.isContractNameValid(body.contractName)) {
                 throw new BadRequestException('Invalid contract name.');
@@ -99,9 +114,7 @@ export class ContractHelperController {
             const contract = this.contractService.getContractMethods(
                 body.contractName,
             );
-            const decodedData = contract[body.functionName]({
-                returned: body.data,
-            });
+            const decodedData = contract[body.functionName](body.data);
 
             return { data: decodedData };
         } catch (error) {
