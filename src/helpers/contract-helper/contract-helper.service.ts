@@ -52,7 +52,7 @@ export class ContractHelperService {
             let parfinCallRes: ParfinContractCallSuccessRes | ParfinErrorRes;
             parfinCallRes = await this.parfinService.smartContractCall(parfinCallDTO);
             const { data } = parfinCallRes as ParfinContractCallSuccessRes;
-            if (data) {
+            if (!data) {
                 const payload = JSON.stringify(parfinCallDTO)
                 throw new Error(
                     `[ERROR]: Erro ao tentar interagir com contrato ${contractName}. Parfin Call DTO: ${payload}`

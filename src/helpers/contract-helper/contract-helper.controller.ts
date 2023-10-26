@@ -41,7 +41,7 @@ export class ContractHelperController {
         }
         try {
             const address = await this.contractService.getContractAddress(contractName);
-            return { address };
+            return address;
         } catch (error) {
             this.logger.error(error);
             throw new NotFoundException(
