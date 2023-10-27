@@ -5,4 +5,7 @@ dotenv.config();
 
 export const parfinApi = axios.create({
     baseURL: process.env.PARFIN_API_V1_URL_SANDBOX,
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
