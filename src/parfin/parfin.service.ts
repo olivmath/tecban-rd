@@ -57,8 +57,7 @@ export class ParfinService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar criar uma nova carteira na blockchain ${blockchainId}.
-                Request: ${parfinApi.request}`
+                `[ERROR]: Erro ao tentar criar uma nova carteira na blockchain ${blockchainId}.`
             );
         }
         return response.data;
@@ -76,8 +75,7 @@ export class ParfinService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar adicionar o token: ${dto.blockchainTokenId} na carteira: ${dto.walletId}.
-                Request: ${parfinApi.request}`,
+                `[ERROR]: Erro ao tentar adicionar o token: ${dto.blockchainTokenId} na carteira: ${dto.walletId}.`,
             );
         }
         return response.data;
@@ -94,8 +92,7 @@ export class ParfinService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar buscar as carteiras registradas na Parfin. 
-                Request: ${parfinApi.request}`,
+                `[ERROR]: Erro ao tentar buscar as carteiras registradas na Parfin. `,
             );
         }
         return response.data;
@@ -113,7 +110,7 @@ export class ParfinService {
             response = await parfinApi.post(url, reqBody);
         } catch (error) {
             this.logger.error(error);
-            throw new Error(`[ERROR]: Erro ao registrar um novo token ERC20. Request: ${parfinApi.request}`);
+            throw new Error(`[ERROR]: Erro ao registrar um novo token ERC20.`);
         }
         return response.data;
     }
@@ -129,7 +126,7 @@ export class ParfinService {
             response = await parfinApi.get(url);
         } catch (error) {
             this.logger.error(error);
-            throw new Error(`[ERROR]: Erro ao listar os contratos. Request: ${parfinApi.request}}`);
+            throw new Error(`[ERROR]: Erro ao listar os contratos.}`);
         }
         return response.data;
     }
@@ -146,8 +143,7 @@ export class ParfinService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar registrar o contrato: ${dto.contractAddress}.
-                Request: ${parfinApi.request}`,
+                `[ERROR]: Erro ao tentar registrar o contrato: ${dto.contractAddress}.`,
             );
         }
         return response.data;
@@ -165,8 +161,7 @@ export class ParfinService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar consultar informações do contrato: ${dto.metadata.contractAddress}.
-                Request: ${parfinApi.request}`,
+                `[ERROR]: Erro ao tentar consultar informações do contrato: ${dto.metadata.contractAddress}.`,
             );
         }
         return response.data;
@@ -184,8 +179,7 @@ export class ParfinService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar interagir com o contrato: ${dto.metadata.contractAddress}.
-                Request: ${parfinApi.request}`,
+                `[ERROR]: Erro ao tentar interagir com o contrato: ${dto.metadata.contractAddress}.`,
             );
         }
         return response.data;
@@ -203,7 +197,7 @@ export class ParfinService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao buscar as transações na Parfin. Request: ${parfinApi.request}`
+                `[ERROR]: Erro ao buscar as transações na Parfin.`
             );
         }
         return response.data;
@@ -220,7 +214,7 @@ export class ParfinService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao buscar a transação ${id}. Request: ${parfinApi.request}`
+                `[ERROR]: Erro ao buscar a transação ${id}.`
             );
         }
         return response.data;
@@ -235,7 +229,7 @@ export class ParfinService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao assinar a transação ${transactionId}. Request: ${parfinApi.request}`
+                `[ERROR]: Erro ao assinar a transação ${transactionId}.`
             );
         }
         return response.data;
