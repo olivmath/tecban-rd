@@ -301,4 +301,55 @@ export class RealDigitalService {
             );
         }
     }
+
+    async balanceOf(address: string): Promise<{
+        realDigitalBalanceOf: number;
+        realDigitalFrozenBalanceOf: number;
+    }> {
+        try {
+            const realDigital = 'RealDigital';
+            const { address: realDigitalAddress } = await this.contractHelper.getContractAddress(realDigital);
+            if (!realDigitalAddress) {
+                throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigital}`);
+            }
+
+            const encodedBalanceOfCall = this.realDigital['balanceOf(address)'](address)[0];
+            const encodedFrozenBalanceOfCall = this.realDigital['frozenBalanceOf(address)'](address)[0];
+
+            const parfinDTO = new ParfinContractInteractDTO();
+
+            const requests = [
+                { id: 'balanceOf', data: encodedBalanceOfCall },
+                { id: 'frozenBalanceOf', data: encodedFrozenBalanceOfCall },
+            ];
+
+            const allResponse = await Promise.all(
+                requests.map(async (request) => {
+                    return this.parfinService.smartContractCall({
+                        metadata: {
+                            data: request.data,
+                            contractAddress: realDigitalAddress,
+                        },
+                        blockchainId: parfinDTO.blockchainId,
+                    });
+                }),
+            );
+
+            const responses: { balanceOf?: string; frozenBalanceOf?: string } = {};
+            allResponse.forEach((response: ParfinContractCallSuccessRes, index) => {
+                const requestId = requests[index].id;
+                responses[requestId] = response.data;
+            });
+
+            const balanceOf = responses.balanceOf;
+            const frozenBalanceOf = responses.frozenBalanceOf;
+            return {
+                realDigitalBalanceOf: this.realDigital['balanceOf'](balanceOf)[0],
+                realDigitalFrozenBalanceOf: this.realDigital['frozenBalanceOf'](frozenBalanceOf)[0],
+            };
+        } catch (error) {
+            this.logger.log(error);
+            throw new Error(`[ERROR]: Erro ao tentar buscar o saldo de Real Digital do address: ${address}`);
+        }
+    }
 }

@@ -1,5 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import {
   RealTokenizadoMintDTO,
   RealTokenizadoBurnDTO,
@@ -28,5 +28,12 @@ export class RealTokenizadoController {
   @ApiOperation({ summary: 'Tranfer Real Tokenizado (Internal)', description: 'Transfer Real Tokenizado token between clients from the same financial institution' })
   transfer(@Body() dto: RealTokenizadoInternalTransferDTO,) {
     return this.realTokenizadoService.internalTransfer(dto);
+  }
+
+  @Get('balanceOf/:address')
+  @ApiOperation({ summary: 'Real Tokenizado balance', description: 'Real Tokenizado balance of any address'})
+  @ApiParam({ name: 'address', example: '0x5be4C55e1977E555DB9a815a2CDed576A71Ca3c2' })
+  balanceOf(@Param('address') address: string) {
+    return this.realTokenizadoService.balanceOf(address);
   }
 }
