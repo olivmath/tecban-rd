@@ -6,6 +6,7 @@ export class RealTokenizadoMintDTO {
   @ApiProperty({
     description: 'Descrição da interação com o contrato',
     default: '',
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -26,6 +27,7 @@ export class RealTokenizadoBurnDTO {
   @ApiProperty({
     description: 'Descrição da interação com o contrato',
     default: '',
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -41,6 +43,7 @@ export class RealTokenizadoInternalTransferDTO extends ParfinContractInteractDTO
   @ApiProperty({
     description: 'Descrição da interação com o contrato',
     default: '',
+    required: false,
   })
   @IsString()
   @IsOptional()

@@ -5,6 +5,7 @@ export class RealDigitalDTO {
   @ApiProperty({
     description: 'Descrição da interação com o contrato',
     default: '',
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -20,6 +21,7 @@ export class RealDigitalTransferDTO {
   @ApiProperty({
     description: 'Descrição da interação com o contrato',
     default: '',
+    required: false,
   })
   @IsString()
   @IsOptional()

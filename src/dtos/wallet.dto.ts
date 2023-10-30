@@ -79,6 +79,7 @@ export class WalletEnableDTO {
     @ApiProperty({
         description: 'Descrição da interação com o contrato',
         default: '',
+        required: false,
     })
     @IsString()
     @IsOptional()
