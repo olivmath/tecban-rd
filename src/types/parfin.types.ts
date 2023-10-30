@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { AssetID } from '../types/wallet.types';
 
 export enum Priority {
@@ -29,4 +29,13 @@ export class InteractMetadata extends DeployMetadata {
     @IsString()
     @IsNotEmpty()
     contractAddress: string;
+
+    @ApiProperty({
+        description: 'Endereço da carteira que está chamando o contrato',
+        default: process.env.WALLET_ADDRESS,
+        required: false,
+    })
+    @IsString()
+    @IsOptional()
+    from?: string;
 }
