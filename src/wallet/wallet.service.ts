@@ -22,7 +22,7 @@ import {
 } from '../types/transactions.types';
 import { WalletAddNewAssetSuccessRes } from 'src/res/app/wallet.responses';
 import { LoggerService } from 'src/logger/logger.service';
-import { AssetID } from '../types/wallet.types';
+import { AssetID, OwnerType } from '../types/wallet.types';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
 
 @Injectable()
@@ -57,7 +57,7 @@ export class WalletService {
 
             try {
                 const wallet = await this.walletRepository.create(
-                    parfinCreateRes as Wallet,
+                    { ...parfinCreateRes, ownerType: OwnerType.INSTITUTION } as Wallet,
                 );
                 return wallet;
             } catch (error) {

@@ -74,9 +74,9 @@ export class TransactionsService {
             }
 
             Object.assign(existingTransaction, updateTransactionDto);
-
+            
             try {
-                let updated = this.transactionsRepository.update(
+                let updated = await this.transactionsRepository.update(
                     id,
                     existingTransaction,
                 );

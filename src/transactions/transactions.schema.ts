@@ -8,6 +8,7 @@ import {
 } from '../types/transactions.types';
 import { Priority } from '../types/parfin.types';
 import { AssetID } from '../types/wallet.types';
+import * as crypto from 'node:crypto'
 
 @Schema()
 class Source {
@@ -29,7 +30,12 @@ class Metadata {
 
 @Schema()
 export class Transaction extends Document {
-  @Prop()
+  @Prop({
+    required: true,
+    unique: true,
+    index: true,
+    default: () => crypto.randomUUID(),
+  })
   id: string;
 
   @Prop()
@@ -67,5 +73,8 @@ export class Transaction extends Document {
 
   @Prop()
   statusDescription: string;
+
+  @Prop({ required: false })
+  description?: string
 }
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);

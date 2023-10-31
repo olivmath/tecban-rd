@@ -36,8 +36,11 @@ export class Wallet {
     @Prop({ type: [Object] })
     assets: WalletAsset[];
 
-    @Prop({ required: true, default: false })
+    @Prop({ required: true, default: true })
     enabled: boolean;
+
+    @Prop({ required: true, default: false })
+    isBacenEnabled: boolean;
 
     @Prop({ required: true, default: false })
     isBlocked: boolean;
