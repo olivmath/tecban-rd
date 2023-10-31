@@ -40,7 +40,7 @@ export class Wallet {
     enabled: boolean;
 
     @Prop({ required: true, default: false })
-    isBacenEnabled: boolean;
+    bacenEnabled: boolean;
 
     @Prop({ required: true, default: false })
     isBlocked: boolean;
