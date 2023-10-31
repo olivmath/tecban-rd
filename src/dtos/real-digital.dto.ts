@@ -28,7 +28,7 @@ export class RealDigitalTransferDTO {
   description?: string;
 
   @ApiProperty({ description: 'CNPJ uint256 do destinatário (8 primeiros dígitos)' })
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
   cnpj: number;
 
