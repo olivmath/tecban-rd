@@ -15,7 +15,7 @@ import {
   ParfinGetTransactionSuccessRes,
   ParfinGetAllTransactionsSuccessRes,
 } from 'src/res/app/parfin.responses';
-import { registerERC20Token200 } from 'src/res/swagger/parfin.swagger';
+import { getWalletById200, registerERC20Token200 } from 'src/res/swagger/parfin.swagger';
 import { parfinError400, parfinError500 } from 'src/res/swagger/error.swagger';
 import { getAllWallets200 } from 'src/res/swagger/wallet.swagger';
 
@@ -24,6 +24,7 @@ import { getAllWallets200 } from 'src/res/swagger/wallet.swagger';
 export class ParfinController {
   constructor(private readonly parfinService: ParfinService) { }
 
+  //--- Contract Endpoints
   @Post('contract/register')
   @ApiOperation({ summary: 'Register a smart contract', description: 'Register a smart contract for Parfin to listen to its events' })
   async registerContract(
@@ -49,6 +50,7 @@ export class ParfinController {
     return this.parfinService.registerERC20Token(dto);
   }
 
+  //--- Wallet Endpoints
   @Get('wallets')
   @ApiOperation({ summary: 'Get all Parfin wallets', description: 'Get all wallets registered in the Parfin platform' })
   @getAllWallets200
@@ -58,6 +60,17 @@ export class ParfinController {
     ParfinGetWalletSuccessRes[] | ParfinErrorRes
   > {
     return this.parfinService.getAllWallets();
+  }
+
+  @Get('wallet/:id')
+  @ApiOperation({ summary: 'Get a Parfin wallet', description: 'Get a wallet by id registered in the Parfin platform' })
+  @getWalletById200
+  @parfinError400
+  @parfinError500
+  getWalletById(@Param('id') id: string): Promise<
+    ParfinGetWalletSuccessRes | ParfinErrorRes
+  > {
+    return this.parfinService.getWalletById(id);
   }
 
   //--- Transaction Endpoints
@@ -70,7 +83,7 @@ export class ParfinController {
   }
 
   @Get('transaction/:id')
-  @ApiOperation({ summary: 'Get a transaction by id', description: 'Get a transaction by ID, registered in the Parfin platform' })
+  @ApiOperation({ summary: 'Get a Parfin transaction', description: 'Get a transaction by ID, registered in the Parfin platform' })
   getTransactionById(@Param('id') id: string): Promise<
     ParfinGetTransactionSuccessRes | ParfinErrorRes
   > {

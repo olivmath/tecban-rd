@@ -9,3 +9,7 @@ export const registerERC20Token200 = ApiResponse({
 export const getAllWallets200 = ApiResponse({
   status: 200, description: 'Successful operation.', type: [ParfinGetWalletSuccessRes]
 });
+
+export const getWalletById200 = ApiResponse({
+  status: 200, description: 'Successful operation.', type: ParfinGetWalletSuccessRes
+});

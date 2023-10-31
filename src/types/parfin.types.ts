@@ -32,7 +32,7 @@ export class InteractMetadata extends DeployMetadata {
 
     @ApiProperty({
         description: 'Endereço da carteira que está chamando o contrato',
-        default: process.env.WALLET_ADDRESS,
+        default: process.env.DEFAULT_WALLET_ADDRESS,
         required: false,
     })
     @IsString()
