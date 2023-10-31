@@ -98,6 +98,23 @@ export class ParfinService {
         return response.data;
     }
 
+    async getWalletById(id: string): Promise<
+        ParfinGetWalletSuccessRes | ParfinErrorRes
+    > {
+        const url = `/v1/api/wallet/${id}`;
+        let response;
+        try {
+            await this.parfinAuth.setAuth(url, {});
+            response = await parfinApi.get(url);
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(
+                `[ERROR]: Erro ao tentar buscar a carteira ${id}`,
+            );
+        }
+        return response.data;
+    }
+
     //--- Blockchain Token Endpoints
     async registerERC20Token(
         dto: ParfinRegisterERC20TokenDTO,
