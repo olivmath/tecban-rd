@@ -136,7 +136,7 @@ export class RealDigitalService {
                 contractAddress: address,
             };
             parfinSendDTO.metadata.data =
-                this.str['requestToBurn(uin256)'](amount)[0];
+                this.str['requestToBurn(uint256)'](amount)[0];
 
             // 3. ???
             const parfinSendRes = await this.parfinService.smartContractSend(
