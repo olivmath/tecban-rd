@@ -60,7 +60,7 @@ export class WalletController {
   @parfinError400
   @parfinError500
   createClientWallet(@Body() dto: WalletClientCreateDTO) {
-    return 'ok'
+    return this.walletService.createClientWallet(dto);
   }
 
   @Post('enable')
