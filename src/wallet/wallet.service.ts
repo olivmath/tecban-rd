@@ -24,6 +24,7 @@ import { WalletAddNewAssetSuccessRes } from 'src/res/app/wallet.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { AssetID, OwnerType } from '../types/wallet.types';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
+import Web3 from 'web3';
 
 @Injectable()
 export class WalletService {
@@ -74,99 +75,68 @@ export class WalletService {
         }
     }
 
-    // async createClientWallet(
-    //     dto: WalletClientCreateDTO,
-    // ): Promise<ParfinCreateWalletSuccessRes | ParfinErrorRes> {
-    //     const { key, taxId, bankNumber, account, branch, wallet } = dto;
-    //     const parfinDTO = dto as Omit<
-    //         WalletClientCreateDTO,
-    //         | 'blockchainId'
-    //         | 'key'
-    //         | 'taxId'
-    //         | 'bankNumber'
-    //         | 'account'
-    //         | 'branch'
-    //         | 'wallet'
-    //     >;
+    async createClientWallet(
+        dto: WalletClientCreateDTO,
+    ): Promise<{ wallet: string, walletId: string, clientKey: string, parfinTxId: string }> {
+        const parfinSendDTO = new ParfinContractInteractDTO()
+        const w3 = new Web3()
+        dto.key = w3.utils.keccak256(dto.taxId.toString())
 
-    //     try {
-    //         // 1 - Pegar endereço do contrato `Key Dictionary`
-    //         parfinDTO.metadata.contractAddress =
-    //             await this.contractHelper.getContractAddress('KeyDictionary');
-    //     } catch (error) {
-    //         this.logger.error(error);
-    //         throw new Error(
-    //             'Erro ao buscar o endereço do contrato: Key Dictionary',
-    //         );
-    //     }
+        const { walletName, key, taxId, bankNumber, account, branch, blockchainId, walletType } = dto;
 
-    //     // 2 - Codificar a chamada do contrato `Key Dictionary`
-    //     parfinDTO.metadata.data = this.keyDictionary.addAccount(
-    //         key,
-    //         taxId,
-    //         bankNumber,
-    //         account,
-    //         branch,
-    //         wallet,
-    //     )[0];
 
-    //     try {
-    //         // 3 - Interagir com o contrato usando o endpoint send/write
-    //         const parfinSendRes = await this.parfinService.smartContractSend(
-    //             parfinDTO,
-    //         );
-    //         const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 
-    //         try {
-    //             const transactionData = {
-    //                 parfinTransactionId: transactionId,
-    //                 operation: TransactionOperations.CREATE_WALLET,
-    //                 asset: null,
-    //                 ...parfinDTO,
-    //             };
-    //             // 4 - Salvar a transação no banco
-    //             const { id: dbTransactionId } =
-    //                 await this.transactionService.create(transactionData);
+        try {
+            // create wallet in parfin
+            const res = await this.parfinService.createWallet({ walletName, blockchainId, walletType })
+            const { address: walletAddress, walletId } = res as ParfinCreateWalletSuccessRes
 
-    //             try {
-    //                 // 5 - Assinar transação e inserir na blockchain
-    //                 await this.transactionService.transactionSignAndPush(
-    //                     transactionId,
-    //                     dbTransactionId,
-    //                 );
 
-    //                 try {
-    //                     // Chamando a criação de wallet na Parfin
-    //                     const parfinCreateRes =
-    //                         await this.parfinService.createWallet(dto);
-    //                     return { ...parfinCreateRes };
-    //                 } catch (error) {
-    //                     this.logger.error(error);
-    //                     throw new Error(
-    //                         `Erro ao tentar criar uma carteira para um cliente: ${dto.walletName} no banco de dados`,
-    //                     );
-    //                 }
-    //             } catch (error) {
-    //                 this.logger.error(error);
-    //                 throw new Error(
-    //                     `Erro ao tentar assinar transação ${transactionId} de criação de carteira`,
-    //                 );
-    //             }
-    //         } catch (error) {
-    //             this.logger.error(error);
-    //             throw new Error(
-    //                 `Erro ao tentar salvar transação ${transactionId} de criação de carteira no banco`,
-    //             );
-    //         }
-    //     } catch (error) {
-    //         this.logger.error(error);
-    //         throw new Error(
-    //             `Erro ao tentar criar transação de criação de carteira`,
-    //         );
-    //     }
-    // }
+            // 1 - Pegar endereço do contrato `Key Dictionary`
+            const { address: contractAddress } = await this.contractHelper.getContractAddress('KeyDictionary');
+            if (!contractAddress) {
+                throw new Error(
+                    'Erro ao buscar o endereço do contrato: Key Dictionary',
+                );
+            }
 
-    // Função para habilitar uma carteira
+            // 2 - Codificar a chamada do contrato `Key Dictionary`
+            parfinSendDTO.metadata = {
+                contractAddress: contractAddress,
+                data: this.keyDictionary['addAccount(bytes32,uint256,uint256,uint256,uint256,address)'](
+                    key,
+                    taxId,
+                    bankNumber,
+                    account,
+                    branch,
+                    walletAddress,
+                )[0]
+            }
+            // 3 - Interagir com o contrato usando o endpoint send/write
+            const parfinSendRes = await this.parfinService.smartContractSend(
+                parfinSendDTO,
+            );
+            const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+
+            // TODO: sign&push transaction in parfin
+            // TODO: save wallet in database
+
+            return {
+                parfinTxId: transactionId,
+                wallet: walletAddress,
+                clientKey: dto.key,
+                walletId: walletId,
+            }
+
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(
+                `Erro ao tentar criar transação de criação de carteira`,
+            );
+        }
+    }
+
+
 
     async enableWallet(dto: WalletEnableDTO): Promise<any> {
         const { description, asset, walletAddress } = dto;
