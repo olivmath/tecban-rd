@@ -101,11 +101,14 @@ export class RealDigitalService {
                 throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${transactionData}`);
             }
 
-            return statusDescription;
+            return {
+                parfinId: transactionId,
+                status: statusDescription
+            };
 
         } catch (error) {
             const payload = JSON.stringify(parfinSendDTO)
-            this.logger.log(error);
+            this.logger.error(error);
             throw new Error(
                 `[ERROR]: Erro ao tentar fazer emissão de $${amount} Real Digital. 
                 Parfin Send DTO: ${payload}`
@@ -175,11 +178,14 @@ export class RealDigitalService {
                 throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${transactionData}`);
             }
 
-            return statusDescription;
+            return {
+                parfinId: transactionId,
+                status: statusDescription
+            };
 
         } catch (error) {
             const payload = JSON.stringify(parfinSendDTO)
-            this.logger.log(error);
+            this.logger.error(error);
             throw new Error(
                 `[ERROR]: Erro ao tentar fazer o resgate de $${amount} Real Digital. Parfin Send DTO: ${payload}`
             );
@@ -293,9 +299,13 @@ export class RealDigitalService {
             if (!statusDescription) {
                 throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${transactionData}`);
             }
-            return statusDescription;
+
+            return {
+                parfinId: transactionId,
+                status: statusDescription
+            };
         } catch (error) {
-            this.logger.log(error);
+            this.logger.error(error);
             throw new Error(
                 `[ERROR]: Erro ao tentar transferir $${amount} Real Digital para o CNPJ: ${cnpj}`
             );
@@ -348,7 +358,7 @@ export class RealDigitalService {
                 realDigitalFrozenBalanceOf: this.realDigital['frozenBalanceOf'](frozenBalanceOf)[0],
             };
         } catch (error) {
-            this.logger.log(error);
+            this.logger.error(error);
             throw new Error(`[ERROR]: Erro ao tentar buscar o saldo de Real Digital do address: ${address}`);
         }
     }
