@@ -20,7 +20,7 @@ export class RealDigitalController {
   @Post('burn')
   @ApiOperation({ summary: 'Burn Real Digital', description: 'Burn Real Digital token from an enabled wallet' })
   burn(@Body() dto: RealDigitalDTO) {
-    this.realDigitalService.burn(dto);
+    return this.realDigitalService.burn(dto);
   }
 
   @Post('external-transfer')
@@ -30,7 +30,7 @@ export class RealDigitalController {
   }
 
   @Get('balanceOf/:address')
-  @ApiOperation({ summary: 'Real Digital balance', description: 'Real Digital balance of any address'})
+  @ApiOperation({ summary: 'Real Digital balance', description: 'Real Digital balance of any address' })
   @ApiParam({ name: 'address', example: '0x5be4C55e1977E555DB9a815a2CDed576A71Ca3c2' })
   balanceOf(@Param('address') address: string) {
     return this.realDigitalService.balanceOf(address);
