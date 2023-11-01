@@ -235,7 +235,7 @@ export class WalletService {
 
                 return statusDescription;
             } catch (error) {
-                this.logger.log(error);
+                this.logger.error(error);
                 throw new Error(
                     `[ERROR]: Erro ao tentar habilitar a carteira ${walletAddress}. Parfin Send DTO: ${parfinSendDTO}`
                 );
@@ -297,7 +297,7 @@ export class WalletService {
 
                 return statusDescription;
             } catch (error) {
-                this.logger.log(error);
+                this.logger.error(error);
                 throw new Error(
                     `[ERROR]: Erro ao tentar habilitar a carteira ${walletAddress}. Parfin Send DTO: ${parfinSendDTO}`
                 );
