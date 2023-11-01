@@ -21,7 +21,7 @@ export class RealTokenizadoController {
   @Post('burn')
   @ApiOperation({ summary: 'Burn Real Tokenizado', description: 'Burn Real Tokenizado token from an enabled wallet' })
   burn(@Body() dto: RealTokenizadoBurnDTO) {
-    this.realTokenizadoService.burn(dto);
+    return this.realTokenizadoService.burn(dto);
   }
 
   @Post('internal-transfer')
@@ -31,7 +31,7 @@ export class RealTokenizadoController {
   }
 
   @Get('balanceOf/:address')
-  @ApiOperation({ summary: 'Real Tokenizado balance', description: 'Real Tokenizado balance of any address'})
+  @ApiOperation({ summary: 'Real Tokenizado balance', description: 'Real Tokenizado balance of any address' })
   @ApiParam({ name: 'address', example: '0x5be4C55e1977E555DB9a815a2CDed576A71Ca3c2' })
   balanceOf(@Param('address') address: string) {
     return this.realTokenizadoService.balanceOf(address);
