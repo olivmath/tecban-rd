@@ -10,7 +10,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ContractHelperService } from 'src/helpers/contract-helper/contract-helper.service';
 import {
     ParfinCreateWalletSuccessRes,
-    ParfinErrorRes,
     ParfinSuccessRes,
 } from 'src/res/app/parfin.responses';
 import { ParfinService } from 'src/parfin/parfin.service';
@@ -57,24 +56,36 @@ export class WalletService {
         dto: WalletCreateDTO,
     ): Promise<WalletCreateSuccessRes | any> {
         try {
-            // Chamando a criação de wallet na parfin
+            // 1. Criando a carteira na Parfin
             const parfinCreateRes = await this.parfinService.createWallet(dto);
-
-            try {
-                const wallet = await this.walletRepository.create(
-                    { ...parfinCreateRes, ownerType: OwnerType.INSTITUTION } as Wallet,
-                );
-                return wallet;
-            } catch (error) {
-                this.logger.error(error);
+            const { walletId } = parfinCreateRes as ParfinCreateWalletSuccessRes;
+            if (!walletId) {
+                this.logger.error(parfinCreateRes);
                 throw new Error(
-                    `Erro ao tentar criar uma carteira para uma instituição: ${dto.walletName} no banco de dados`,
+                    `[ERROR]: Erro ao tentar criar a carteira ${dto.walletName} na Parfin. Parfin DTO: ${dto}`
                 );
             }
+
+            // 2. Criando a carteira no banco de dados
+            const payload = {
+                ...parfinCreateRes,
+                bacenEnabled: false,
+                ownerId: process.env.ARBI_ID,
+                ownerType: OwnerType.INSTITUTION
+            } as Wallet
+            const wallet = await this.walletRepository.create(payload);
+            if (!wallet.id) {
+                this.logger.error(wallet);
+                throw new Error(
+                    `[ERROR]: Erro ao tentar criar a carteira ${dto.walletName} no banco de dados. Payload: ${payload}`
+                );
+            }
+            return wallet;
+
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `Erro durante a criação de wallet na Parfin: ${error.message}`,
+                `[ERROR]: Erro durante a criação de wallet na Parfin: ${error.message}`,
             );
         }
     }
@@ -86,24 +97,28 @@ export class WalletService {
         const parfinSendDTO = new ParfinContractInteractDTO()
         const w3 = new Web3()
 
-
-
         try {
-            // create wallet in parfin
-            const res = await this.parfinService.createWallet({ walletName, blockchainId, walletType })
-            const { address: walletAddress, walletId } = res as ParfinCreateWalletSuccessRes
-
-
-            // 1 - Pegar endereço do contrato `Key Dictionary`
-            const { address: contractAddress } = await this.contractHelper.getContractAddress('KeyDictionary');
-            if (!contractAddress) {
+            // 1. Criando a carteira na Parfin
+            const parfinCreateRes = await this.parfinService.createWallet({ walletName, blockchainId, walletType })
+            const { address: walletAddress, walletId } = parfinCreateRes as ParfinCreateWalletSuccessRes
+            if (!walletId) {
+                this.logger.error(parfinCreateRes);
                 throw new Error(
-                    'Erro ao buscar o endereço do contrato: Key Dictionary',
+                    `[ERROR]: Erro ao tentar criar a carteira ${dto.walletName} na Parfin. Parfin DTO: ${dto}`
                 );
             }
 
+
+            // 2. Pegar endereço do contrato `Key Dictionary`
+            const { address: contractAddress } = await this.contractHelper.getContractAddress('KeyDictionary');
+            if (!contractAddress) {
+                throw new Error(
+                    `[ERROR]: Erro ao buscar o endereço do contrato Key Dictionary`,
+                );
+            }
+
+            // 3. Codificar a chamada do contrato `Key Dictionary`
             const clientKey = w3.utils.keccak256(dto.taxId.toString())
-            // 2 - Codificar a chamada do contrato `Key Dictionary`
             parfinSendDTO.metadata = {
                 contractAddress: contractAddress,
                 data: this.keyDictionary['addAccount(bytes32,uint256,uint256,uint256,uint256,address)'](
@@ -115,19 +130,36 @@ export class WalletService {
                     walletAddress,
                 )[0]
             }
-            // 3 - Interagir com o contrato usando o endpoint send/write
+
+            // 4. Interagir com o contrato usando o endpoint send/write
             const parfinSendRes = await this.parfinService.smartContractSend(
                 parfinSendDTO,
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+            if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
+                throw new Error(
+                    `[ERROR]: Erro ao tentar interagir com contrato Key Dictionary. Parfin Send DTO: ${payload}`
+                );
+            }
 
             await this.parfinService.transactionSignAndPush(transactionId)
 
-            const parfinCreateRes = await this.parfinService.createWallet(dto);
+            // 5. Criando a carteira no banco de dados
+            const payload = {
+                ...parfinCreateRes,
+                bacenEnabled: false,
+                ownerId: process.env.ARBI_ID,
+                ownerType: OwnerType.INSTITUTION
+            } as Wallet
+            const wallet = await this.walletRepository.create(payload);
+            if (!wallet.id) {
+                this.logger.error(wallet);
+                throw new Error(
+                    `[ERROR]: Erro ao tentar criar a carteira ${dto.walletName} no banco de dados. Payload: ${payload}`
+                );
+            }
 
-            const wallet = await this.walletRepository.create(
-                { ...parfinCreateRes, ownerType: OwnerType.INSTITUTION } as Wallet,
-            );
             return {
                 ...wallet,
                 clientKey: clientKey,
@@ -136,7 +168,7 @@ export class WalletService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `Erro ao tentar criar transação de criação de carteira`,
+                `[ERROR]: Erro ao tentar criar transação de criação de carteira ${dto.walletName}`,
             );
         }
     }

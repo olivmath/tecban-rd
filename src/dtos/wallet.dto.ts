@@ -71,7 +71,7 @@ export class WalletEnableDTO {
 }
 
 export class WalletNewAssetDTO {
-    @ApiProperty({ description: 'ID do Token ERC20' })
+    @ApiProperty({ description: 'ID do token ERC20' })
     @IsString()
     @IsNotEmpty()
     blockchainTokenId: string;
