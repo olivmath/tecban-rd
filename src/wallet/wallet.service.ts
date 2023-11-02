@@ -20,7 +20,11 @@ import {
     AssetTypes,
     TransactionOperations,
 } from '../types/transactions.types';
-import { CreateClientWalletRes, WalletAddNewAssetSuccessRes } from 'src/res/app/wallet.responses';
+import {
+    WalletCreateSuccessRes,
+    WalletCreateClientSuccessRes,
+    WalletAddNewAssetSuccessRes
+} from 'src/res/app/wallet.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { AssetID, OwnerType } from '../types/wallet.types';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
@@ -51,7 +55,7 @@ export class WalletService {
     // Gravação: Create a new Wallet
     async createInstitutionWallet(
         dto: WalletCreateDTO,
-    ): Promise<ParfinCreateWalletSuccessRes | ParfinErrorRes> {
+    ): Promise<WalletCreateSuccessRes | any> {
         try {
             // Chamando a criação de wallet na parfin
             const parfinCreateRes = await this.parfinService.createWallet(dto);
@@ -77,7 +81,7 @@ export class WalletService {
 
     async createClientWallet(
         dto: WalletClientCreateDTO,
-    ): Promise<CreateClientWalletRes> {
+    ): Promise<WalletCreateClientSuccessRes | any> {
         const { walletName, taxId, bankNumber, account, branch, blockchainId, walletType } = dto;
         const parfinSendDTO = new ParfinContractInteractDTO()
         const w3 = new Web3()
@@ -98,12 +102,12 @@ export class WalletService {
                 );
             }
 
-            const key = w3.utils.keccak256(dto.taxId.toString())
+            const clientKey = w3.utils.keccak256(dto.taxId.toString())
             // 2 - Codificar a chamada do contrato `Key Dictionary`
             parfinSendDTO.metadata = {
                 contractAddress: contractAddress,
                 data: this.keyDictionary['addAccount(bytes32,uint256,uint256,uint256,uint256,address)'](
-                    key,
+                    clientKey,
                     taxId,
                     bankNumber,
                     account,
@@ -119,12 +123,14 @@ export class WalletService {
 
             await this.parfinService.transactionSignAndPush(transactionId)
 
-            // TODO: save wallet in database
+            const parfinCreateRes = await this.parfinService.createWallet(dto);
 
+            const wallet = await this.walletRepository.create(
+                { ...parfinCreateRes, ownerType: OwnerType.INSTITUTION } as Wallet,
+            );
             return {
-                wallet: walletAddress,
-                walletId: walletId,
-                clientKey: key,
+                ...wallet,
+                clientKey: clientKey,
             }
 
         } catch (error) {
@@ -281,7 +287,7 @@ export class WalletService {
     }
 
     // Consulta: Retrieve a Wallet by its ID
-    async getWalletById(id: string): Promise<Wallet> {
+    async getWalletById(id: string): Promise<Wallet | any> {
         const wallet = await this.walletRepository.findById(id);
         if (!wallet) {
             throw new NotFoundException(`Wallet with ID ${id} not found`);
@@ -290,7 +296,7 @@ export class WalletService {
     }
 
     // Listagem: List all Wallets
-    async getAllWallets(): Promise<Wallet[]> {
+    async getAllWallets(): Promise<Wallet[] | any> {
         try {
             return await this.walletRepository.findAll();
         } catch (error) {
@@ -301,7 +307,7 @@ export class WalletService {
 
     async addNewAsset(
         dto: WalletNewAssetDTO,
-    ): Promise<WalletAddNewAssetSuccessRes | ParfinErrorRes> {
+    ): Promise<WalletAddNewAssetSuccessRes | any> {
         try {
             const parfinCreateRes = await this.parfinService.addNewAsset(dto);
             return {

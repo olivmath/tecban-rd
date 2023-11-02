@@ -1,22 +1,26 @@
 import { ApiResponse } from '@nestjs/swagger';
-import { CreateClientWalletRes, WalletAddNewAssetSuccessRes, WalletSuccessRes } from '../app/wallet.responses';
+import {
+  WalletCreateSuccessRes,
+  WalletCreateClientSuccessRes,
+  WalletAddNewAssetSuccessRes
+} from '../app/wallet.responses';
 // Success
 export const getAllWallets200 = ApiResponse({
-  status: 200, description: 'Successful operation.', type: [WalletSuccessRes]
+  status: 200, description: 'Successful operation.', type: [WalletCreateSuccessRes]
 });
 export const getWalletById200 = ApiResponse({
-  status: 200, description: 'Successful operation.', type: WalletSuccessRes
+  status: 200, description: 'Successful operation.', type: WalletCreateSuccessRes
 });
 export const createWallet201 = ApiResponse({
-  status: 201, description: 'Successful operation.', type: WalletSuccessRes
+  status: 201, description: 'Successful operation.', type: WalletCreateSuccessRes
 });
 export const createClienteWallet201 = ApiResponse({
-  status: 201, description: 'Successful operation.', type: CreateClientWalletRes
+  status: 201, description: 'Successful operation.', type: WalletCreateClientSuccessRes
 });
 export const enableWallet200 = ApiResponse({ status: 200, description: 'Success' });
 
 export const newAssetAdded201 = ApiResponse({
-    status: 201,
-    description: 'Successful operation.',
-    type: WalletAddNewAssetSuccessRes,
+  status: 201,
+  description: 'Successful operation.',
+  type: WalletAddNewAssetSuccessRes,
 });

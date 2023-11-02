@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { WalletAsset } from '../../types/wallet.types';
+import { OwnerType, WalletAsset } from '../../types/wallet.types';
 
-export class WalletSuccessRes {
+export class WalletCreateSuccessRes {
   @ApiProperty({
     description: 'ID da operação de criação',
     type: String,
@@ -74,37 +74,25 @@ export class WalletSuccessRes {
   })
   walletType: string;
 
-  @ApiPropertyOptional({
-    description: 'ID da empresa',
+  @ApiProperty({
+    description: 'ID do dono da cartiera',
     type: String,
   })
-  companyId?: string;
+  ownerId: string;
 
-  @ApiPropertyOptional({
-    description: 'ID do usuário',
+  @ApiProperty({
+    description: 'Tipo de dono da carteira (instituição financeira ou um cliente)',
     type: String,
   })
-  userId?: string;
+  ownerType: string;
 }
 
-export class CreateClientWalletRes {
+export class WalletCreateClientSuccessRes extends WalletCreateSuccessRes {
   @ApiProperty({
-    description: 'address da carteira do client',
+    description: 'Key da carteira do cliente registrada no KeyDictionary',
     type: String,
   })
-  wallet: string
-
-  @ApiProperty({
-    description: 'id da carteira do cliente na parfin',
-    type: String,
-  })
-  walletId: string
-
-  @ApiProperty({
-    description: 'key da carteira do cliente no KeyDictionary e no MongoDB',
-    type: String,
-  })
-  clientKey: string
+  clientKey: string;
 }
 export class WalletAddNewAssetSuccessRes {
   @ApiProperty({ description: 'ID do asset adicionado na carteira' })
