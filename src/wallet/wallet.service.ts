@@ -118,7 +118,8 @@ export class WalletService {
             );
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
 
-            // TODO: sign&push transaction in parfin
+            await this.parfinService.transactionSignAndPush(transactionId)
+
             // TODO: save wallet in database
 
             return {
