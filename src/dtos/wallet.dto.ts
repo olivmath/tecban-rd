@@ -28,25 +28,35 @@ export class WalletCreateDTO {
 }
 
 export class WalletClientCreateDTO extends WalletCreateDTO {
-    @ApiProperty({ description: 'CPF do cliente', example: 12345678901 })
-    @IsNumber()
-    @IsNotEmpty()
-    taxId: number;
+    @ApiProperty({
+        description: 'Descrição da operação',
+        example: 'Criando a carteira do Cliente ? Banco Arbi',
+        default: '',
+        required: false,
+    })
+    @IsString()
+    @IsOptional()
+    description?: string;
 
-    @ApiProperty({ description: 'Código do banco do cliente', example: 123 })
-    @IsNumber()
+    @ApiProperty({ description: 'CPF do cliente', example: '12345678901' })
+    @IsString()
     @IsNotEmpty()
-    bankNumber: number;
+    taxId: string;
 
-    @ApiProperty({ description: 'Conta do banco do cliente', example: 987654 })
-    @IsNumber()
+    @ApiProperty({ description: 'Código do banco do cliente', example: '123' })
+    @IsString()
     @IsNotEmpty()
-    account: number;
+    bankNumber: string;
 
-    @ApiProperty({ description: 'Agência do banco do cliente', example: 4567 })
-    @IsNumber()
+    @ApiProperty({ description: 'Conta do banco do cliente', example: '987654' })
+    @IsString()
     @IsNotEmpty()
-    branch: number;
+    account: string;
+
+    @ApiProperty({ description: 'Agência do banco do cliente', example: '4567' })
+    @IsString()
+    @IsNotEmpty()
+    branch: string;
 }
 
 export class WalletEnableDTO {
@@ -59,7 +69,10 @@ export class WalletEnableDTO {
     @IsOptional()
     description?: string;
 
-    @ApiProperty({ description: 'Ativo da carteira' })
+    @ApiProperty({
+        description: 'Ativo da carteira',
+        example: 'RD'
+    })
     @IsString()
     @IsNotEmpty()
     asset: string;
