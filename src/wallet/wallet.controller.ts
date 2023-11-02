@@ -8,7 +8,7 @@ import {
   WalletNewAssetDTO,
 } from '../dtos/wallet.dto';
 import {
-  createClienteWallet201,
+  createClientWallet201,
   createWallet201,
   enableWallet200,
   getAllWallets200,
@@ -57,7 +57,7 @@ export class WalletController {
     summary: 'Create a client wallet',
     description: 'Create a wallet for a client of a financial institution'
   })
-  @createClienteWallet201
+  @createClientWallet201
   @parfinError400
   @parfinError500
   createClientWallet(@Body() dto: WalletClientCreateDTO) {

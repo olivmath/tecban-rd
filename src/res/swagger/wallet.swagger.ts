@@ -14,7 +14,7 @@ export const getWalletById200 = ApiResponse({
 export const createWallet201 = ApiResponse({
   status: 201, description: 'Successful operation.', type: WalletCreateSuccessRes
 });
-export const createClienteWallet201 = ApiResponse({
+export const createClientWallet201 = ApiResponse({
   status: 201, description: 'Successful operation.', type: WalletCreateClientSuccessRes
 });
 export const enableWallet200 = ApiResponse({ status: 200, description: 'Success' });
