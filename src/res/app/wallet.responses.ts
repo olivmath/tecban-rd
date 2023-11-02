@@ -101,7 +101,7 @@ export class CreateClientWalletRes {
   walletId: string
 
   @ApiProperty({
-    description: 'key da carteira do cliente no KeyDictionary',
+    description: 'key da carteira do cliente no KeyDictionary e no MongoDB',
     type: String,
   })
   clientKey: string
