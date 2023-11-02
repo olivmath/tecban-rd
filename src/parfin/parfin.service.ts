@@ -19,7 +19,7 @@ import {
     ParfinGetAllTransactionsSuccessRes,
 } from 'src/res/app/parfin.responses';
 import {
-    WalletInstitutionCreateDTO,
+    WalletCreateDTO,
     WalletClientCreateDTO,
     WalletNewAssetDTO,
 } from '../dtos/wallet.dto';
@@ -41,7 +41,7 @@ export class ParfinService {
         walletName,
         blockchainId,
         walletType,
-    }: WalletInstitutionCreateDTO | WalletClientCreateDTO): Promise<
+    }: WalletCreateDTO): Promise<
         ParfinCreateWalletSuccessRes | ParfinErrorRes
     > {
         const reqBody = {

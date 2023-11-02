@@ -1,7 +1,7 @@
 import { TransactionsService } from 'src/transactions/transactions.service';
 import ParfinContractWrapper from 'src/utils/contract-util/contract-wrapper';
 import {
-    WalletInstitutionCreateDTO,
+    WalletCreateDTO,
     WalletClientCreateDTO,
     WalletEnableDTO,
     WalletNewAssetDTO,
@@ -50,7 +50,7 @@ export class WalletService {
 
     // Gravação: Create a new Wallet
     async createInstitutionWallet(
-        dto: WalletInstitutionCreateDTO,
+        dto: WalletCreateDTO,
     ): Promise<ParfinCreateWalletSuccessRes | ParfinErrorRes> {
         try {
             // Chamando a criação de wallet na parfin

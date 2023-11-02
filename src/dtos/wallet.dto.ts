@@ -1,9 +1,8 @@
-import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
 import { BlockchainId, WalletType } from '../types/wallet.types';
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class WalletInstitutionCreateDTO {
+export class WalletCreateDTO {
     @ApiProperty({ description: 'Nome da carteira' })
     @IsString()
     @IsNotEmpty()
@@ -11,62 +10,42 @@ export class WalletInstitutionCreateDTO {
 
     @ApiProperty({
         description: 'ID da blocklchain onde será utilizada a carteira',
-        enum: BlockchainId,
-        enumName: 'BlockchainId',
+        enum: Object.values(BlockchainId),
         default: BlockchainId.BLOCKCHAIN_ID,
     })
-    @IsString()
-    @IsNotEmpty()
-    blockchainId: BlockchainId = BlockchainId.BLOCKCHAIN_ID;
+    @IsEnum(BlockchainId)
+    @IsOptional()
+    blockchainId?: BlockchainId;
 
     @ApiProperty({
         description: 'Tipo de custódia da carteira',
-        enum: WalletType,
-        enumName: 'WalletType',
+        enum: Object.values(WalletType),
         default: WalletType.CUSTODY,
     })
-    @IsString()
-    @IsNotEmpty()
-    walletType: WalletType = WalletType.CUSTODY;
+    @IsEnum(WalletType)
+    @IsOptional()
+    walletType?: WalletType;
 }
 
-export class WalletClientCreateDTO {
-    @ApiProperty({ description: 'Nome do Cliente', example: "Lucas Oliveira" })
-    @IsString()
+export class WalletClientCreateDTO extends WalletCreateDTO {
+    @ApiProperty({ description: 'CPF do cliente', example: 12345678901 })
+    @IsNumber()
     @IsNotEmpty()
-    walletName: string;
-
-    @ApiProperty({
-        description: 'ID da blocklchain onde será utilizada a carteira',
-        enum: BlockchainId,
-        enumName: 'BlockchainId',
-        default: BlockchainId.BLOCKCHAIN_ID,
-    })
-    @IsString()
-    @IsNotEmpty()
-    blockchainId?: BlockchainId = BlockchainId.BLOCKCHAIN_ID;
-
-    @ApiProperty({
-        description: 'Tipo de custódia da carteira',
-        enum: WalletType,
-        enumName: 'WalletType',
-        default: WalletType.CUSTODY,
-    })
-    @IsString()
-    @IsNotEmpty()
-    walletType?: WalletType = WalletType.CUSTODY;
-
-
-    @ApiProperty({ description: 'CPF da wallet', example: 12345678901 })
     taxId: number;
 
-    @ApiProperty({ description: 'Código do banco da carteira', example: 123 })
+    @ApiProperty({ description: 'Código do banco do cliente', example: 123 })
+    @IsNumber()
+    @IsNotEmpty()
     bankNumber: number;
 
-    @ApiProperty({ description: 'Conta do banco da carteira', example: 987654 })
+    @ApiProperty({ description: 'Conta do banco do cliente', example: 987654 })
+    @IsNumber()
+    @IsNotEmpty()
     account: number;
 
-    @ApiProperty({ description: 'Agência do banco da carteira', example: 4567 })
+    @ApiProperty({ description: 'Agência do banco do cliente', example: 4567 })
+    @IsNumber()
+    @IsNotEmpty()
     branch: number;
 }
 

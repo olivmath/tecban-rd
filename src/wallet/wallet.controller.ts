@@ -2,7 +2,7 @@ import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WalletService } from './wallet.service';
 import {
-  WalletInstitutionCreateDTO,
+  WalletCreateDTO,
   WalletClientCreateDTO,
   WalletEnableDTO,
   WalletNewAssetDTO,
@@ -48,7 +48,7 @@ export class WalletController {
   @createWallet201
   @parfinError400
   @parfinError500
-  createInstitutionWallet(@Body() dto: WalletInstitutionCreateDTO) {
+  createInstitutionWallet(@Body() dto: WalletCreateDTO) {
     return this.walletService.createInstitutionWallet(dto);
   }
 
