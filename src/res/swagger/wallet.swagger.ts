@@ -1,5 +1,5 @@
 import { ApiResponse } from '@nestjs/swagger';
-import { WalletAddNewAssetSuccessRes, WalletSuccessRes } from '../app/wallet.responses';
+import { CreateClientWalletRes, WalletAddNewAssetSuccessRes, WalletSuccessRes } from '../app/wallet.responses';
 // Success
 export const getAllWallets200 = ApiResponse({
   status: 200, description: 'Successful operation.', type: [WalletSuccessRes]
@@ -9,6 +9,9 @@ export const getWalletById200 = ApiResponse({
 });
 export const createWallet201 = ApiResponse({
   status: 201, description: 'Successful operation.', type: WalletSuccessRes
+});
+export const createClienteWallet201 = ApiResponse({
+  status: 201, description: 'Successful operation.', type: CreateClientWalletRes
 });
 export const enableWallet200 = ApiResponse({ status: 200, description: 'Success' });
 
