@@ -56,8 +56,6 @@ export class WalletClientCreateDTO {
     @IsNotEmpty()
     walletType?: WalletType = WalletType.CUSTODY;
 
-    @ApiProperty({ description: 'Chave da carteira, hashs keccak256 do CPF', example: "0x99f90daae883d399edb194ba4b903d39979fec8eca0240465e3bb8115a5ef71b" })
-    key?: string;
 
     @ApiProperty({ description: 'CPF da wallet', example: 12345678901 })
     taxId: number;
