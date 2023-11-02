@@ -20,7 +20,7 @@ import {
     AssetTypes,
     TransactionOperations,
 } from '../types/transactions.types';
-import { WalletAddNewAssetSuccessRes } from 'src/res/app/wallet.responses';
+import { CreateClientWalletRes, WalletAddNewAssetSuccessRes } from 'src/res/app/wallet.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { AssetID, OwnerType } from '../types/wallet.types';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
@@ -77,12 +77,10 @@ export class WalletService {
 
     async createClientWallet(
         dto: WalletClientCreateDTO,
-    ): Promise<{ wallet: string, walletId: string, clientKey: string, parfinTxId: string }> {
+    ): Promise<CreateClientWalletRes> {
+        const { walletName, taxId, bankNumber, account, branch, blockchainId, walletType } = dto;
         const parfinSendDTO = new ParfinContractInteractDTO()
         const w3 = new Web3()
-        dto.key = w3.utils.keccak256(dto.taxId.toString())
-
-        const { walletName, key, taxId, bankNumber, account, branch, blockchainId, walletType } = dto;
 
 
 
@@ -100,6 +98,7 @@ export class WalletService {
                 );
             }
 
+            const key = w3.utils.keccak256(dto.taxId.toString())
             // 2 - Codificar a chamada do contrato `Key Dictionary`
             parfinSendDTO.metadata = {
                 contractAddress: contractAddress,
@@ -123,10 +122,9 @@ export class WalletService {
             // TODO: save wallet in database
 
             return {
-                parfinTxId: transactionId,
                 wallet: walletAddress,
-                clientKey: dto.key,
                 walletId: walletId,
+                clientKey: key,
             }
 
         } catch (error) {
