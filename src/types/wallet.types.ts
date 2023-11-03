@@ -22,12 +22,6 @@ export enum BlockchainId {
     BLOCKCHAIN_ID = 'ba727c86-3d6d-44dd-af4c-1b34f1c3b00d',
 }
 
-export enum AssetID {
-    realDigital = '0430a64a-088a-4346-895e-e78c02a14345',
-    realTokenizado = '720f61dc-124d-446c-a04e-58cf7a053c90',
-    tpft = '',
-}
-
 export class WalletAsset {
     @ApiProperty({ description: 'ID do ativo da carteira' })
     @IsString()
