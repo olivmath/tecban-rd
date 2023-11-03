@@ -38,6 +38,22 @@ export class WalletClientCreateDTO extends WalletCreateDTO {
     @IsOptional()
     description?: string;
 
+    @ApiProperty({
+        description: 'ID do dono da carteira',
+        example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
+    })
+    @IsString()
+    @IsNotEmpty()
+    ownerId: string;
+
+    @ApiProperty({
+        description: 'ID que identifica o ativo na Parfin',
+        example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
+    })
+    @IsString()
+    @IsNotEmpty()
+    assetId: string;
+
     @ApiProperty({ description: 'CPF do cliente', example: '12345678901' })
     @IsString()
     @IsNotEmpty()
@@ -70,12 +86,20 @@ export class WalletEnableDTO {
     description?: string;
 
     @ApiProperty({
-        description: 'Ativo da carteira',
+        description: 'Ativo da operação',
         example: 'RD'
     })
     @IsString()
     @IsNotEmpty()
     asset: string;
+
+    @ApiProperty({
+        description: 'ID que identifica o ativo na Parfin',
+        example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
+    })
+    @IsString()
+    @IsNotEmpty()
+    assetId: string;
 
     @ApiProperty({ description: 'Endereço da carteira' })
     @IsString()

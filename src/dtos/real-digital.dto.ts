@@ -11,6 +11,14 @@ export class RealDigitalDTO {
   @IsOptional()
   description?: string;
 
+  @ApiProperty({
+    description: 'ID que identifica o ativo na Parfin',
+    example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
+  })
+  @IsString()
+  @IsNotEmpty()
+  assetId: string;
+
   @ApiProperty({ description: 'Quantidade uint256 a ser queimada' })
   @IsNumber()
   @IsNotEmpty()
@@ -26,6 +34,14 @@ export class RealDigitalTransferDTO {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty({
+    description: 'ID que identifica o ativo na Parfin',
+    example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
+  })
+  @IsString()
+  @IsNotEmpty()
+  assetId: string;
 
   @ApiProperty({ description: 'CNPJ uint256 do destinatário (8 primeiros dígitos)' })
   @IsString()
