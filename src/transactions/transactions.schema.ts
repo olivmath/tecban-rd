@@ -7,13 +7,12 @@ import {
   TransactionOperations,
 } from '../types/transactions.types';
 import { Priority } from '../types/parfin.types';
-import { AssetID } from '../types/wallet.types';
 import * as crypto from 'node:crypto'
 
 @Schema()
 class Source {
   @Prop()
-  assetId: AssetID;
+  assetId: string;
 
   @Prop()
   walletId: string;
