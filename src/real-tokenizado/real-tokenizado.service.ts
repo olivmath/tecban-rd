@@ -18,7 +18,6 @@ import {
 } from 'src/res/app/parfin.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
-import { AssetID } from '../types/wallet.types';
 
 @Injectable()
 export class RealTokenizadoService {
@@ -38,13 +37,11 @@ export class RealTokenizadoService {
     }
 
     async mint(dto: RealTokenizadoMintDTO): Promise<any> {
-        const { description, to, amount } = dto as RealTokenizadoMintDTO;
+        const { description, assetId, to, amount } = dto as RealTokenizadoMintDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const { blockchainId, ...parfinSendDTO } = parfinDTO;
         parfinSendDTO.description = description;
-        parfinSendDTO.source = {
-            assetId: AssetID.realTokenizado,
-        };
+        parfinSendDTO.source = { assetId };
 
         try {
             // 1. ???
@@ -56,7 +53,7 @@ export class RealTokenizadoService {
                 contractAddress: address,
             };
             parfinSendDTO.metadata.data = this.realTokenizado[
-                'mint(address,uint256'
+                'mint(address,uint256)'
             ](to, amount)[0];
 
             // 3. ???
@@ -113,13 +110,11 @@ export class RealTokenizadoService {
     }
 
     async burn(dto: RealTokenizadoBurnDTO): Promise<any> {
-        const { description, amount } = dto as RealTokenizadoBurnDTO;
+        const { description, assetId, amount } = dto as RealTokenizadoBurnDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const { blockchainId, ...parfinSendDTO } = parfinDTO;
         parfinSendDTO.description = description;
-        parfinSendDTO.source = {
-            assetId: AssetID.realDigital,
-        };
+        parfinSendDTO.source = { assetId };
 
         try {
             // 1. ???
@@ -129,6 +124,7 @@ export class RealTokenizadoService {
             parfinSendDTO.metadata = {
                 data: '',
                 contractAddress: address,
+                from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
             };
             parfinSendDTO.metadata.data =
                 this.realTokenizado['burn(uint256)'](amount)[0];
@@ -188,7 +184,7 @@ export class RealTokenizadoService {
     async internalTransfer(
         dto: RealTokenizadoInternalTransferDTO,
     ): Promise<any> {
-        const { description, key, amount } = dto as RealTokenizadoInternalTransferDTO;
+        const { description, assetId, key, amount } = dto as RealTokenizadoInternalTransferDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const parfinCallDTO = {
             metadata: parfinDTO.metadata,
@@ -207,6 +203,7 @@ export class RealTokenizadoService {
             parfinCallDTO.metadata = {
                 data: '',
                 contractAddress: keyDictionaryAddress,
+                from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
             };
             parfinCallDTO.metadata.data =
                 this.keyDictionary['getWallet(bytes32)'](key)[0];
@@ -231,9 +228,7 @@ export class RealTokenizadoService {
             const parfinDTO = new ParfinContractInteractDTO();
             const { blockchainId, ...parfinSendDTO } = parfinDTO;
             parfinSendDTO.description = description;
-            parfinSendDTO.source = {
-                assetId: AssetID.realTokenizado,
-            };
+            parfinSendDTO.source = { assetId };
 
             // 6. ???
             const address = process.env.REAL_TOKENIZADO_ADDRESS;
@@ -305,11 +300,7 @@ export class RealTokenizadoService {
         realTokenizadoFrozenBalanceOf: number;
     }> {
         try {
-            const realTokenizado = 'RealDigital';
-            const { address: realTokenizadoAddress } = await this.contractHelper.getContractAddress(realTokenizado);
-            if (!realTokenizadoAddress) {
-                throw new Error(`[ERROR]: Erro ao buscar o contrato ${realTokenizado}`);
-            }
+            const realTokenizadoAddress = process.env.REAL_TOKENIZADO_ADDRESS;
 
             const encodedBalanceOfCall = this.realTokenizado['balanceOf(address)'](address)[0];
             const encodedFrozenBalanceOfCall = this.realTokenizado['frozenBalanceOf(address)'](address)[0];

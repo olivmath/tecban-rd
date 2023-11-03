@@ -17,7 +17,6 @@ import {
 } from 'src/res/app/parfin.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
-import { AssetID } from '../types/wallet.types';
 
 @Injectable()
 export class RealDigitalService {
@@ -40,13 +39,11 @@ export class RealDigitalService {
     }
 
     async mint(dto: RealDigitalDTO): Promise<any> {
-        const { description, amount } = dto as RealDigitalDTO;
+        const { description, assetId, amount } = dto as RealDigitalDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const { blockchainId, ...parfinSendDTO } = parfinDTO;
         parfinSendDTO.description = description;
-        parfinSendDTO.source = {
-            assetId: AssetID.realDigital,
-        };
+        parfinSendDTO.source = { assetId };
 
         try {
             // 1. ???
@@ -117,13 +114,11 @@ export class RealDigitalService {
     }
 
     async burn(dto: RealDigitalDTO): Promise<any> {
-        const { description, amount } = dto as RealDigitalDTO;
+        const { description, assetId, amount } = dto as RealDigitalDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const { blockchainId, ...parfinSendDTO } = parfinDTO;
         parfinSendDTO.description = description;
-        parfinSendDTO.source = {
-            assetId: AssetID.realDigital,
-        };
+        parfinSendDTO.source = { assetId };
 
         try {
             // 1. ???
@@ -193,7 +188,7 @@ export class RealDigitalService {
     }
 
     async transfer(dto: RealDigitalTransferDTO): Promise<any> {
-        const { description, cnpj, amount } = dto as RealDigitalTransferDTO;
+        const { description, assetId, cnpj, amount } = dto as RealDigitalTransferDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const parfinCallDTO = {
             metadata: parfinDTO.metadata,
@@ -212,6 +207,7 @@ export class RealDigitalService {
             parfinCallDTO.metadata = {
                 data: '',
                 contractAddress: realDigitalDefaultAccountAddress,
+                from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
             };
             parfinCallDTO.metadata.data =
                 this.realDigitalDefaultAccount['defaultAccount(uint256)'](
@@ -240,9 +236,7 @@ export class RealDigitalService {
             const parfinDTO = new ParfinContractInteractDTO();
             const { blockchainId, ...parfinSendDTO } = parfinDTO;
             parfinSendDTO.description = description;
-            parfinSendDTO.source = {
-                assetId: AssetID.realDigital,
-            };
+            parfinSendDTO.source = { assetId };
 
             // 6. ???
             const realDigital = 'RealDigital'
