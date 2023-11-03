@@ -4,6 +4,7 @@ export enum BlockchainNetwork {
 }
 
 export enum TransactionOperations {
+  APPROVE = 'Approve',
   MINT = 'Mint',
   BURN = 'Burn',
   TRANSFER = 'Transfer',
