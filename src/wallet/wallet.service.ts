@@ -25,7 +25,7 @@ import {
     WalletAddNewAssetSuccessRes
 } from 'src/res/app/wallet.responses';
 import { LoggerService } from 'src/logger/logger.service';
-import { AssetID, OwnerType } from '../types/wallet.types';
+import { OwnerType } from '../types/wallet.types';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
 import Web3 from 'web3';
 
@@ -93,9 +93,23 @@ export class WalletService {
     async createClientWallet(
         dto: WalletClientCreateDTO,
     ): Promise<WalletCreateClientSuccessRes | any> {
-        const { walletName, taxId, bankNumber, account, branch, blockchainId, walletType } = dto;
-        const parfinSendDTO = new ParfinContractInteractDTO()
-        const w3 = new Web3()
+        const {
+            description,
+            assetId,
+            ownerId,
+            walletName,
+            taxId,
+            bankNumber,
+            account,
+            branch,
+            walletType
+        } = dto;
+        const parfinDTO = new ParfinContractInteractDTO();
+        const { blockchainId, ...parfinSendDTO } = parfinDTO;
+        parfinSendDTO.description = description;
+        parfinSendDTO.source = { assetId };
+
+        const w3 = new Web3();
 
         try {
             // 1. Criando a carteira na Parfin
@@ -108,8 +122,7 @@ export class WalletService {
                 );
             }
 
-
-            // 2. Pegar endereço do contrato `Key Dictionary`
+            // // 2. Pegar endereço do contrato `Key Dictionary`
             const { address: contractAddress } = await this.contractHelper.getContractAddress('KeyDictionary');
             if (!contractAddress) {
                 throw new Error(
@@ -142,8 +155,7 @@ export class WalletService {
                     `[ERROR]: Erro ao tentar interagir com contrato Key Dictionary. Parfin Send DTO: ${payload}`
                 );
             }
-
-            await this.parfinService.transactionSignAndPush(transactionId)
+            await this.parfinService.transactionSignAndPush(transactionId);
 
             // 5. Criando a carteira no banco de dados
             const payload = {
@@ -168,24 +180,21 @@ export class WalletService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar criar transação de criação de carteira ${dto.walletName}`,
+                `[ERROR]: Erro ao tentar criar uma carteira de um cliente ${dto.walletName}`,
             );
         }
     }
 
-
-
     async enableWallet(dto: WalletEnableDTO): Promise<any> {
-        const { description, asset, walletAddress } = dto;
+        const { description, asset, assetId, walletAddress } = dto;
         const parfinDTO = new ParfinContractInteractDTO();
         const { blockchainId, ...parfinSendDTO } = parfinDTO;
         parfinSendDTO.description = description;
+        parfinSendDTO.source = {
+            assetId,
+        };
 
         if (asset === 'RD') {
-            parfinSendDTO.source = {
-                assetId: AssetID.realDigital,
-            };
-
             try {
                 // 1. ???
                 const realDigitalEnableAccount = 'RealDigitalEnableAccount';
@@ -240,7 +249,10 @@ export class WalletService {
                     throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${transactionData}`);
                 }
 
-                return statusDescription;
+                return {
+                    parfinId: transactionId,
+                    status: statusDescription
+                };
             } catch (error) {
                 this.logger.error(error);
                 throw new Error(
@@ -248,10 +260,6 @@ export class WalletService {
                 );
             }
         } else if (asset === 'RT') {
-            parfinSendDTO.source = {
-                assetId: AssetID.realTokenizado,
-            };
-
             try {
                 // 1. ???
                 const address = process.env.REAL_TOKENIZADO_ADDRESS;
@@ -302,17 +310,18 @@ export class WalletService {
                     throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${transactionData}`);
                 }
 
-                return statusDescription;
+                return {
+                    parfinId: transactionId,
+                    status: statusDescription
+                };
             } catch (error) {
+                const payload = JSON.stringify(parfinSendDTO)
                 this.logger.error(error);
                 throw new Error(
-                    `[ERROR]: Erro ao tentar habilitar a carteira ${walletAddress}. Parfin Send DTO: ${parfinSendDTO}`
+                    `[ERROR]: Erro ao tentar habilitar a carteira ${walletAddress}. Parfin Send DTO: ${payload}`
                 );
             }
         } else if (asset === 'TPFT') {
-            parfinSendDTO.source = {
-                assetId: AssetID.tpft,
-            };
             console.log('');
             // TODO: Implementar lógica de habilitação para receber TPFt aqui
         }
