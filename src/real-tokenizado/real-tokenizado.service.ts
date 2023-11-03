@@ -124,7 +124,6 @@ export class RealTokenizadoService {
             parfinSendDTO.metadata = {
                 data: '',
                 contractAddress: address,
-                from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
             };
             parfinSendDTO.metadata.data =
                 this.realTokenizado['burn(uint256)'](amount)[0];
