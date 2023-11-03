@@ -79,6 +79,7 @@ export class ParfinContractInteractDTO {
         description: 'Informações sobre o ativo do contrato que está sendo interagido com',
         type: Source,
     })
+    @IsObject()
     @IsOptional()
     source?: Source;
 
