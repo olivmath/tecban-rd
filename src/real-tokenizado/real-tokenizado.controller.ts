@@ -4,6 +4,7 @@ import {
   RealTokenizadoMintDTO,
   RealTokenizadoBurnDTO,
   RealTokenizadoInternalTransferDTO,
+  RealTokenizadoApproveBurnDTO,
 } from '../dtos/real-tokenizado.dto';
 import { RealTokenizadoService } from './real-tokenizado.service';
 
@@ -35,5 +36,11 @@ export class RealTokenizadoController {
   @ApiParam({ name: 'address', example: '0x5be4C55e1977E555DB9a815a2CDed576A71Ca3c2' })
   balanceOf(@Param('address') address: string) {
     return this.realTokenizadoService.balanceOf(address);
+  }
+
+  @Post('approve-burn')
+  @ApiOperation({ summary: 'Approve Real Tokenizado Burn', description: 'Approve a Real Tokenizado Burn transaction' })
+  approveBurn(@Body() dto: RealTokenizadoApproveBurnDTO) {
+    return this.realTokenizadoService.approveBurn(dto);
   }
 }
