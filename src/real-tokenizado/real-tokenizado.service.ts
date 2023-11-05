@@ -12,6 +12,7 @@ import {
     RealTokenizadoBurnDTO,
     RealTokenizadoInternalTransferDTO,
     RealTokenizadoApproveBurnDTO,
+    RealTokenizadoBurnFromDTO,
 } from '../dtos/real-tokenizado.dto';
 import {
     ParfinContractCallSuccessRes,
@@ -38,24 +39,25 @@ export class RealTokenizadoService {
     }
 
     async mint(dto: RealTokenizadoMintDTO): Promise<any> {
-        const { description, assetId, to, amount } = dto as RealTokenizadoMintDTO;
+        const { description, to, amount } = dto as RealTokenizadoMintDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const { blockchainId, ...parfinSendDTO } = parfinDTO;
         parfinSendDTO.description = description;
-        parfinSendDTO.source = { assetId };
+        parfinSendDTO.source = { assetId: process.env.ARBI_RT_ASSET_ID };
 
         try {
             // 1. ???
-            const realTokenizadoaddress = process.env.REAL_TOKENIZADO_ADDRESS;
+            const realTokenizadoAddress = process.env.ARBI_REAL_TOKENIZADO_ADDRESS;
 
             // 2. ???
             parfinSendDTO.metadata = {
                 data: '',
-                contractAddress: realTokenizadoaddress,
+                contractAddress: realTokenizadoAddress,
+                from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
             };
             parfinSendDTO.metadata.data = this.realTokenizado[
                 'mint(address,uint256)'
-            ](to, amount)[0];
+            ](to, Number(amount))[0];
 
             // 3. ???
             const parfinSendRes = await this.parfinService.smartContractSend(
@@ -111,7 +113,7 @@ export class RealTokenizadoService {
     }
 
     async burn(dto: RealTokenizadoBurnDTO): Promise<any> {
-        const { description, assetId, amount } = dto as RealTokenizadoBurnDTO;
+        const { description, walletAddress, assetId, amount } = dto as RealTokenizadoBurnDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const { blockchainId, ...parfinBurnDTO } = parfinDTO;
 
@@ -121,24 +123,24 @@ export class RealTokenizadoService {
 
 
         // 3. Pegando endereço do contrato Real Tokenizado
-        const realTokenizadoaddress = process.env.REAL_TOKENIZADO_ADDRESS;
+        const realTokenizadoAddress = process.env.ARBI_REAL_TOKENIZADO_ADDRESS;
 
         try {
             // 8. Criando o metadata do burn()
             parfinBurnDTO.metadata = {
                 data: '',
-                contractAddress: realTokenizadoaddress,
-                from: '', // Revisar o valor do from
+                contractAddress: realTokenizadoAddress,
+                from: walletAddress,
             };
             parfinBurnDTO.metadata.data =
-                this.realTokenizado['burn(uint256)'](amount)[0];
+                this.realTokenizado['burn(uint256)'](Number(amount))[0];
 
             // 9. Interagindo com o método burn()
             const parfinBurnRes = await this.parfinService.smartContractSend(
                 parfinBurnDTO,
             );
-            const { id: burnTransactionId } = parfinBurnRes as ParfinSuccessRes;
-            if (!burnTransactionId) {
+            const { id: transactionId } = parfinBurnRes as ParfinSuccessRes;
+            if (!transactionId) {
                 const payload = JSON.stringify(parfinBurnDTO)
                 throw new Error(
                     `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${payload}`
@@ -147,31 +149,31 @@ export class RealTokenizadoService {
 
             // 10. Salvando a transação do burn()
             const burnTransactionData = {
-                parfinTransactionId: burnTransactionId,
+                parfinTransactionId: transactionId,
                 operation: TransactionOperations.BURN,
                 asset: AssetTypes.RT,
                 ...parfinBurnDTO,
             };
 
-            const { id: dbBurnTransactionId } =
+            const { id: dbtransactionId } =
                 await this.transactionService.create(burnTransactionData);
-            if (!dbBurnTransactionId) {
+            if (!dbtransactionId) {
                 throw new Error(
-                    `[ERROR]: Erro ao tentar salvar a transação ${burnTransactionId} no banco. Payload: ${burnTransactionData}`
+                    `[ERROR]: Erro ao tentar salvar a transação ${transactionId} no banco. Payload: ${burnTransactionData}`
                 );
             }
 
             // 11. Assinando a transação do approve()
             const { statusDescription: burnStatus } = await this.transactionService.transactionSignAndPush(
-                burnTransactionId,
-                dbBurnTransactionId,
+                transactionId,
+                dbtransactionId,
             );
             if (!burnStatus) {
-                throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${burnTransactionId}. Payload: ${burnTransactionData}`);
+                throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${burnTransactionData}`);
             }
 
             return {
-                parfinId: burnTransactionId,
+                parfinId: transactionId,
                 status: burnStatus,
             };
 
@@ -185,10 +187,160 @@ export class RealTokenizadoService {
         }
     }
 
+    async burnFrom(dto: RealTokenizadoBurnFromDTO): Promise<any> {
+        const { description, account, amount } = dto as RealTokenizadoBurnFromDTO;
+        const parfinDTO = new ParfinContractInteractDTO();
+        const { blockchainId, ...parfinSendDTO } = parfinDTO;
+
+        // 2. Criando o DTO para o método burn()
+        parfinSendDTO.description = description;
+        parfinSendDTO.source = { assetId: process.env.ARBI_RT_ASSET_ID };
+
+        // 3. Pegando endereço do contrato Real Tokenizado
+        const realTokenizadoAddress = process.env.ARBI_REAL_TOKENIZADO_ADDRESS;
+
+        try {
+            // 8. Criando o metadata do burn()
+            parfinSendDTO.metadata = {
+                data: '',
+                contractAddress: realTokenizadoAddress,
+                from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
+            };
+            parfinSendDTO.metadata.data =
+                this.realTokenizado['burnFrom(address,uint256)'](account, Number(amount))[0];
+
+            // 9. Interagindo com o método burn()
+            const parfinBurnRes = await this.parfinService.smartContractSend(
+                parfinSendDTO,
+            );
+            const { id: transactionId } = parfinBurnRes as ParfinSuccessRes;
+            if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
+                throw new Error(
+                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${payload}`
+                );
+            }
+
+            // 10. Salvando a transação do burn()
+            const transactionData = {
+                parfinTransactionId: transactionId,
+                operation: TransactionOperations.BURN_FROM,
+                asset: AssetTypes.RT,
+                ...parfinSendDTO,
+            };
+
+            const { id: dbtransactionId } =
+                await this.transactionService.create(transactionData);
+            if (!dbtransactionId) {
+                throw new Error(
+                    `[ERROR]: Erro ao tentar salvar a transação ${transactionId} no banco. Payload: ${transactionData}`
+                );
+            }
+
+            // 11. Assinando a transação do approve()
+            const { statusDescription: status } = await this.transactionService.transactionSignAndPush(
+                transactionId,
+                dbtransactionId,
+            );
+            if (!status) {
+                throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${transactionData}`);
+            }
+
+            return {
+                parfinId: transactionId,
+                status: status,
+            };
+
+        } catch (error) {
+            const payload = JSON.stringify(parfinSendDTO)
+            this.logger.error(error);
+            throw new Error(
+                `[ERROR]: Erro ao tentar fazer o resgate de $${amount} Real Tokenizado. 
+                Parfin Send DTO: ${payload}`
+            );
+        }
+    }
+
+    async approveBurn(dto: RealTokenizadoApproveBurnDTO): Promise<any> {
+        const { description, walletAddress, assetId, amount } = dto as RealTokenizadoApproveBurnDTO;
+        const parfinDTO = new ParfinContractInteractDTO();
+        const { blockchainId, ...parfinSendDTO } = parfinDTO;
+
+        // 1. Criando o DTO para o método approve()
+        parfinSendDTO.description = description;
+        parfinSendDTO.source = { assetId };
+
+        // 3. Pegando endereço do contrato Real Tokenizado
+        const realTokenizadoAddress = process.env.ARBI_REAL_TOKENIZADO_ADDRESS;
+
+        try {
+            // 4. Criando o metadata do approve()
+            parfinSendDTO.metadata = {
+                data: '',
+                contractAddress: realTokenizadoAddress,
+                from: walletAddress,
+            };
+            const spender = process.env.ARBI_DEFAULT_WALLET_ADDRESS;
+            parfinSendDTO.metadata.data =
+                this.realTokenizado['approve(address,uint256)'](spender, Number(amount))[0];
+
+            // 5. Interagindo com o método approve()
+            const parfinSendRes = await this.parfinService.smartContractSend(
+                parfinSendDTO,
+            );
+            // O aprove() retorna um valor boolean como output porém não é retornado pelo endpoint da Parfin
+
+            const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+            if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
+                throw new Error(
+                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${payload}`
+                );
+            }
+
+            // 6. Salvando a transação do approve()
+            const transactionData = {
+                parfinTransactionId: transactionId,
+                operation: TransactionOperations.APPROVE,
+                asset: AssetTypes.RT,
+                ...parfinSendDTO,
+            };
+
+            const { id: dbtransactionId } =
+                await this.transactionService.create(transactionData);
+            if (!dbtransactionId) {
+                throw new Error(
+                    `[ERROR]: Erro ao tentar salvar a transação ${transactionId} no banco. Payload: ${transactionData}`
+                );
+            }
+
+            // 7. Assinando a transação do approve()
+            const { statusDescription: status } = await this.transactionService.transactionSignAndPush(
+                transactionId,
+                dbtransactionId,
+            );
+            if (!status) {
+                throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${transactionData}`);
+            }
+
+            return {
+                parfinId: transactionId,
+                status: status,
+            };
+        } catch (error) {
+            const payload = JSON.stringify(parfinSendDTO)
+            this.logger.error(error);
+            throw new Error(
+                `[ERROR]: Erro ao tentar fazer o approve do resgate de $${amount} Real Tokenizado. 
+                Parfin Send DTO: ${payload}`
+            );
+        }
+    }
+
     async internalTransfer(
         dto: RealTokenizadoInternalTransferDTO,
     ): Promise<any> {
-        const { description, assetId, key, amount } = dto as RealTokenizadoInternalTransferDTO;
+        const { description, walletAddress, assetId, key, amount } = dto as RealTokenizadoInternalTransferDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const parfinCallDTO = {
             metadata: parfinDTO.metadata,
@@ -207,7 +359,7 @@ export class RealTokenizadoService {
             parfinCallDTO.metadata = {
                 data: '',
                 contractAddress: keyDictionaryAddress,
-                from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
+                from: walletAddress,
             };
             parfinCallDTO.metadata.data =
                 this.keyDictionary['getWallet(bytes32)'](key)[0];
@@ -235,16 +387,16 @@ export class RealTokenizadoService {
             parfinSendDTO.source = { assetId };
 
             // 6. ???
-            const address = process.env.REAL_TOKENIZADO_ADDRESS;
+            const realTokenizadoAddress = process.env.ARBI_REAL_TOKENIZADO_ADDRESS;
 
             // 7. ???
             parfinSendDTO.metadata = {
                 data: '',
-                contractAddress: address,
+                contractAddress: realTokenizadoAddress,
             };
             parfinSendDTO.metadata.data = this.realTokenizado[
                 'transfer(address,uint256)'
-            ](receiverAddress, amount)[0];
+            ](receiverAddress, Number(amount))[0];
 
             // 8. ???
             const parfinSendRes =
@@ -263,8 +415,8 @@ export class RealTokenizadoService {
             // 9. ???
             const transactionData = {
                 parfinTransactionId: transactionId,
-                operation: TransactionOperations.TRANSFER,
-                asset: AssetTypes.RD,
+                operation: TransactionOperations.INTERNAL_TRANSFER,
+                asset: AssetTypes.RT,
                 ...parfinSendDTO,
             };
 
@@ -304,7 +456,7 @@ export class RealTokenizadoService {
         realTokenizadoFrozenBalanceOf: number;
     }> {
         try {
-            const realTokenizadoAddress = process.env.REAL_TOKENIZADO_ADDRESS;
+            const realTokenizadoAddress = process.env.ARBI_REAL_TOKENIZADO_ADDRESS;
 
             const encodedBalanceOfCall = this.realTokenizado['balanceOf(address)'](address)[0];
             const encodedFrozenBalanceOfCall = this.realTokenizado['frozenBalanceOf(address)'](address)[0];
@@ -344,82 +496,6 @@ export class RealTokenizadoService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(`[ERROR]: Erro ao tentar buscar o saldo de Real Digital do address: ${address}`);
-        }
-    }
-
-    async approveBurn(dto: RealTokenizadoApproveBurnDTO): Promise<any> {
-        const { description, assetId, amount } = dto as RealTokenizadoBurnDTO;
-        const parfinDTO = new ParfinContractInteractDTO();
-        const { blockchainId, ...parfinApproveDTO } = parfinDTO;
-
-        // 1. Criando o DTO para o método approve()
-        parfinApproveDTO.description = description;
-        parfinApproveDTO.source = { assetId };
-
-        // 3. Pegando endereço do contrato Real Tokenizado
-        const realTokenizadoaddress = process.env.REAL_TOKENIZADO_ADDRESS;
-
-        try {
-            // 4. Criando o metadata do approve()
-            parfinApproveDTO.metadata = {
-                data: '',
-                contractAddress: realTokenizadoaddress,
-                from: '' // Revisar valor do from
-            };
-            const spender = process.env.ARBI_DEFAULT_WALLET_ADDRESS;
-            parfinApproveDTO.metadata.data =
-                this.realTokenizado['approve(address,uint256)'](spender, amount)[0];
-
-            // 5. Interagindo com o método approve()
-            const parfinApproveRes = await this.parfinService.smartContractSend(
-                parfinApproveDTO,
-            );
-            // O aprove() retorna um valor boolean como output porém não é retornado pelo endpoint da Parfin
-
-            const { id: approveTransactionId } = parfinApproveRes as ParfinSuccessRes;
-            if (!approveTransactionId) {
-                const payload = JSON.stringify(parfinApproveDTO)
-                throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${payload}`
-                );
-            }
-
-            // 6. Salvando a transação do approve()
-            const approveTransactionData = {
-                parfinTransactionId: approveTransactionId,
-                operation: TransactionOperations.APPROVE,
-                asset: AssetTypes.RT,
-                ...parfinApproveDTO,
-            };
-
-            const { id: dbApproveTransactionId } =
-                await this.transactionService.create(approveTransactionData);
-            if (!dbApproveTransactionId) {
-                throw new Error(
-                    `[ERROR]: Erro ao tentar salvar a transação ${approveTransactionId} no banco. Payload: ${approveTransactionData}`
-                );
-            }
-
-            // 7. Assinando a transação do approve()
-            const { statusDescription: approveStatus } = await this.transactionService.transactionSignAndPush(
-                approveTransactionId,
-                dbApproveTransactionId,
-            );
-            if (!approveStatus) {
-                throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${approveTransactionId}. Payload: ${approveTransactionData}`);
-            }
-
-            return {
-                parfinId: approveTransactionId,
-                status: approveStatus,
-            };
-        } catch (error) {
-            const payload = JSON.stringify(parfinApproveDTO)
-            this.logger.error(error);
-            throw new Error(
-                `[ERROR]: Erro ao tentar fazer o resgate de $${amount} Real Tokenizado. 
-                Parfin Send DTO: ${payload}`
-            );
         }
     }
 }
