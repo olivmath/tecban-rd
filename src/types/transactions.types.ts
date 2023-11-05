@@ -7,6 +7,7 @@ export enum TransactionOperations {
   APPROVE = 'Approve',
   MINT = 'Mint',
   BURN = 'Burn',
+  BURN_FROM = 'BurnFrom',
   TRANSFER = 'Transfer',
   ENABLE_ACCOUNT = 'EnableAccount',
   CREATE_WALLET = 'CreateWallet',
