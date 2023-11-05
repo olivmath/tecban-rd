@@ -1,5 +1,5 @@
 import { BlockchainId, WalletType } from '../types/wallet.types';
-import { IsString, IsNumber, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class WalletCreateDTO {
