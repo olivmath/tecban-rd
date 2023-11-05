@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class RealDigitalDTO {
   @ApiProperty({
@@ -19,10 +19,10 @@ export class RealDigitalDTO {
   @IsNotEmpty()
   assetId: string;
 
-  @ApiProperty({ description: 'Quantidade uint256 a ser queimada' })
-  @IsNumber()
+  @ApiProperty({ description: 'Quantidade a ser queimada' })
+  @IsString()
   @IsNotEmpty()
-  amount: number;
+  amount: string;
 }
 
 export class RealDigitalTransferDTO {
@@ -48,8 +48,8 @@ export class RealDigitalTransferDTO {
   @IsNotEmpty()
   cnpj: string;
 
-  @ApiProperty({ description: 'Quantidade uint256 a ser transferida' })
-  @IsNumber()
+  @ApiProperty({ description: 'Quantidade a ser transferida' })
+  @IsString()
   @IsNotEmpty()
-  amount: number;
+  amount: string;
 }
