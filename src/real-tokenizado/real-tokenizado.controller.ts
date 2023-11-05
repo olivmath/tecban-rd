@@ -32,7 +32,7 @@ export class RealTokenizadoController {
     return this.realTokenizadoService.burnFrom(dto);
   }
 
-  @Post('approve-burn')
+  @Post('approve')
   @ApiOperation({ summary: 'Approve a transaction', description: 'Approve a Real Tokenizado transaction' })
   approveBurn(@Body() dto: RealTokenizadoApproveDTO) {
     return this.realTokenizadoService.approve(dto);
