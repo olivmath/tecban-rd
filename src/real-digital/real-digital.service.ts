@@ -59,7 +59,7 @@ export class RealDigitalService {
                 contractAddress: address,
             };
             parfinSendDTO.metadata.data =
-                this.str['requestToMint(uint256)'](amount)[0];
+                this.str['requestToMint(uint256)'](Number(amount))[0];
 
             // 3. ???
             const parfinSendRes = await this.parfinService.smartContractSend(
@@ -134,7 +134,7 @@ export class RealDigitalService {
                 contractAddress: address,
             };
             parfinSendDTO.metadata.data =
-                this.str['requestToBurn(uint256)'](amount)[0];
+                this.str['requestToBurn(uint256)'](Number(amount))[0];
 
             // 3. ???
             const parfinSendRes = await this.parfinService.smartContractSend(
@@ -252,7 +252,7 @@ export class RealDigitalService {
             // 7. ???
             parfinSendDTO.metadata.data = this.realDigital[
                 'transfer(address,uint256)'
-            ](receiverAddress, amount)[0];
+            ](receiverAddress, Number(amount))[0];
 
             // 8. ???
             const parfinSendRes =
