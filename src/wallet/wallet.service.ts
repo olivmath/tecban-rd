@@ -70,7 +70,7 @@ export class WalletService {
             const payload = {
                 ...parfinCreateRes,
                 bacenEnabled: false,
-                ownerId: process.env.ARBI_ID,
+                ownerId: process.env.ARBI_USER_ID,
                 ownerType: OwnerType.INSTITUTION
             } as Wallet
             const wallet = await this.walletRepository.create(payload);
@@ -161,7 +161,7 @@ export class WalletService {
             const payload = {
                 ...parfinCreateRes,
                 bacenEnabled: false,
-                ownerId: process.env.ARBI_ID,
+                ownerId,
                 ownerType: OwnerType.INSTITUTION
             } as Wallet
             const wallet = await this.walletRepository.create(payload);
