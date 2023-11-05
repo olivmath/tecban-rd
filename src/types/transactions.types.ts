@@ -9,6 +9,7 @@ export enum TransactionOperations {
   BURN = 'Burn',
   BURN_FROM = 'BurnFrom',
   TRANSFER = 'Transfer',
+  INTERNAL_TRANSFER = 'InternalTransfer',
   ENABLE_ACCOUNT = 'EnableAccount',
   CREATE_WALLET = 'CreateWallet',
 }
