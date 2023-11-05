@@ -97,7 +97,7 @@ export class RealTokenizadoBurnFromDTO {
   // assetId: string;
 }
 
-export class RealTokenizadoApproveBurnDTO {
+export class RealTokenizadoApproveDTO {
   @ApiProperty({
     description: 'Descrição da interação com o contrato',
     default: '',

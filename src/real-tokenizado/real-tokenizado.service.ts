@@ -11,7 +11,7 @@ import {
     RealTokenizadoMintDTO,
     RealTokenizadoBurnDTO,
     RealTokenizadoInternalTransferDTO,
-    RealTokenizadoApproveBurnDTO,
+    RealTokenizadoApproveDTO,
     RealTokenizadoBurnFromDTO,
 } from '../dtos/real-tokenizado.dto';
 import {
@@ -261,8 +261,8 @@ export class RealTokenizadoService {
         }
     }
 
-    async approveBurn(dto: RealTokenizadoApproveBurnDTO): Promise<any> {
-        const { description, walletAddress, assetId, amount } = dto as RealTokenizadoApproveBurnDTO;
+    async approve(dto: RealTokenizadoApproveDTO): Promise<any> {
+        const { description, walletAddress, assetId, amount } = dto as RealTokenizadoApproveDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const { blockchainId, ...parfinSendDTO } = parfinDTO;
 
