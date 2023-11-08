@@ -48,7 +48,7 @@ export class RealDigitalService {
         try {
             // 1. ???
             const str = 'STR';
-            const { address } = await this.contractHelper.getContractAddress(str);
+            const { address } = await this.contractHelper.getContractAddressByName(str);
             if (!address) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${str}`);
             }
@@ -123,7 +123,7 @@ export class RealDigitalService {
         try {
             // 1. ???
             const str = 'STR';
-            const { address } = await this.contractHelper.getContractAddress(str);
+            const { address } = await this.contractHelper.getContractAddressByName(str);
             if (!address) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${str}`);
             }
@@ -198,7 +198,7 @@ export class RealDigitalService {
         try {
             // 1. ???
             const realDigitalDefaultAccount = 'RealDigitalDefaultAccount';
-            const { address: realDigitalDefaultAccountAddress } = await this.contractHelper.getContractAddress(realDigitalDefaultAccount);
+            const { address: realDigitalDefaultAccountAddress } = await this.contractHelper.getContractAddressByName(realDigitalDefaultAccount);
             if (!realDigitalDefaultAccountAddress) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigitalDefaultAccount}`);
             }
@@ -240,7 +240,7 @@ export class RealDigitalService {
 
             // 6. ???
             const realDigital = 'RealDigital'
-            const { address: realDigitalAddress } = await this.contractHelper.getContractAddress(realDigital);
+            const { address: realDigitalAddress } = await this.contractHelper.getContractAddressByName(realDigital);
             parfinSendDTO.metadata = {
                 data: '',
                 contractAddress: realDigitalAddress,
@@ -312,7 +312,7 @@ export class RealDigitalService {
     }> {
         try {
             const realDigital = 'RealDigital';
-            const { address: realDigitalAddress } = await this.contractHelper.getContractAddress(realDigital);
+            const { address: realDigitalAddress } = await this.contractHelper.getContractAddressByName(realDigital);
             if (!realDigitalAddress) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigital}`);
             }

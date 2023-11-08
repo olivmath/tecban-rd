@@ -26,7 +26,7 @@ export class ContractHelperService {
     }
 
     // Função que retorna o endereço de um contrato
-    async getContractAddress(contractName: ContractName): Promise<
+    async getContractAddressByName(contractName: string): Promise<
         ContractHelperGetContractSuccessRes
     > {
         const w3 = new Web3();

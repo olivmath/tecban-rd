@@ -16,6 +16,7 @@ import {
     EncodedDataResponse,
 } from 'src/res/app/contract-helper.responses';
 import {
+    decodeData200,
     encodeData200,
     getContractAddress200,
 } from 'src/res/swagger/contract-helper.swagger';
@@ -39,17 +40,13 @@ export class ContractHelperController {
     })
     @getContractAddress200
     async getContractAddressByName(
-        @Param('contractName') contractName: ContractName,
+        @Param('contractName') contractName: string,
     ) {
         this.logger.setContext(
             'ContractHelperController::getContractAddressByName',
         );
-
-        if (!this.contractService.isContractNameValid(contractName)) {
-            throw new BadRequestException('Invalid contract name.');
-        }
         try {
-            const address = await this.contractService.getContractAddress(
+            const address = await this.contractService.getContractAddressByName(
                 contractName,
             );
             return { address };
@@ -91,14 +88,10 @@ export class ContractHelperController {
     }
 
     @Post('decode-data')
+    @decodeData200
     @ApiOperation({
         summary: 'Decode data returned from smartcontract',
         description: 'Decode data returned from smartcontract via Parfin',
-    })
-    @ApiResponse({
-        status: 200,
-        description: 'Decoded data',
-        type: DecodedDataResponse,
     })
     @ApiResponse({ status: 400, description: 'Bad Request' })
     async decodeData(

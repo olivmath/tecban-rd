@@ -350,7 +350,7 @@ export class RealTokenizadoService {
         try {
             // 1. ???
             const keyDictionary = 'KeyDictionary';
-            const { address: keyDictionaryAddress } = await this.contractHelper.getContractAddress(keyDictionary);
+            const { address: keyDictionaryAddress } = await this.contractHelper.getContractAddressByName(keyDictionary);
             if (!keyDictionaryAddress) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${keyDictionary}`);
             }

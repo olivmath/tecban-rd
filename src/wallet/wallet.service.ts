@@ -123,7 +123,7 @@ export class WalletService {
             }
 
             // // 2. Pegar endereço do contrato `Key Dictionary`
-            const { address: contractAddress } = await this.contractHelper.getContractAddress('KeyDictionary');
+            const { address: contractAddress } = await this.contractHelper.getContractAddressByName('KeyDictionary');
             if (!contractAddress) {
                 throw new Error(
                     `[ERROR]: Erro ao buscar o endereço do contrato Key Dictionary`,
@@ -198,7 +198,7 @@ export class WalletService {
             try {
                 // 1. ???
                 const realDigitalEnableAccount = 'RealDigitalEnableAccount';
-                const { address } = await this.contractHelper.getContractAddress(realDigitalEnableAccount);
+                const { address } = await this.contractHelper.getContractAddressByName(realDigitalEnableAccount);
                 if (!address) {
                     throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigitalEnableAccount}`);
                 }
