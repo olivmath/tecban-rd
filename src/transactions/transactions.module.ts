@@ -7,7 +7,7 @@ import { Transaction, TransactionSchema } from './transactions.schema';
 import { TransactionsRepository } from './transactions.repository';
 import { ParfinModule } from 'src/parfin/parfin.module';
 import { LoggerService } from 'src/logger/logger.service';
-import { ParfinAuth } from 'src/auth/parfin.auth';
+
 
 @Module({
   imports: [
