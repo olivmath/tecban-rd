@@ -6,7 +6,7 @@ import { AppError } from 'src/error/app.error';
 export class LoggerService extends ConsoleLogger {
     error(error: AppError) {
         const message = error.originalStack ? `From: ${error.originalStack} To: ` : '';
-        super.error(`[Request-ID]: ${error.requestId} - ${message}${error.pathError}: ${error.message}`, this.context);
+        super.error(`[Request-ID]: ${error.requestId} - ${message}${error.errorLocation}: ${error.message}`, this.context);
         if (process.env.LOG === 'DEBUG' && error.parfinError) {
             super.error(`Api url: ${error.parfinError.url}`, this.context);
 
