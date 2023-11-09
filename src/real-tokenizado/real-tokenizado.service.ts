@@ -1,6 +1,5 @@
 import { TransactionsService } from 'src/transactions/transactions.service';
 import { ContractHelperService } from 'src/helpers/contract-helper/contract-helper.service';
-import ContractWrapper from 'src/utils/contract-util/contract-wrapper';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { Injectable } from '@nestjs/common';
 import {
@@ -20,11 +19,12 @@ import {
 } from 'src/res/app/parfin.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
+import WrapperContractABI from 'src/helpers/contract-helper/contract-helper.wrapper';
 
 @Injectable()
 export class RealTokenizadoService {
-    keyDictionary: ContractWrapper;
-    realTokenizado: ContractWrapper;
+    keyDictionary: WrapperContractABI;
+    realTokenizado: WrapperContractABI;
     constructor(
         private readonly transactionService: TransactionsService,
         private readonly contractHelper: ContractHelperService,
@@ -350,7 +350,7 @@ export class RealTokenizadoService {
         try {
             // 1. ???
             const keyDictionary = 'KeyDictionary';
-            const { address: keyDictionaryAddress } = await this.contractHelper.getContractAddressByName(keyDictionary);
+            const { address: keyDictionaryAddress } = await this.contractHelper.getContractAddress(keyDictionary);
             if (!keyDictionaryAddress) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${keyDictionary}`);
             }

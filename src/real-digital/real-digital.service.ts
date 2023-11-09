@@ -1,6 +1,5 @@
 import { TransactionsService } from 'src/transactions/transactions.service';
 import { ContractHelperService } from 'src/helpers/contract-helper/contract-helper.service';
-import ContractWrapper from 'src/utils/contract-util/contract-wrapper';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { Injectable } from '@nestjs/common';
 import {
@@ -17,12 +16,13 @@ import {
 } from 'src/res/app/parfin.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
+import WrapperContractABI from 'src/helpers/contract-helper/contract-helper.wrapper';
 
 @Injectable()
 export class RealDigitalService {
-    str: ContractWrapper;
-    realDigitalDefaultAccount: ContractWrapper;
-    realDigital: ContractWrapper;
+    str: WrapperContractABI;
+    realDigitalDefaultAccount: WrapperContractABI;
+    realDigital: WrapperContractABI;
     constructor(
         private readonly transactionService: TransactionsService,
         private readonly contractHelper: ContractHelperService,
@@ -48,7 +48,7 @@ export class RealDigitalService {
         try {
             // 1. ???
             const str = 'STR';
-            const { address } = await this.contractHelper.getContractAddressByName(str);
+            const { address } = await this.contractHelper.getContractAddress(str);
             if (!address) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${str}`);
             }
@@ -123,7 +123,7 @@ export class RealDigitalService {
         try {
             // 1. ???
             const str = 'STR';
-            const { address } = await this.contractHelper.getContractAddressByName(str);
+            const { address } = await this.contractHelper.getContractAddress(str);
             if (!address) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${str}`);
             }
@@ -198,7 +198,7 @@ export class RealDigitalService {
         try {
             // 1. ???
             const realDigitalDefaultAccount = 'RealDigitalDefaultAccount';
-            const { address: realDigitalDefaultAccountAddress } = await this.contractHelper.getContractAddressByName(realDigitalDefaultAccount);
+            const { address: realDigitalDefaultAccountAddress } = await this.contractHelper.getContractAddress(realDigitalDefaultAccount);
             if (!realDigitalDefaultAccountAddress) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigitalDefaultAccount}`);
             }
@@ -240,7 +240,7 @@ export class RealDigitalService {
 
             // 6. ???
             const realDigital = 'RealDigital'
-            const { address: realDigitalAddress } = await this.contractHelper.getContractAddressByName(realDigital);
+            const { address: realDigitalAddress } = await this.contractHelper.getContractAddress(realDigital);
             parfinSendDTO.metadata = {
                 data: '',
                 contractAddress: realDigitalAddress,
@@ -312,7 +312,7 @@ export class RealDigitalService {
     }> {
         try {
             const realDigital = 'RealDigital';
-            const { address: realDigitalAddress } = await this.contractHelper.getContractAddressByName(realDigital);
+            const { address: realDigitalAddress } = await this.contractHelper.getContractAddress(realDigital);
             if (!realDigitalAddress) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigital}`);
             }

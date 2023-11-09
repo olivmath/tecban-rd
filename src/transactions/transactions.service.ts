@@ -6,6 +6,7 @@ import { TransactionsRepository } from './transactions.repository';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { ParfinGetTransactionSuccessRes } from 'src/res/app/parfin.responses';
 import { LoggerService } from 'src/logger/logger.service';
+import { AppError } from 'src/error/app.error';
 
 export enum InteractionEnum {
     CALL = 'Call',
@@ -68,7 +69,7 @@ export class TransactionsService {
 
             if (!existingTransaction) {
                 this.logger.error(
-                    new Error(`Transação com ID ${id} não encontrada.`),
+                    new AppError(500, `Transação com ID ${id} não encontrada.`),
                 );
                 throw new Error(`Transação com ID ${id} não encontrada.`);
             }
@@ -113,7 +114,7 @@ export class TransactionsService {
 
                 if (!existingTransaction) {
                     this.logger.error(
-                        new Error(`Transação com ID ${id} não encontrada.`),
+                        new AppError(500, `Transação com ID ${id} não encontrada.`),
                     );
                     throw new Error(`Transação com ID ${id} não encontrada.`);
                 }

@@ -1,5 +1,4 @@
 import { TransactionsService } from 'src/transactions/transactions.service';
-import ParfinContractWrapper from 'src/utils/contract-util/contract-wrapper';
 import {
     WalletCreateDTO,
     WalletClientCreateDTO,
@@ -28,12 +27,13 @@ import { LoggerService } from 'src/logger/logger.service';
 import { OwnerType } from '../types/wallet.types';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
 import Web3 from 'web3';
+import WrapperContractABI from 'src/helpers/contract-helper/contract-helper.wrapper';
 
 @Injectable()
 export class WalletService {
-    keyDictionary: ParfinContractWrapper;
-    realDigitalEnableAccount: ParfinContractWrapper;
-    realTokenizado: ParfinContractWrapper;
+    keyDictionary: WrapperContractABI;
+    realDigitalEnableAccount: WrapperContractABI;
+    realTokenizado: WrapperContractABI;
     constructor(
         private readonly walletRepository: WalletRepository,
         private readonly contractHelper: ContractHelperService,
@@ -60,7 +60,6 @@ export class WalletService {
             const parfinCreateRes = await this.parfinService.createWallet(dto);
             const { walletId } = parfinCreateRes as ParfinCreateWalletSuccessRes;
             if (!walletId) {
-                this.logger.error(parfinCreateRes);
                 throw new Error(
                     `[ERROR]: Erro ao tentar criar a carteira ${dto.walletName} na Parfin. Parfin DTO: ${dto}`
                 );
@@ -75,7 +74,6 @@ export class WalletService {
             } as Wallet
             const wallet = await this.walletRepository.create(payload);
             if (!wallet.id) {
-                this.logger.error(wallet);
                 throw new Error(
                     `[ERROR]: Erro ao tentar criar a carteira ${dto.walletName} no banco de dados. Payload: ${payload}`
                 );
@@ -116,14 +114,13 @@ export class WalletService {
             const parfinCreateRes = await this.parfinService.createWallet({ walletName, blockchainId, walletType })
             const { address: walletAddress, walletId } = parfinCreateRes as ParfinCreateWalletSuccessRes
             if (!walletId) {
-                this.logger.error(parfinCreateRes);
                 throw new Error(
                     `[ERROR]: Erro ao tentar criar a carteira ${dto.walletName} na Parfin. Parfin DTO: ${dto}`
                 );
             }
 
             // // 2. Pegar endereço do contrato `Key Dictionary`
-            const { address: contractAddress } = await this.contractHelper.getContractAddressByName('KeyDictionary');
+            const { address: contractAddress } = await this.contractHelper.getContractAddress('KeyDictionary');
             if (!contractAddress) {
                 throw new Error(
                     `[ERROR]: Erro ao buscar o endereço do contrato Key Dictionary`,
@@ -166,7 +163,6 @@ export class WalletService {
             } as Wallet
             const wallet = await this.walletRepository.create(payload);
             if (!wallet.id) {
-                this.logger.error(wallet);
                 throw new Error(
                     `[ERROR]: Erro ao tentar criar a carteira ${dto.walletName} no banco de dados. Payload: ${payload}`
                 );
@@ -198,7 +194,7 @@ export class WalletService {
             try {
                 // 1. ???
                 const realDigitalEnableAccount = 'RealDigitalEnableAccount';
-                const { address } = await this.contractHelper.getContractAddressByName(realDigitalEnableAccount);
+                const { address } = await this.contractHelper.getContractAddress(realDigitalEnableAccount);
                 if (!address) {
                     throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigitalEnableAccount}`);
                 }
