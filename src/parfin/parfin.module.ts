@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { ParfinController } from './parfin.controller';
 import { ParfinService } from './parfin.service';
 import { LoggerService } from 'src/logger/logger.service';
-import { ParfinAuth } from 'src/auth/parfin.auth';
+import { ParfinHttpService } from './parfin.api.service';
 
 @Module({
     controllers: [ParfinController],
-    providers: [ParfinService, ParfinAuth, LoggerService],
+    providers: [ParfinService, LoggerService, ParfinHttpService],
     exports: [ParfinService],
 })
-export class ParfinModule { }
+export class ParfinModule {}
