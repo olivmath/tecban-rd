@@ -1,21 +1,28 @@
+// logger.middleware.ts
 import { ConsoleLogger, Injectable, Scope } from '@nestjs/common';
-import { AxiosError } from 'axios';
+import { AppError } from 'src/error/app.error';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService extends ConsoleLogger {
-    error(error: Error | AxiosError | any) {
-        if (error instanceof AxiosError) {
-            super.error(`${error.message}`, this.context);
-            super.error(`Response.Body: ${error.response.data}`, this.context);
-        } else if (error instanceof Error) {
-            const [, path] = error.stack.split('\n')[1].split(' (');
-            const message = `${path.replace(')', '')} ${error.message}`;
+    error(error: AppError) {
+        const message = error.originalStack ? `From: ${error.originalStack} To: ` : '';
+        super.error(`[Request-ID]: ${error.requestId} - ${message}${error.pathError}: ${error.message}`, this.context);
+        if (process.env.LOG === 'DEBUG' && error.parfinError) {
+            super.error(`Api url: ${error.parfinError.url}`, this.context);
 
-            super.error(message, this.context);
-        } else {
-            super.error(`Unknow Error: ${error}`, this.context);
+            const requestString = JSON.stringify(error.parfinError.request, null, 2);
+            const responseString = JSON.stringify(error.parfinError.response, null, 2);
+
+            super.error(`Request sent: ${requestString}`, this.context);
+            super.error(`Response received: ${responseString}`, this.context);
         }
     }
 
-    // TODO: add new type of logging
+    logResponse(requestId: string, method: string, url: string, statusCode: number, duration: number) {
+        this.log(`[Request-ID: ${requestId}] ${method} ${url} - StatusCode: ${statusCode} - ${duration}ms`);
+    }
+
+    logRequest(requestId: string, method: string, url: string) {
+        this.log(`[Request-ID: ${requestId}] ${method} ${url}`);
+    }
 }
