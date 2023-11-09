@@ -39,7 +39,7 @@ export class ContractHelperController {
     })
     @getContractAddress200
     async getContractAddressByName(
-        @Param('contractName') contractName: ContractName,
+        @Param('contractName') contractName: string,
     ) {
         this.logger.setContext('ContractHelperController::getContractAddressByName');
 
