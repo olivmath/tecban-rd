@@ -54,7 +54,7 @@ export class ParfinGetWalletSuccessRes {
     blockedMetadataHistory: string[];
     @ApiProperty({
         description: 'Tipo de carteira',
-        enum: ['CUSTODY', 'HOTWALLET']
+        enum: ['CUSTODY', 'HOTWALLET'],
     })
     walletType: WalletType;
 }
@@ -192,6 +192,18 @@ export class ParfinGetTransactionSuccessRes {
 export class ParfinGetAllTransactionsSuccessRes {
     @ApiProperty({ description: 'Transações registradas na Parfin' })
     transactions: ParfinGetTransactionSuccessRes[];
+}
+
+export class ParfinSignAndPushRes {
+    status: string;
+    description: string;
+    txId: string;
+    parfinId: string;
+    walletId: string;
+    blockchainId: string;
+    blockchainType: string;
+    assetId: string;
+    assetType: string;
 }
 
 //--- Errors
