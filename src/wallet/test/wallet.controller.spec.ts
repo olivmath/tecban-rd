@@ -1,31 +1,32 @@
-import { MongoMemoryServer } from "mongodb-memory-server";
-import { WalletController } from "../wallet.controller";
-import { Test, TestingModule } from "@nestjs/testing";
-import { MongooseModule } from "@nestjs/mongoose";
-import { ParfinModule } from "src/parfin/parfin.module";
-import { TransactionsModule } from "src/transactions/transactions.module";
-import { Wallet, WalletSchema } from "../wallet.schema";
-import { WalletClientCreateDTO } from "src/dtos/wallet.dto";
-import { ContractHelperService } from "src/helpers/contract-helper/contract-helper.service";
-import { WalletRepository } from "../wallet.repository";
-import { WalletService } from "../wallet.service";
-import { LoggerService } from "src/logger/logger.service";
-import { BlockchainId, WalletType } from "src/types/wallet.types";
-import { parfinApi } from "src/config/parfin-api-client";
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { WalletController } from '../wallet.controller';
+import { Test, TestingModule } from '@nestjs/testing';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ParfinModule } from 'src/parfin/parfin.module';
+import { TransactionsModule } from 'src/transactions/transactions.module';
+import { Wallet, WalletSchema } from '../wallet.schema';
+import { WalletClientCreateDTO } from 'src/dtos/wallet.dto';
+import { ContractHelperService } from 'src/helpers/contract-helper/contract-helper.service';
+import { WalletRepository } from '../wallet.repository';
+import { WalletService } from '../wallet.service';
+import { LoggerService } from 'src/logger/logger.service';
+import { BlockchainId, WalletType } from 'src/types/wallet.types';
+import { ParfinHttpService } from 'src/parfin/parfin.api.service';
+import { AxiosResponse } from 'axios';
 
 describe('WalletController', () => {
     let controller: WalletController;
     let mongod: MongoMemoryServer;
+    let service: ParfinHttpService;
 
-
-    const client1 = new WalletClientCreateDTO()
-    client1.blockchainId = BlockchainId.BLOCKCHAIN_ID
-    client1.walletType = WalletType.CUSTODY
-    client1.walletName = 'Lucas Oliveira'
-    client1.taxId = 12345678901
-    client1.bankNumber = 123
-    client1.account = 987654
-    client1.branch = 4567
+    const client1 = new WalletClientCreateDTO();
+    client1.blockchainId = BlockchainId.BLOCKCHAIN_ID;
+    client1.walletType = WalletType.CUSTODY;
+    client1.walletName = 'Lucas Oliveira';
+    client1.taxId = 12345678901;
+    client1.bankNumber = 123;
+    client1.account = 987654;
+    client1.branch = 4567;
 
     const client2 = new WalletClientCreateDTO();
     client2.walletName = 'Yuri Correa';
@@ -35,7 +36,6 @@ describe('WalletController', () => {
     client2.bankNumber = 456;
     client2.account = 123789;
     client2.branch = 9876;
-
 
     const client3 = new WalletClientCreateDTO();
     client3.walletName = 'Samer Valente';
@@ -54,58 +54,69 @@ describe('WalletController', () => {
         const module: TestingModule = await Test.createTestingModule({
             imports: [
                 ParfinModule,
-                TransactionsModule, MongooseModule.forRoot(uri),
-                MongooseModule.forFeature([
-                    { name: Wallet.name, schema: WalletSchema, collection: 'Wallet' },
-                ]),
+                TransactionsModule,
+                MongooseModule.forRoot(uri),
+                MongooseModule.forFeature([{ name: Wallet.name, schema: WalletSchema, collection: 'Wallet' }]),
             ],
             controllers: [WalletController],
-            providers: [WalletService, WalletRepository, ContractHelperService, LoggerService],
+            providers: [WalletService, WalletRepository, ContractHelperService, LoggerService, ParfinHttpService],
         }).compile();
 
-        controller = module.get<WalletController>(WalletController)
+        controller = module.get<WalletController>(WalletController);
+        service = module.get<ParfinHttpService>(ParfinHttpService);
     });
 
     afterAll(async () => {
-        await mongod.stop()
+        await mongod.stop();
     });
 
     describe('createClientWallet', () => {
         it('should create a client wallet', async () => {
-            // Mock `parfinApi.post` when call `createWallet`
-            jest.spyOn(parfinApi, 'post').mockResolvedValueOnce(
+            // Mock `ParfinHttpService.makeRequest` when call `createWallet`
+            jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
                 Promise.resolve({
                     data: {
-                        walletId: "abcdef12-1234-4321-1234abcd4321",
-                        address: "0x0000000000000000000000000000000000000001"
+                        walletId: 'abcdef12-1234-4321-1234abcd4321',
+                        address: '0x0000000000000000000000000000000000000001',
                     },
-                }),
+                    status: 200,
+                    statusText: 'OK',
+                    headers: {},
+                    config: {},
+                } as AxiosResponse),
             );
-            // Mock `parfinApi.post` when call `AddressDiscovery::addressDiscovery`
-            jest.spyOn(parfinApi, 'post').mockResolvedValueOnce(
+            // Mock `ParfinHttpService.makeRequest` when call `AddressDiscovery::addressDiscovery`
+            jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
                 Promise.resolve({
                     data: {
                         data: '0x00000000000000000000000060c48562056c6cfcd2128ce60fd18c67e81ed971',
                     },
-                }),
+                    status: 200,
+                    statusText: 'OK',
+                    headers: {},
+                    config: {},
+                } as AxiosResponse),
             );
-            // Mock `parfinApi.post` when call `KeyDictionary::addAccount`
-            jest.spyOn(parfinApi, 'post').mockResolvedValueOnce(
+            // Mock `ParfinHttpService.makeRequest` when call `KeyDictionary::addAccount`
+            jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
                 Promise.resolve({
                     data: {
-                        id: "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+                        id: '497f6eca-6276-4993-bfeb-53cbbbba6f08',
                     },
-                }),
+                    status: 200,
+                    statusText: 'OK',
+                    headers: {},
+                    config: {},
+                } as AxiosResponse),
             );
-            const response = await controller.createClientWallet(client1)
-
+            const response = await controller.createClientWallet(client1);
 
             // Verifique se a resposta contém a mensagem 'ok'
             expect(response).toEqual({
-                clientKey: "0x7ca3dc9a4a1c43a9fe8a03b17379006b526b1e0ae38dd9540c703c2ab990f385",
-                wallet: "0x0000000000000000000000000000000000000001",
-                parfinTxId: "497f6eca-6276-4993-bfeb-53cbbbba6f08",
-                walletId: "abcdef12-1234-4321-1234abcd4321",
+                clientKey: '0x7ca3dc9a4a1c43a9fe8a03b17379006b526b1e0ae38dd9540c703c2ab990f385',
+                wallet: '0x0000000000000000000000000000000000000001',
+                parfinTxId: '497f6eca-6276-4993-bfeb-53cbbbba6f08',
+                walletId: 'abcdef12-1234-4321-1234abcd4321',
             });
         });
     });
