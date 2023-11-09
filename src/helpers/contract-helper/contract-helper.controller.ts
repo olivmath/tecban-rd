@@ -16,7 +16,6 @@ import {
     EncodedDataResponse,
 } from 'src/res/app/contract-helper.responses';
 import {
-    decodeData200,
     encodeData200,
     getContractAddress200,
 } from 'src/res/swagger/contract-helper.swagger';
@@ -40,22 +39,13 @@ export class ContractHelperController {
     })
     @getContractAddress200
     async getContractAddressByName(
-        @Param('contractName') contractName: string,
+        @Param('contractName') contractName: ContractName,
     ) {
-        this.logger.setContext(
-            'ContractHelperController::getContractAddressByName',
-        );
-        try {
-            const address = await this.contractService.getContractAddressByName(
-                contractName,
-            );
-            return { address };
-        } catch (error) {
-            this.logger.error(error);
-            throw new NotFoundException(
-                `Contract with name ${contractName} not found.`,
-            );
-        }
+        this.logger.setContext('ContractHelperController::getContractAddressByName');
+
+        this.contractService.isContractNameValid(contractName)
+        const address = await this.contractService.getContractAddress(contractName);
+        return { address };
     }
 
     @Post('encode-data')
@@ -70,49 +60,33 @@ export class ContractHelperController {
     ): Promise<EncodedDataResponse | BadRequestException> {
         this.logger.setContext('ContractHelperController::encodeData');
 
-        try {
-            if (!this.contractService.isContractNameValid(body.contractName)) {
-                throw new BadRequestException('Invalid contract name.');
-            }
+        this.contractService.isContractNameValid(body.contractName)
+        const contract = this.contractService.getContractMethods(body.contractName);
+        const encodedData = contract[body.functionName](...body.args);
 
-            const contract = this.contractService.getContractMethods(
-                body.contractName,
-            );
-            const encodedData = contract[body.functionName](...body.args);
-
-            return { data: encodedData };
-        } catch (error) {
-            this.logger.error(error);
-            throw new BadRequestException('An error occurred');
-        }
+        return { data: encodedData };
     }
 
     @Post('decode-data')
-    @decodeData200
     @ApiOperation({
         summary: 'Decode data returned from smartcontract',
         description: 'Decode data returned from smartcontract via Parfin',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Decoded data',
+        type: DecodedDataResponse,
     })
     @ApiResponse({ status: 400, description: 'Bad Request' })
     async decodeData(
         @Body() body: DecodeDataDTO,
     ): Promise<DecodedDataResponse | BadRequestException> {
         this.logger.setContext('ContractHelperController::decodeData');
+        this.contractService.isContractNameValid(body.contractName)
+        
+        const contract = this.contractService.getContractMethods(body.contractName);
+        const decodedData = contract[body.functionName](body.data);
 
-        try {
-            if (!this.contractService.isContractNameValid(body.contractName)) {
-                throw new BadRequestException('Invalid contract name.');
-            }
-
-            const contract = this.contractService.getContractMethods(
-                body.contractName,
-            );
-            const decodedData = contract[body.functionName](body.data);
-
-            return { data: decodedData };
-        } catch (error) {
-            this.logger.error(error);
-            throw new BadRequestException('An error occurred');
-        }
+        return { data: decodedData };
     }
 }

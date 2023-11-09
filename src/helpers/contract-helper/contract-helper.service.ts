@@ -1,5 +1,5 @@
 import { ParfinContractInteractDTO } from '../../dtos/parfin.dto';
-import ContractWrapper from '../../utils/contract-util/contract-wrapper';
+import ContractWrapper from './contract-helper.wrapper';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { Injectable } from '@nestjs/common';
 import abiLoader from '../abi-loader';
@@ -8,15 +8,13 @@ import { LoggerService } from 'src/logger/logger.service';
 import { ContractHelperGetContractSuccessRes } from 'src/res/app/contract-helper.responses';
 import { ParfinContractCallSuccessRes, ParfinErrorRes } from 'src/res/app/parfin.responses';
 import { ContractName } from 'src/types/contract-helper.types';
+import { AppError } from 'src/error/app.error';
 
 export const discoveryAddress = process.env.ADDRESS_DISCOVERY_ADDRESS;
 
 @Injectable()
 export class ContractHelperService {
-    constructor(
-        private readonly parfinService: ParfinService,
-        private readonly logger: LoggerService,
-    ) {
+    constructor(private readonly parfinService: ParfinService, private readonly logger: LoggerService) {
         this.logger.setContext('ContractHelperService');
     }
 
@@ -26,54 +24,36 @@ export class ContractHelperService {
     }
 
     // Função que retorna o endereço de um contrato
-    async getContractAddressByName(contractName: string): Promise<
-        ContractHelperGetContractSuccessRes
-    > {
+    async getContractAddress(contractName: ContractName): Promise<ContractHelperGetContractSuccessRes> {
         const w3 = new Web3();
+        // build tx data to get address from addressDiscovery
+        const contract = new ContractWrapper(abiLoader.AddressDiscovery);
+        const encodedData = contract['addressDiscovery(bytes32)'](w3.utils.keccak256(contractName))[0];
 
-        try {
-            // build tx data to get address from addressDiscovery
-            const contract = new ContractWrapper(abiLoader.AddressDiscovery);
-            const encodedData = contract['addressDiscovery(bytes32)'](
-                w3.utils.sha3(contractName),
-            )[0];
+        // mount Parfin's payload
+        const parfinDTO = new ParfinContractInteractDTO();
+        const parfinCallDTO = {
+            metadata: parfinDTO.metadata,
+            blockchainId: parfinDTO.blockchainId,
+        };
 
-            // mount Parfin's payload
-            const parfinDTO = new ParfinContractInteractDTO();
-            const parfinCallDTO = {
-                metadata: parfinDTO.metadata,
-                blockchainId: parfinDTO.blockchainId,
-            };
+        parfinCallDTO.metadata = {
+            data: encodedData,
+            contractAddress: discoveryAddress,
+        };
 
-            parfinCallDTO.metadata = {
-                data: encodedData,
-                contractAddress: discoveryAddress,
-            };
+        // send tx via Parfin
+        let parfinCallRes: ParfinContractCallSuccessRes | ParfinErrorRes;
+        parfinCallRes = await this.parfinService.smartContractCall(parfinCallDTO);
+        const data = parfinCallRes as ParfinContractCallSuccessRes;
 
-            // send tx via Parfin
-            let parfinCallRes: ParfinContractCallSuccessRes | ParfinErrorRes;
-            parfinCallRes = await this.parfinService.smartContractCall(parfinCallDTO);
-            const { data } = parfinCallRes as ParfinContractCallSuccessRes;
-            if (!data) {
-                const payload = JSON.stringify(parfinCallDTO)
-                throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato ${contractName}. Parfin Call DTO: ${payload}`
-                );
-            }
+        // decode response
+        const address: string = contract['addressDiscovery'](data)[0];
 
-            // decode response
-            const address: string = contract['addressDiscovery'](data)[0];
-
-            return { address };
-        } catch (error) {
-            this.logger.error(error);
-            throw new Error(
-                `[ERROR]: Erro ao buscar o endereço do contrato: ${contractName}`,
-            );
-        }
+        return { address };
     }
 
-    isContractNameValid(contractName: string): boolean {
+    isContractNameValid(contractName: string) {
         const validContractNames: ContractName[] = [
             'RealDigitalDefaultAccount',
             'RealDigitalEnableAccount',
@@ -91,6 +71,8 @@ export class ContractHelperService {
             'STR',
         ];
 
-        return validContractNames.includes(contractName as ContractName);
+        if (!validContractNames.includes(contractName as ContractName)) {
+            throw new AppError(500, 'Invalid contract name');
+        }
     }
 }
