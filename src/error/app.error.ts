@@ -14,30 +14,43 @@ type ParfinError = {
 export class AppError extends Error {
     public readonly statusCode: number;
     public readonly parfinError: ParfinError;
-    public readonly pathError: string;
+    public readonly errorLocation: string;
     public readonly originalStack: string;
-    public requestId: string
+    public requestId: string;
 
+    /**
+     * @param statusCode O código de status HTTP que vai voltar pro cliente.
+     * @param message A mensagem de erro que vai voltar pro cliente .
+     * @param data Dados adicionais, como parfinError ou erro original (Apenas para log).
+     */
     constructor(statusCode: number, message: string, data?: { parfinError?: ParfinError; erro?: Error }) {
         super(message);
 
         this.statusCode = statusCode;
         this.message = message;
-        this.parfinError = data.parfinError;
-        this.originalStack = data.erro ? this.getPathError(data.erro.stack) : ''
-        Error.captureStackTrace(data.erro ? data.erro : this, this.constructor);
+        this.parfinError = data?.parfinError || {
+            url: '',
+            response: { status: 0, body: {}, headers: {} },
+            request: { body: {}, headers: {} },
+        };
+        this.originalStack = data?.erro ? this.captureOriginalStack(data.erro) : '';
+        this.errorLocation = this.getErrorLocation(this.stack);
 
-        this.pathError = this.getPathError(this.stack);
+        this.requestId = ''; // Você pode definir um requestId posteriormente, se necessário.
     }
 
-    private getPathError(stack: string) {
+    private captureOriginalStack(erro: Error) {
+        return erro.stack || '';
+    }
+
+    private getErrorLocation(stack: string) {
         const stackLines = stack.split('\n');
         const stackLine = stackLines?.[1] || '';
-        const [, path = ''] = stackLine.includes('(') ? stackLine.split(' (') : stackLine.split('at ');
-        return path.replace(')', '').trim();
+        const [, location = ''] = stackLine.includes('(') ? stackLine.split(' (') : stackLine.split('at ');
+        return location.replace(')', '').trim();
     }
 
-    setReqId(requestId: string) {
+    setRequestId(requestId: string) {
         this.requestId = requestId;
     }
 }
