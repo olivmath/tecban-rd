@@ -14,8 +14,9 @@ describe('WrapperContractABI', () => {
             expect(wrapperContractABI).toBeDefined();
         });
 
-        it('deve retornar o todas methods do abi corretamente', () => {
-            expect(Object.getOwnPropertyNames(wrapperContractABI).length).toEqual(62);
+        it('deve retornar o todos methods do abi corretamente', () => {
+            const methodNames = wrapperContractABI['functionsMap'];
+            expect(methodNames.length).toEqual(62);
         });
 
         it('deve retornar o hex para uma chamada de uma funcao qualquer do abi', () => {

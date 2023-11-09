@@ -69,17 +69,22 @@ export default class WrapperContractABI {
         if (abi.length === 0) {
             throw new AppError(500, 'InvalidABILenght: must not be empty array');
         }
-        if (
-            !abi.every(
-                (item) =>
-                    typeof item === 'object' &&
-                    item !== null &&
-                    'inputs' in item &&
-                    'type' in item &&
-                    ['function', 'constructor', 'event', 'fallback', 'receive'].includes(item.type),
-            )
-        ) {
-            throw new AppError(500, 'InvalidABIItemType: each item must match the Item structure');
+        const invalidItem = abi.find((item) => {
+            const isValid =
+                typeof item === 'object' &&
+                item !== null &&
+                'inputs' in item &&
+                'type' in item &&
+                ['error', 'function', 'constructor', 'event', 'fallback', 'receive'].includes(item.type);
+
+            return !isValid;
+        });
+
+        if (invalidItem) {
+            throw new AppError(
+                500,
+                `InvalidABIItemType: Item ${JSON.stringify(invalidItem)} does not match the Item structure`,
+            );
         }
 
         // Map para armazenar funções com base na assinatura
@@ -103,7 +108,10 @@ export default class WrapperContractABI {
                             ),
                         ];
                     } catch (erro) {
-                        throw new AppError(500, `InvalidEncoding: \`${callFunctionSignature}\`, Args: ${JSON.stringify(args)}`);
+                        throw new AppError(
+                            500,
+                            `InvalidEncoding: \`${callFunctionSignature}\`, Args: ${JSON.stringify(args)}`,
+                        );
                     }
                 };
 
@@ -135,7 +143,9 @@ export default class WrapperContractABI {
 
         return new Proxy(this, {
             get(target, propKey) {
-                if (propKey in target.functionsMap) {
+                if (propKey === 'functionsMap') {
+                    return Object.getOwnPropertyNames(target.functionsMap);
+                } else if (propKey in target.functionsMap) {
                     return (...args: any[]) => {
                         return target.functionsMap[propKey.toString()](...args);
                     };
