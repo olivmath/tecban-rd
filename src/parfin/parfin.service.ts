@@ -5,7 +5,6 @@ import {
     ParfinRegisterContractSuccessRes,
     ParfinGetAllContractsSuccessRes,
     ParfinContractCallSuccessRes,
-    ParfinErrorRes,
     ParfinGetTransactionSuccessRes,
     ParfinCreateWalletSuccessRes,
     ParfinRegisterERC20TokenSuccessRes,
@@ -55,9 +54,7 @@ export class ParfinService {
     }
 
     //--- Blockchain Token Endpoints
-    async registerERC20Token(
-        dto: ParfinRegisterERC20TokenDTO,
-    ): Promise<ParfinRegisterERC20TokenSuccessRes> {
+    async registerERC20Token(dto: ParfinRegisterERC20TokenDTO): Promise<ParfinRegisterERC20TokenSuccessRes> {
         const url = '/v1/api/blockchain-token/evm';
         const reqBody = dto;
         return await this.parfinHttp.makeRequest('POST', url, reqBody);
@@ -68,7 +65,7 @@ export class ParfinService {
         const url = '/v1/api/custody/web3/contract';
         const response: ParfinGetAllContractsSuccessRes[] = await this.parfinHttp.makeRequest('GET', url, {});
 
-        return response
+        return response;
     }
 
     async registerContract(dto: ParfinRegisterContractDTO): Promise<ParfinRegisterContractSuccessRes> {
@@ -85,9 +82,7 @@ export class ParfinService {
         return await this.parfinHttp.makeRequest('POST', url, reqBody);
     }
 
-    async smartContractSend(
-        dto: Omit<ParfinContractInteractDTO, 'blockchainId'>,
-    ): Promise<ParfinSuccessRes> {
+    async smartContractSend(dto: Omit<ParfinContractInteractDTO, 'blockchainId'>): Promise<ParfinSuccessRes> {
         const url = '/v1/api/custody/web3/contract/send';
         const reqBody = dto;
         return await this.parfinHttp.makeRequest('POST', url, reqBody);
@@ -96,9 +91,7 @@ export class ParfinService {
     //--- Transaction Endpoints
     async getAllTransactions(): Promise<ParfinGetAllTransactionsSuccessRes> {
         const url = `/v1/api/transaction/`;
-        const data = await this.parfinHttp.makeRequest('GET', url, {});
-        this.logger.log(data);
-        return data.data as ParfinGetAllTransactionsSuccessRes;
+        return await this.parfinHttp.makeRequest('GET', url, {});
     }
 
     async getTransactionById(id: string): Promise<ParfinGetTransactionSuccessRes> {
