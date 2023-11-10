@@ -1,16 +1,11 @@
-import { ParfinContractInteractDTO } from '../../dtos/parfin.dto';
+import { ContractHelperGetContractSuccessRes } from 'src/res/app/contract-helper.responses';
+import { ContractName } from 'src/types/contract-helper.types';
+import { LoggerService } from 'src/logger/logger.service';
 import ContractWrapper from './contract-helper.wrapper';
-import { ParfinService } from 'src/parfin/parfin.service';
+import { AppError } from 'src/error/app.error';
 import { Injectable } from '@nestjs/common';
 import abiLoader from '../abi-loader';
-import Web3 from 'web3';
-import { LoggerService } from 'src/logger/logger.service';
-import { ContractHelperGetContractSuccessRes } from 'src/res/app/contract-helper.responses';
-import { ParfinContractCallSuccessRes, ParfinErrorRes } from 'src/res/app/parfin.responses';
-import { ContractName } from 'src/types/contract-helper.types';
-import { AppError } from 'src/error/app.error';
-
-export const discoveryAddress = process.env.ADDRESS_DISCOVERY_ADDRESS;
+import * as dotenv from 'dotenv';
 
 @Injectable()
 export class ContractHelperService {
