@@ -4,7 +4,7 @@ import { DecodeDataDTO, EncodeDataDTO } from '../../dtos/contract-helper.dto';
 import { LoggerService } from 'src/logger/logger.service';
 import { BadRequestException, NotFoundException, Controller, Param, Body, Post, Get } from '@nestjs/common';
 import { DecodedDataResponse, EncodedDataResponse } from 'src/res/app/contract-helper.responses';
-import { encodeData200, getContractAddress200 } from 'src/res/swagger/contract-helper.swagger';
+import { decodeData200, encodeData200, getContractAddress200 } from 'src/res/swagger/contract-helper.swagger';
 import { appError400 } from 'src/res/swagger/error.swagger';
 import { ContractName } from 'src/types/contract-helper.types';
 
@@ -45,14 +45,10 @@ export class ContractHelperController {
     }
 
     @Post('decode-data')
+    @decodeData200
     @ApiOperation({
         summary: 'Decode data returned from smartcontract',
         description: 'Decode data returned from smartcontract via Parfin',
-    })
-    @ApiResponse({
-        status: 200,
-        description: 'Decoded data',
-        type: DecodedDataResponse,
     })
     @ApiResponse({ status: 400, description: 'Bad Request' })
     async decodeData(@Body() body: DecodeDataDTO): Promise<DecodedDataResponse | BadRequestException> {

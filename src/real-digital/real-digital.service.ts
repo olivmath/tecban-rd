@@ -3,10 +3,7 @@ import { ContractHelperService } from 'src/helpers/contract-helper/contract-help
 import { ParfinService } from 'src/parfin/parfin.service';
 import { Injectable } from '@nestjs/common';
 import {
-    AssetTypes,
-    TransactionOperations,
-} from '../types/transactions.types';
-import {
+    RealDigitalApproveDTO,
     RealDigitalDTO,
     RealDigitalTransferDTO,
 } from '../dtos/real-digital.dto';
@@ -38,6 +35,59 @@ export class RealDigitalService {
         this.logger.setContext('RealDigitalService');
     }
 
+    async approve(dto: RealDigitalApproveDTO): Promise<any> {
+        const { description, walletAddress, assetId, amount } = dto as RealDigitalApproveDTO;
+        const parfinDTO = new ParfinContractInteractDTO();
+        const { blockchainId, ...parfinSendDTO } = parfinDTO;
+
+        // 1. Criando o DTO para o método approve()
+        parfinSendDTO.description = description;
+        parfinSendDTO.source = { assetId };
+
+        // 3. Pegando endereço do contrato Real Tokenizado
+        const realDigitalAddress = process.env.REAL_DIGITAL_ADDRESS;
+
+        try {
+            // 4. Criando o metadata do approve()
+            parfinSendDTO.metadata = {
+                data: '',
+                contractAddress: realDigitalAddress,
+                from: walletAddress,
+            };
+            const spender = process.env.SWAP_ONE_STEP_ADDRESS;
+            parfinSendDTO.metadata.data =
+                this.realDigital['approve(address,uint256)'](spender, Number(amount))[0];
+
+            // 5. Interagindo com o método approve()
+            const parfinSendRes = await this.parfinService.smartContractSend(
+                parfinSendDTO,
+            );
+            // O aprove() retorna um valor boolean como output porém não é retornado pelo endpoint da Parfin
+
+            const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+            if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
+                throw new Error(
+                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${payload}`
+                );
+            }
+
+            // 6. Assinando a transação do approve()
+            await this.parfinService.transactionSignAndPush(transactionId);
+
+            return {
+                parfinTxId: transactionId,
+            };
+        } catch (error) {
+            const payload = JSON.stringify(parfinSendDTO)
+            this.logger.error(error);
+            throw new Error(
+                `[ERROR]: Erro ao tentar fazer o approve do valor de $${amount} Real Digital. 
+                Parfin Send DTO: ${payload}`
+            );
+        }
+    }
+
     async mint(dto: RealDigitalDTO): Promise<any> {
         const { description, assetId, amount } = dto as RealDigitalDTO;
         const parfinDTO = new ParfinContractInteractDTO();
@@ -47,16 +97,12 @@ export class RealDigitalService {
 
         try {
             // 1. ???
-            const str = 'STR';
-            const { address } = await this.contractHelper.getContractAddress(str);
-            if (!address) {
-                throw new Error(`[ERROR]: Erro ao buscar o contrato ${str}`);
-            }
+            const strAddress = process.env.STR_ADDRESS;
 
             // 2. ???
             parfinSendDTO.metadata = {
                 data: '',
-                contractAddress: address,
+                contractAddress: strAddress,
             };
             parfinSendDTO.metadata.data =
                 this.str['requestToMint(uint256)'](Number(amount))[0];
@@ -69,38 +115,15 @@ export class RealDigitalService {
             if (!transactionId) {
                 const payload = JSON.stringify(parfinSendDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato ${str}. Parfin Send DTO: ${payload}`
-                );
-            }
-
-            // 4. ???
-            const transactionData = {
-                parfinTransactionId: transactionId,
-                operation: TransactionOperations.MINT,
-                asset: AssetTypes.RD,
-                ...parfinSendDTO,
-            };
-
-            const { id: dbTransactionId } =
-                await this.transactionService.create(transactionData);
-            if (!dbTransactionId) {
-                throw new Error(
-                    `[ERROR]: Erro ao tentar salvar a transação ${transactionId} no banco. Payload: ${transactionData}`
+                    `[ERROR]: Erro ao tentar interagir com contrato ${strAddress}. Parfin Send DTO: ${payload}`
                 );
             }
 
             // 5. ???
-            const { statusDescription } = await this.transactionService.transactionSignAndPush(
-                transactionId,
-                dbTransactionId,
-            );
-            if (!statusDescription) {
-                throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${transactionData}`);
-            }
+            await this.parfinService.transactionSignAndPush(transactionId);
 
             return {
-                parfinId: transactionId,
-                status: statusDescription
+                parfinTxId: transactionId,
             };
 
         } catch (error) {
@@ -122,16 +145,12 @@ export class RealDigitalService {
 
         try {
             // 1. ???
-            const str = 'STR';
-            const { address } = await this.contractHelper.getContractAddress(str);
-            if (!address) {
-                throw new Error(`[ERROR]: Erro ao buscar o contrato ${str}`);
-            }
+            const strAddress = process.env.STR_ADDRESS;
 
             // 2. ???
             parfinSendDTO.metadata = {
                 data: '',
-                contractAddress: address,
+                contractAddress: strAddress,
             };
             parfinSendDTO.metadata.data =
                 this.str['requestToBurn(uint256)'](Number(amount))[0];
@@ -144,38 +163,15 @@ export class RealDigitalService {
             if (!transactionId) {
                 const payload = JSON.stringify(parfinSendDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato ${str}. Parfin Send DTO: ${payload}`
-                );
-            }
-
-            // 4. ???
-            const transactionData = {
-                parfinTransactionId: transactionId,
-                operation: TransactionOperations.BURN,
-                asset: AssetTypes.RD,
-                ...parfinSendDTO,
-            };
-
-            const { id: dbTransactionId } =
-                await this.transactionService.create(transactionData);
-            if (!dbTransactionId) {
-                throw new Error(
-                    `[ERROR]: Erro ao tentar salvar a transação ${transactionId} no banco. Payload: ${transactionData}`
+                    `[ERROR]: Erro ao tentar interagir com contrato ${strAddress}. Parfin Send DTO: ${payload}`
                 );
             }
 
             // 5. ???
-            const { statusDescription } = await this.transactionService.transactionSignAndPush(
-                transactionId,
-                dbTransactionId,
-            );
-            if (!statusDescription) {
-                throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${transactionData}`);
-            }
+            await this.parfinService.transactionSignAndPush(transactionId);
 
             return {
-                parfinId: transactionId,
-                status: statusDescription
+                parfinTxId: transactionId,
             };
 
         } catch (error) {
@@ -222,7 +218,7 @@ export class RealDigitalService {
             if (!data) {
                 const payload = JSON.stringify(parfinCallDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato ${realDigitalDefaultAccount}. 
+                    `[ERROR]: Erro ao tentar interagir com contrato ${realDigitalDefaultAccountAddress}. 
                     Parfin Call DTO: ${payload}`
                 );
             }
@@ -245,9 +241,6 @@ export class RealDigitalService {
                 data: '',
                 contractAddress: realDigitalAddress,
             };
-            if (!realDigitalAddress) {
-                throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigital}`);
-            }
 
             // 7. ???
             parfinSendDTO.metadata.data = this.realDigital[
@@ -263,40 +256,15 @@ export class RealDigitalService {
             if (!transactionId) {
                 const payload = JSON.stringify(parfinSendDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato ${realDigital}. Parfin Send DTO: ${payload}`
+                    `[ERROR]: Erro ao tentar interagir com contrato ${realDigitalAddress}. Parfin Send DTO: ${payload}`
                 );
             }
 
             // 9. ???
-            const transactionData = {
-                parfinTransactionId: transactionId,
-                operation: TransactionOperations.TRANSFER,
-                asset: AssetTypes.RD,
-                ...parfinSendDTO,
-            };
-
-            const { id: dbTransactionId } =
-                await this.transactionService.create(
-                    transactionData,
-                );
-            if (!dbTransactionId) {
-                throw new Error(
-                    `[ERROR]: Erro ao tentar salvar a transação ${transactionId} no banco. Payload: ${transactionData}`
-                );
-            }
-
-            // 10. ???
-            const { statusDescription } = await this.transactionService.transactionSignAndPush(
-                transactionId,
-                dbTransactionId,
-            );
-            if (!statusDescription) {
-                throw new Error(`[ERROR]: Erro ao tentar assinar a transação ${transactionId}. Payload: ${transactionData}`);
-            }
+            await this.parfinService.transactionSignAndPush(transactionId);
 
             return {
-                parfinId: transactionId,
-                status: statusDescription
+                parfinTxId: transactionId
             };
         } catch (error) {
             this.logger.error(error);

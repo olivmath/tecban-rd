@@ -20,14 +20,6 @@ export class RealTokenizadoMintDTO {
   @IsString()
   @IsNotEmpty()
   amount: string;
-
-  // @ApiProperty({
-  //   description: 'ID que identifica o ativo na Parfin',
-  //   example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
-  // })
-  // @IsString()
-  // @IsNotEmpty()
-  // assetId: string;
 }
 
 export class RealTokenizadoBurnDTO {
@@ -41,7 +33,7 @@ export class RealTokenizadoBurnDTO {
   description?: string;
 
   @ApiProperty({
-    description: 'ID que identifica o ativo na Parfin',
+    description: 'ID que identifica a carteira na Parfin',
     example: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
   })
   @IsString()
@@ -81,20 +73,12 @@ export class RealTokenizadoBurnFromDTO {
   account: string;
 
   @ApiProperty({
-    description: 'Quantidade uint256 a ser queimada',
+    description: 'Quantidade a ser queimada',
     example: 1000
   })
   @IsString()
   @IsNotEmpty()
   amount: string;
-
-  // @ApiProperty({
-  //   description: 'ID que identifica o ativo na Parfin',
-  //   example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
-  // })
-  // @IsString()
-  // @IsNotEmpty()
-  // assetId: string;
 }
 
 export class RealTokenizadoApproveDTO {
@@ -108,7 +92,7 @@ export class RealTokenizadoApproveDTO {
   description?: string;
 
   @ApiProperty({
-    description: 'ID que identifica o ativo na Parfin',
+    description: 'ID que identifica a carteira na Parfin',
     example: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
   })
   @IsString()
@@ -123,7 +107,12 @@ export class RealTokenizadoApproveDTO {
   @IsNotEmpty()
   assetId: string;
 
-  @ApiProperty({ description: 'Quantidade uint256 a ser queimada' })
+  @ApiProperty({ description: 'Endereço que irá executar a operação' })
+  @IsString()
+  @IsNotEmpty()
+  spender: string;
+
+  @ApiProperty({ description: 'Valor a ser aprovado' })
   @IsString()
   @IsNotEmpty()
   amount: string;
@@ -140,7 +129,7 @@ export class RealTokenizadoInternalTransferDTO {
   description?: string;
 
   @ApiProperty({
-    description: 'ID que identifica o ativo na Parfin',
+    description: 'ID que identifica a carteira na Parfin',
     example: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
   })
   @IsString()
@@ -160,7 +149,43 @@ export class RealTokenizadoInternalTransferDTO {
   @IsNotEmpty()
   key: string;
 
-  @ApiProperty({ description: 'Quantidade uint256 a ser transferida' })
+  @ApiProperty({ description: 'Quantidade a ser transferida' })
+  @IsString()
+  @IsNotEmpty()
+  amount: string;
+}
+
+export class RealTokenizadoExternalTransferDTO {
+  @ApiProperty({
+    description: 'Descrição da interação com o contrato',
+    default: '',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ description: 'ID que identifica a carteira na Parfin' })
+  @IsString()
+  @IsNotEmpty()
+  walletAddress: string;
+
+  @ApiProperty({ description: 'ID que identifica o ativo na Parfin' })
+  @IsString()
+  @IsNotEmpty()
+  assetId: string;
+
+  @ApiProperty({ description: 'Endereço do contrato Real Tokenizado do banco do cliente recebedor' })
+  @IsString()
+  @IsNotEmpty()
+  tokenReceiver: string;
+
+  @ApiProperty({ description: 'Endereço da carteira do recebedor' })
+  @IsString()
+  @IsNotEmpty()
+  receiver: string;
+
+  @ApiProperty({ description: 'Quantidade a ser transferida' })
   @IsString()
   @IsNotEmpty()
   amount: string;

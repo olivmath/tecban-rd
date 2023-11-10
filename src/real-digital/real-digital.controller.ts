@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import {
+  RealDigitalApproveDTO,
   RealDigitalDTO,
   RealDigitalTransferDTO,
 } from '../dtos/real-digital.dto';
@@ -10,6 +11,12 @@ import { RealDigitalService } from './real-digital.service';
 @ApiTags('Real Digital Operations')
 export class RealDigitalController {
   constructor(private readonly realDigitalService: RealDigitalService) { }
+
+  @Post('approve')
+  @ApiOperation({ summary: 'Approve a transaction', description: 'Approve a Real Digital transaction' })
+  approve(@Body() dto: RealDigitalApproveDTO) {
+    return this.realDigitalService.approve(dto);
+  }
 
   @Post('mint')
   @ApiOperation({ summary: 'Mint Real Digital', description: 'Mint Real Digital token to an enabled wallet' })
@@ -29,8 +36,8 @@ export class RealDigitalController {
     return this.realDigitalService.transfer(dto);
   }
 
-  @Get('balanceOf/:address')
-  @ApiOperation({ summary: 'Real Digital balance', description: 'Real Digital balance of any address' })
+  @Get('balance/:address')
+  @ApiOperation({ summary: 'Get Real Digital balance', description: 'get Real Digital balance from any address' })
   @ApiParam({ name: 'address', example: '0x5be4C55e1977E555DB9a815a2CDed576A71Ca3c2' })
   balanceOf(@Param('address') address: string) {
     return this.realDigitalService.balanceOf(address);

@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class DecodeDataDTO {
     @ApiProperty({
-        description: 'Nome do contrato que',
+        description: 'Nome do contrato onde será feito o encode',
         example: 'AddressDiscovery',
     })
     @IsString()
@@ -28,7 +28,7 @@ export class DecodeDataDTO {
 
 export class EncodeDataDTO {
     @ApiProperty({
-        description: 'Nome do contrato que',
+        description: 'Nome do contrato onde será feito o decode',
         example: 'ITPFtOperation1052',
     })
     @IsString()

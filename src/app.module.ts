@@ -9,6 +9,7 @@ import { ParfinModule } from './parfin/parfin.module';
 import { RealDigitalModule } from './real-digital/real-digital.module';
 import { RealTokenizadoModule } from './real-tokenizado/real-tokenizado.module';
 import { ContractHelperModule } from './helpers/contract-helper/contract-helper.module';
+import { TPFtModule } from './tpft/tpft.module';
 import { LoggerModule } from './logger/logger.module';
 import { AllExceptionsFilter } from './filters/http-exception.filter';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
@@ -23,6 +24,7 @@ import { RequestIdMiddleware } from './middleware/request-id.middleware';
         ParfinModule,
         RealDigitalModule,
         RealTokenizadoModule,
+        TPFtModule,
         TransactionsModule,
         WalletModule,
         ContractHelperModule,
