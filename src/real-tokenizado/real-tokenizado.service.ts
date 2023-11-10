@@ -455,47 +455,31 @@ export class RealTokenizadoService {
         realTokenizadoBalanceOf: number;
         realTokenizadoFrozenBalanceOf: number;
     }> {
-        try {
-            const realTokenizadoAddress = process.env.ARBI_REAL_TOKENIZADO_ADDRESS;
+        const realTokenizadoAddress = process.env.ARBI_REAL_TOKENIZADO_ADDRESS;
+        const encodedBalanceOfCall = this.realTokenizado['balanceOf(address)'](address)[0];
+        const encodedFrozenBalanceOfCall = this.realTokenizado['frozenBalanceOf(address)'](address)[0];
+        const parfinDTO = new ParfinContractInteractDTO();
 
-            const encodedBalanceOfCall = this.realTokenizado['balanceOf(address)'](address)[0];
-            const encodedFrozenBalanceOfCall = this.realTokenizado['frozenBalanceOf(address)'](address)[0];
+        const { data: encodedBalanceOfResponse } = await this.parfinService.smartContractCall({
+            blockchainId: parfinDTO.blockchainId,
+            metadata: {
+                data: encodedBalanceOfCall,
+                contractAddress: realTokenizadoAddress,
+            },
+        });
 
-            const parfinDTO = new ParfinContractInteractDTO();
+        const { data: encodedFrozenBalanceOfResponse } = await this.parfinService.smartContractCall({
+            blockchainId: parfinDTO.blockchainId,
+            metadata: {
+                data: encodedFrozenBalanceOfCall,
+                contractAddress: realTokenizadoAddress,
+            },
+        });
 
-            const requests = [
-                { id: 'balanceOf', data: encodedBalanceOfCall },
-                { id: 'frozenBalanceOf', data: encodedFrozenBalanceOfCall },
-            ];
-
-            const allResponse = await Promise.all(
-                requests.map(async (request) => {
-                    return this.parfinService.smartContractCall({
-                        metadata: {
-                            data: request.data,
-                            contractAddress: realTokenizadoAddress,
-                        },
-                        blockchainId: parfinDTO.blockchainId,
-                    });
-                }),
-            );
-
-            const responses: { balanceOf?: string; frozenBalanceOf?: string } = {};
-            allResponse.forEach((response: ParfinContractCallSuccessRes, index) => {
-                const requestId = requests[index].id;
-                responses[requestId] = response.data;
-            });
-
-            const balanceOf = responses.balanceOf;
-            const frozenBalanceOf = responses.frozenBalanceOf;
-            return {
-                realTokenizadoBalanceOf: this.realTokenizado['balanceOf'](balanceOf)[0],
-                realTokenizadoFrozenBalanceOf: this.realTokenizado['frozenBalanceOf'](frozenBalanceOf)[0],
-            };
-
-        } catch (error) {
-            this.logger.error(error);
-            throw new Error(`[ERROR]: Erro ao tentar buscar o saldo de Real Digital do address: ${address}`);
-        }
+        return {
+            realTokenizadoBalanceOf: this.realTokenizado['balanceOf'](encodedBalanceOfResponse)[0],
+            realTokenizadoFrozenBalanceOf: this.realTokenizado['frozenBalanceOf'](encodedFrozenBalanceOfResponse)[0],
+        };
     }
 }
+
