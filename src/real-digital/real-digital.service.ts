@@ -31,9 +31,9 @@ export class RealDigitalService {
     ) {
         this.str = this.contractHelper.getContractMethods('STR');
         this.realDigital =
-            this.contractHelper.getContractMethods('RealDigital');
+            this.contractHelper.getContractMethods('REAL_DIGITAL');
         this.realDigitalDefaultAccount = this.contractHelper.getContractMethods(
-            'RealDigitalDefaultAccount',
+            'REAL_DIGITAL_DEFAULT_ACCOUNT',
         );
         this.logger.setContext('RealDigitalService');
     }
@@ -197,7 +197,7 @@ export class RealDigitalService {
 
         try {
             // 1. ???
-            const realDigitalDefaultAccount = 'RealDigitalDefaultAccount';
+            const realDigitalDefaultAccount = 'REAL_DIGITAL_DEFAULT_ACCOUNT';
             const { address: realDigitalDefaultAccountAddress } = await this.contractHelper.getContractAddress(realDigitalDefaultAccount);
             if (!realDigitalDefaultAccountAddress) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigitalDefaultAccount}`);
@@ -239,7 +239,7 @@ export class RealDigitalService {
             parfinSendDTO.source = { assetId };
 
             // 6. ???
-            const realDigital = 'RealDigital'
+            const realDigital = 'REAL_DIGITAL'
             const { address: realDigitalAddress } = await this.contractHelper.getContractAddress(realDigital);
             parfinSendDTO.metadata = {
                 data: '',
