@@ -57,22 +57,22 @@ export class WalletClientCreateDTO extends WalletCreateDTO {
     @ApiProperty({ description: 'CPF do cliente', example: '12345678901' })
     @IsString()
     @IsNotEmpty()
-    taxId: number;
+    taxId: string;
 
     @ApiProperty({ description: 'Código do banco do cliente', example: '123' })
     @IsString()
     @IsNotEmpty()
-    bankNumber: number;
+    bankNumber: string;
 
     @ApiProperty({ description: 'Conta do banco do cliente', example: '987654' })
     @IsString()
     @IsNotEmpty()
-    account: number;
+    account: string;
 
     @ApiProperty({ description: 'Agência do banco do cliente', example: '4567' })
     @IsString()
     @IsNotEmpty()
-    branch: number;
+    branch: string;
 }
 
 export class WalletEnableDTO {
