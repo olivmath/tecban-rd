@@ -14,7 +14,6 @@ import { AllExceptionsFilter } from './filters/http-exception.filter';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { RequestIdMiddleware } from './middleware/request-id.middleware';
-import { RequestIdResponseInterceptor } from './interceptors/response.request-id.interceptor';
 
 @Module({
     imports: [
@@ -33,10 +32,6 @@ import { RequestIdResponseInterceptor } from './interceptors/response.request-id
         {
             provide: APP_FILTER,
             useClass: AllExceptionsFilter,
-        },
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: RequestIdResponseInterceptor,
         },
     ],
 
