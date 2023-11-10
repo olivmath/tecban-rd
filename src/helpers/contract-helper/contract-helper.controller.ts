@@ -24,7 +24,6 @@ export class ContractHelperController {
     async getContractAddressByName(@Param('contractName') contractName: string) {
         this.logger.setContext('ContractHelperController::getContractAddressByName');
 
-        this.contractService.isContractNameValid(contractName);
         const address = await this.contractService.getContractAddress(contractName as ContractName);
         return { address };
     }
@@ -39,7 +38,6 @@ export class ContractHelperController {
     async encodeData(@Body() body: EncodeDataDTO): Promise<EncodedDataResponse | BadRequestException> {
         this.logger.setContext('ContractHelperController::encodeData');
 
-        this.contractService.isContractNameValid(body.contractName);
         const contract = this.contractService.getContractMethods(body.contractName);
         const encodedData = contract[body.functionName](...body.args);
 
@@ -59,7 +57,6 @@ export class ContractHelperController {
     @ApiResponse({ status: 400, description: 'Bad Request' })
     async decodeData(@Body() body: DecodeDataDTO): Promise<DecodedDataResponse | BadRequestException> {
         this.logger.setContext('ContractHelperController::decodeData');
-        this.contractService.isContractNameValid(body.contractName);
 
         const contract = this.contractService.getContractMethods(body.contractName);
         const decodedData = contract[body.functionName](body.data);
