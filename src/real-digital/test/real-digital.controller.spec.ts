@@ -8,11 +8,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { TransactionsModule } from 'src/transactions/transactions.module';
 import { ParfinHttpService } from 'src/parfin/parfin.api.service';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 describe('RealDigitalController', () => {
     let controller: RealDigitalController;
-    let service: ParfinHttpService;
     let mongod: MongoMemoryServer;
 
     beforeAll(async () => {
@@ -27,7 +26,6 @@ describe('RealDigitalController', () => {
         }).compile();
 
         controller = module.get<RealDigitalController>(RealDigitalController);
-        service = module.get<ParfinHttpService>(ParfinHttpService);
     });
 
     afterAll(async () => {
@@ -35,24 +33,8 @@ describe('RealDigitalController', () => {
     });
 
     it('should call balanceOf method and return a response', async () => {
-        const mockResponse = {
-            realDigitalBalanceOf: 1,
-            realDigitalFrozenBalanceOf: 0,
-        };
-        // Mock `ParfinHttpService.makeRequest` when address discovery call
-        jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
-            Promise.resolve({
-                data: {
-                    data: '0x00000000000000000000000060c48562056c6cfcd2128ce60fd18c67e81ed971',
-                },
-                status: 200,
-                statusText: 'OK',
-                headers: {},
-                config: {},
-            } as AxiosResponse),
-        );
         // Mock `ParfinHttpService.makeRequest` when real digital balance of call
-        jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
+        jest.spyOn(axios, 'request').mockResolvedValueOnce(
             Promise.resolve({
                 data: {
                     data: '0x0000000000000000000000000000000000000000000000000000000000000064',
@@ -65,7 +47,7 @@ describe('RealDigitalController', () => {
         );
 
         // Mock `ParfinHttpService.makeRequest` when real digital frozen balance of call
-        jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
+        jest.spyOn(axios, 'request').mockResolvedValueOnce(
             Promise.resolve({
                 data: {
                     data: '0x0000000000000000000000000000000000000000000000000000000000000100',
