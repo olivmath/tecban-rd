@@ -32,9 +32,9 @@ export class RealTokenizadoService {
         private readonly logger: LoggerService,
     ) {
         this.realTokenizado =
-            this.contractHelper.getContractMethods('RealTokenizado');
+            this.contractHelper.getContractMethods('REAL_TOKENIZADO');
         this.keyDictionary =
-            this.contractHelper.getContractMethods('KeyDictionary');
+            this.contractHelper.getContractMethods('KEY_DICTIONARY');
         this.logger.setContext('RealTokenizadoService');
     }
 
@@ -349,7 +349,7 @@ export class RealTokenizadoService {
 
         try {
             // 1. ???
-            const keyDictionary = 'KeyDictionary';
+            const keyDictionary = 'KEY_DICTIONARY';
             const { address: keyDictionaryAddress } = await this.contractHelper.getContractAddress(keyDictionary);
             if (!keyDictionaryAddress) {
                 throw new Error(`[ERROR]: Erro ao buscar o contrato ${keyDictionary}`);
