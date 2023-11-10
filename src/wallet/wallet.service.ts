@@ -41,13 +41,9 @@ export class WalletService {
         private readonly transactionService: TransactionsService,
         private readonly logger: LoggerService,
     ) {
-        this.keyDictionary =
-            this.contractHelper.getContractMethods('KeyDictionary');
-        this.realTokenizado =
-            this.contractHelper.getContractMethods('RealTokenizado');
-        this.realDigitalEnableAccount = this.contractHelper.getContractMethods(
-            'RealDigitalEnableAccount',
-        );
+        this.keyDictionary = this.contractHelper.getContractMethods('KEY_DICTIONARY');
+        this.realTokenizado = this.contractHelper.getContractMethods('REAL_TOKENIZADO');
+        this.realDigitalEnableAccount = this.contractHelper.getContractMethods('REAL_DIGITAL_ENABLE_ACCOUNT');
         this.logger.setContext('WalletService');
     }
 
@@ -193,7 +189,7 @@ export class WalletService {
         if (asset === 'RD') {
             try {
                 // 1. ???
-                const realDigitalEnableAccount = 'RealDigitalEnableAccount';
+                const realDigitalEnableAccount = 'REAL_DIGITAL_ENABLE_ACCOUNT';
                 const { address } = await this.contractHelper.getContractAddress(realDigitalEnableAccount);
                 if (!address) {
                     throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigitalEnableAccount}`);
