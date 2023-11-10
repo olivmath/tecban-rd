@@ -44,55 +44,12 @@ export class ContractHelperService {
     }
 
     // Função que retorna o endereço de um contrato
-    async getContractAddress(contractName: ContractName): Promise<ContractHelperGetContractSuccessRes> {
-        const w3 = new Web3();
-        // build tx data to get address from addressDiscovery
-        const contract = new ContractWrapper(abiLoader.AddressDiscovery);
-        const encodedData = contract['addressDiscovery(bytes32)'](w3.utils.keccak256(contractName))[0];
+    getContractAddress(contractName: ContractName): ContractHelperGetContractSuccessRes {
+        const contractAddress = this.contracts[contractName];
 
-        // mount Parfin's payload
-        const parfinDTO = new ParfinContractInteractDTO();
-        const parfinCallDTO = {
-            metadata: parfinDTO.metadata,
-            blockchainId: parfinDTO.blockchainId,
-        };
-
-        parfinCallDTO.metadata = {
-            data: encodedData,
-            contractAddress: discoveryAddress,
-        };
-
-        // send tx via Parfin
-        let parfinCallRes: ParfinContractCallSuccessRes | ParfinErrorRes;
-        parfinCallRes = await this.parfinService.smartContractCall(parfinCallDTO);
-        const data = parfinCallRes as ParfinContractCallSuccessRes;
-
-        // decode response
-        const address: string = contract['addressDiscovery'](data)[0];
-
-        return { address };
-    }
-
-    isContractNameValid(contractName: string) {
-        const validContractNames: ContractName[] = [
-            'RealDigitalDefaultAccount',
-            'RealDigitalEnableAccount',
-            'ApprovedDigitalCurrency',
-            'SwapTwoStepsReserve',
-            'ITPFtOperation1002',
-            'ITPFtOperation1052',
-            'AddressDiscovery',
-            'RealTokenizado',
-            'KeyDictionary',
-            'SwapTwoSteps',
-            'RealDigital',
-            'SwapOneStep',
-            'ITPFt',
-            'STR',
-        ];
-
-        if (!validContractNames.includes(contractName as ContractName)) {
+        if (!contractAddress) {
             throw new AppError(500, 'Invalid contract name');
         }
+        return { address: contractAddress };
     }
 }
