@@ -87,12 +87,30 @@ export class WalletCreateSuccessRes {
   ownerType: string;
 }
 
-export class WalletCreateClientSuccessRes extends WalletCreateSuccessRes {
-  @ApiProperty({
-    description: 'Key da carteira do cliente registrada no KeyDictionary',
-    type: String,
-  })
-  clientKey: string;
+export class WalletCreateClientSuccessRes {
+    @ApiProperty({
+        description: 'Key da carteira do cliente registrada no KeyDictionary (keccke256 do cpf)',
+        type: String,
+    })
+    clientKey: string;
+
+    @ApiProperty({
+        description: 'Endereço da carteira do cliente',
+        type: String,
+    })
+    wallet: string;
+
+    @ApiProperty({
+        description: 'Id da transação de que adiciona o cliente no KeyDictionary',
+        type: String,
+    })
+    parfinTxId: string;
+
+    @ApiProperty({
+        description: 'Id da carteira do cliente na Parfin',
+        type: String,
+    })
+    walletId: string;
 }
 export class WalletAddNewAssetSuccessRes {
   @ApiProperty({ description: 'ID do asset adicionado na carteira' })
