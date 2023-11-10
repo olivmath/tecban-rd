@@ -82,7 +82,7 @@ export class ParfinHttpService {
         }
     }
 
-    public async makeRequest(method: Method, apiUri: string, data: object): Promise<AxiosResponse> {
+    public async makeRequest(method: Method, apiUri: string, data: object): Promise<any> {
         const authHeaders = this.setAuthHeaders(apiUri, data);
         const headers = {
             headers: {

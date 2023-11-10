@@ -6,10 +6,8 @@ import {
   ParfinRegisterERC20TokenDTO,
 } from '../dtos/parfin.dto';
 import {
-  ParfinSuccessRes,
   ParfinRegisterContractSuccessRes,
   ParfinGetAllContractsSuccessRes,
-  ParfinErrorRes,
   ParfinRegisterERC20TokenSuccessRes,
   ParfinGetWalletSuccessRes,
   ParfinGetTransactionSuccessRes,
@@ -22,6 +20,9 @@ import { getAllWallets200 } from 'src/res/swagger/wallet.swagger';
 @Controller('parfin')
 @ApiTags('Parfin Operations')
 export class ParfinController {
+  getHttpServer(): any {
+      throw new Error('Method not implemented.');
+  }
   constructor(private readonly parfinService: ParfinService) { }
 
   //--- Contract Endpoints
@@ -29,13 +30,13 @@ export class ParfinController {
   @ApiOperation({ summary: 'Register a smart contract', description: 'Register a smart contract for Parfin to listen to its events' })
   async registerContract(
     @Body() dto: ParfinRegisterContractDTO,
-  ): Promise<ParfinRegisterContractSuccessRes | ParfinErrorRes> {
+  ): Promise<ParfinRegisterContractSuccessRes> {
     return await this.parfinService.registerContract(dto);
   }
 
   @Get('contracts')
   @ApiOperation({ summary: 'Get all contracts', description: 'Get all smart contracts deployed using the Parfin API' })
-  getAllContracts(): Promise<ParfinGetAllContractsSuccessRes[] | ParfinErrorRes> {
+  getAllContracts(): Promise<ParfinGetAllContractsSuccessRes[]> {
     return this.parfinService.getAllContracts();
   }
 
@@ -45,7 +46,7 @@ export class ParfinController {
   @parfinError400
   @parfinError500
   registerERC20Token(@Body() dto: ParfinRegisterERC20TokenDTO): Promise<
-    ParfinRegisterERC20TokenSuccessRes | ParfinErrorRes
+    ParfinRegisterERC20TokenSuccessRes
   > {
     return this.parfinService.registerERC20Token(dto);
   }
@@ -57,7 +58,7 @@ export class ParfinController {
   @parfinError400
   @parfinError500
   getAllWallets(): Promise<
-    ParfinGetWalletSuccessRes[] | ParfinErrorRes
+    ParfinGetWalletSuccessRes[]
   > {
     return this.parfinService.getAllWallets();
   }
@@ -68,7 +69,7 @@ export class ParfinController {
   @parfinError400
   @parfinError500
   getWalletById(@Param('id') id: string): Promise<
-    ParfinGetWalletSuccessRes | ParfinErrorRes
+    ParfinGetWalletSuccessRes
   > {
     return this.parfinService.getWalletById(id);
   }
@@ -77,7 +78,7 @@ export class ParfinController {
   @Get('transactions')
   @ApiOperation({ summary: 'Get all Parfin transactions', description: 'Get all Parfin transactions, registered in the Parfin platform' })
   getAllTransactions(): Promise<
-    ParfinGetAllTransactionsSuccessRes | ParfinErrorRes
+    ParfinGetAllTransactionsSuccessRes
   > {
     return this.parfinService.getAllTransactions();
   }
@@ -85,14 +86,14 @@ export class ParfinController {
   @Get('transaction/:id')
   @ApiOperation({ summary: 'Get a Parfin transaction', description: 'Get a transaction by ID, registered in the Parfin platform' })
   getTransactionById(@Param('id') id: string): Promise<
-    ParfinGetTransactionSuccessRes | ParfinErrorRes
+    ParfinGetTransactionSuccessRes
   > {
     return this.parfinService.getTransactionById(id);
   }
 
   @Put('transaction/sign-and-push/:transactionId')
   @ApiOperation({ summary: 'Sign ans push a transaction', description: 'Sign a transaction using Parfin technology and push it to the blockchain' })
-  transactionSignAndPush(@Param('transactionId') transactionId: string): Promise<any | ParfinErrorRes> {
+  transactionSignAndPush(@Param('transactionId') transactionId: string): Promise<any> {
     return this.parfinService.transactionSignAndPush(transactionId);
   }
 }

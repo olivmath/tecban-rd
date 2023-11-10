@@ -28,96 +28,86 @@ export class ParfinService {
         walletName,
         blockchainId,
         walletType,
-    }: WalletCreateDTO): Promise<ParfinCreateWalletSuccessRes | ParfinErrorRes> {
+    }: WalletCreateDTO): Promise<ParfinCreateWalletSuccessRes> {
         const reqBody = {
             walletName,
             blockchainId,
             walletType,
         };
         const url = '/v1/api/wallet';
-        const response = await this.parfinHttp.makeRequest('POST', url, reqBody);
-        return response.data;
+        return await this.parfinHttp.makeRequest('POST', url, reqBody);
     }
 
-    async addNewAsset(dto: WalletNewAssetDTO): Promise<WalletAddNewAssetSuccessRes | ParfinErrorRes> {
+    async addNewAsset(dto: WalletNewAssetDTO): Promise<WalletAddNewAssetSuccessRes> {
         const url = '/v1/api/wallet/add-asset';
         const reqBody = dto;
-        const response = await this.parfinHttp.makeRequest('POST', url, reqBody);
-        return response.data;
+        return await this.parfinHttp.makeRequest('POST', url, reqBody);
     }
 
-    async getAllWallets(): Promise<ParfinGetWalletSuccessRes[] | ParfinErrorRes> {
+    async getAllWallets(): Promise<ParfinGetWalletSuccessRes[]> {
         const url = '/v1/api/wallet';
-        const response = await this.parfinHttp.makeRequest('GET', url, {});
-        return response.data;
+        return await this.parfinHttp.makeRequest('GET', url, {});
     }
 
-    async getWalletById(id: string): Promise<ParfinGetWalletSuccessRes | ParfinErrorRes> {
+    async getWalletById(id: string): Promise<ParfinGetWalletSuccessRes> {
         const url = `/v1/api/wallet/${id}`;
-        const response = await this.parfinHttp.makeRequest('GET', url, {});
-        return response.data;
+        return await this.parfinHttp.makeRequest('GET', url, {});
     }
 
     //--- Blockchain Token Endpoints
     async registerERC20Token(
         dto: ParfinRegisterERC20TokenDTO,
-    ): Promise<ParfinRegisterERC20TokenSuccessRes | ParfinErrorRes> {
+    ): Promise<ParfinRegisterERC20TokenSuccessRes> {
         const url = '/v1/api/blockchain-token/evm';
         const reqBody = dto;
-        const response = await this.parfinHttp.makeRequest('POST', url, reqBody);
-        return response.data;
+        return await this.parfinHttp.makeRequest('POST', url, reqBody);
     }
 
     //--- Web3 Endpoints
-    async getAllContracts(): Promise<ParfinGetAllContractsSuccessRes[] | ParfinErrorRes> {
+    async getAllContracts(): Promise<ParfinGetAllContractsSuccessRes[]> {
         const url = '/v1/api/custody/web3/contract';
-        const response = await this.parfinHttp.makeRequest('GET', url, {});
+        const response: ParfinGetAllContractsSuccessRes[] = await this.parfinHttp.makeRequest('GET', url, {});
 
-        return response.data;
+        return response
     }
 
-    async registerContract(dto: ParfinRegisterContractDTO): Promise<ParfinRegisterContractSuccessRes | ParfinErrorRes> {
+    async registerContract(dto: ParfinRegisterContractDTO): Promise<ParfinRegisterContractSuccessRes> {
         const url = '/v1/api/custody/web3/contract';
         const reqBody = dto;
-        const response = await this.parfinHttp.makeRequest('POST', url, reqBody);
-        return response.data;
+        return await this.parfinHttp.makeRequest('POST', url, reqBody);
     }
 
     async smartContractCall(
         dto: Pick<ParfinContractInteractDTO, 'metadata' | 'blockchainId'>,
-    ): Promise<ParfinContractCallSuccessRes | ParfinErrorRes> {
+    ): Promise<ParfinContractCallSuccessRes> {
         const url = '/v1/api/custody/web3/contract/call';
         const reqBody = dto;
-        const response = await this.parfinHttp.makeRequest('POST', url, reqBody);
-        return response.data;
+        return await this.parfinHttp.makeRequest('POST', url, reqBody);
     }
 
     async smartContractSend(
         dto: Omit<ParfinContractInteractDTO, 'blockchainId'>,
-    ): Promise<ParfinSuccessRes | ParfinErrorRes> {
+    ): Promise<ParfinSuccessRes> {
         const url = '/v1/api/custody/web3/contract/send';
         const reqBody = dto;
-        const response = await this.parfinHttp.makeRequest('POST', url, reqBody);
-        return response.data;
+        return await this.parfinHttp.makeRequest('POST', url, reqBody);
     }
 
     //--- Transaction Endpoints
-    async getAllTransactions(): Promise<ParfinGetAllTransactionsSuccessRes | ParfinErrorRes> {
+    async getAllTransactions(): Promise<ParfinGetAllTransactionsSuccessRes> {
         const url = `/v1/api/transaction/`;
         const data = await this.parfinHttp.makeRequest('GET', url, {});
         this.logger.log(data);
         return data.data as ParfinGetAllTransactionsSuccessRes;
     }
 
-    async getTransactionById(id: string): Promise<ParfinGetTransactionSuccessRes | ParfinErrorRes> {
+    async getTransactionById(id: string): Promise<ParfinGetTransactionSuccessRes> {
         const url = `/v1/api/transaction/${id}/`;
-        const response = await this.parfinHttp.makeRequest('GET', url, {});
-        return response.data;
+        return await this.parfinHttp.makeRequest('GET', url, {});
     }
 
-    async transactionSignAndPush(transactionId: string): Promise<any | ParfinErrorRes> {
+    async transactionSignAndPush(transactionId: string): Promise<any> {
         const url = `/v1/api/transaction/${transactionId}/sign-and-push`;
-        const response = await this.parfinHttp.makeRequest('POST', url, {});
-        return response.data;
+        return await this.parfinHttp.makeRequest('POST', url, {});
     }
 }
