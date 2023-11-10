@@ -41,7 +41,7 @@ describe('ContractHelperController', () => {
 
         it('should encode data for a valid `RealDigital` contract `mint` function', async () => {
             const data: EncodeDataDTO = {
-                contractName: 'RealDigital',
+                contractName: 'REAL_DIGITAL',
                 functionName: 'mint(address,uint256)',
                 args: ['0xCBD6832Ebc203e49E2B771897067fce3c58575ac', '100'],
             };
@@ -69,7 +69,7 @@ describe('ContractHelperController', () => {
             const wallet = '0xF77d5d60C05238B61eD805841F5f82D7803c72f5';
 
             const data: EncodeDataDTO = {
-                contractName: 'KeyDictionary',
+                contractName: 'KEY_DICTIONARY',
                 functionName:
                     'addAccount(bytes32,uint256,uint256,uint256,uint256,address)',
                 args: [key, taxId, bankNumber, account, branch, wallet],
@@ -108,7 +108,7 @@ describe('ContractHelperController', () => {
             };
 
             const data: EncodeDataDTO = {
-                contractName: 'ITPFtOperation1052',
+                contractName: 'ITPFT_1052',
                 functionName:
                     'trade(uint256,address,address,address,address,uint8,tuple,uint256,uint256)',
                 args: [
@@ -157,7 +157,7 @@ describe('ContractHelperController', () => {
             };
 
             const data: EncodeDataDTO = {
-                contractName: 'ITPFt',
+                contractName: 'ITPFT',
                 functionName: 'createTPFt(tuple)',
                 args: [tpftData],
             };
