@@ -27,7 +27,7 @@ describe('ContractHelperController', () => {
     describe('Simple decode cases', () => {
         it('should decode data for the `allowance` function of `RealDigital` contract', async () => {
             const data: DecodeDataDTO = {
-                contractName: 'RealDigital',
+                contractName: 'REAL_DIGITAL',
                 functionName: 'allowance',
                 data: '0x0000000000000000000000000000000000000000000000000000000000000064',
             };
@@ -41,7 +41,7 @@ describe('ContractHelperController', () => {
 
         it('should decode data for the `getWallet` function of `KeyDictionary` contract', async () => {
             const data: DecodeDataDTO = {
-                contractName: 'KeyDictionary',
+                contractName: 'KEY_DICTIONARY',
                 functionName: 'getWallet',
                 data: '0x00000000000000000000000060c48562056c6cfcd2128ce60fd18c67e81ed971',
             };
@@ -59,7 +59,7 @@ describe('ContractHelperController', () => {
     describe('Complex decode cases', () => {
         it('should decode data for the `getCustomerData` function of `KeyDictionary` contract', async () => {
             const data: DecodeDataDTO = {
-                contractName: 'KeyDictionary',
+                contractName: 'KEY_DICTIONARY',
                 functionName: 'getCustomerData',
                 data:
                     '0x' +

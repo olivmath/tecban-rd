@@ -8,11 +8,10 @@ import { TransactionsModule } from 'src/transactions/transactions.module';
 import { RealTokenizadoController } from '../real-tokenizado.controller';
 import { RealTokenizadoService } from '../real-tokenizado.service';
 import { ParfinHttpService } from 'src/parfin/parfin.api.service';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 describe('RealTokenizadoController', () => {
     let controller: RealTokenizadoController;
-    let service: ParfinHttpService;
     let mongod: MongoMemoryServer;
 
     beforeAll(async () => {
@@ -27,7 +26,6 @@ describe('RealTokenizadoController', () => {
         }).compile();
 
         controller = module.get<RealTokenizadoController>(RealTokenizadoController);
-        service = module.get<ParfinHttpService>(ParfinHttpService);
     });
 
     afterAll(async () => {
@@ -35,40 +33,28 @@ describe('RealTokenizadoController', () => {
     });
 
     it('should call balanceOf method and return a response', async () => {
-        // Mock `ParfinHttpService.makeRequest` when address discovery call
-        jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
-            Promise.resolve({
-                data: {
-                    data: '0x00000000000000000000000060c48562056c6cfcd2128ce60fd18c67e81ed971',
-                },
-                status: 200,
-                statusText: 'OK',
-                headers: {},
-                config: {},
-            } as AxiosResponse),
-        );
         // Mock `ParfinHttpService.makeRequest` when real tokenizado balance of call
-        jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
+        jest.spyOn(axios, 'request').mockResolvedValueOnce(
             Promise.resolve({
                 data: {
                     data: '0x0000000000000000000000000000000000000000000000000000000000000064',
                 },
                 status: 200,
                 statusText: 'OK',
-                headers: {},
+                headers: {"Content-Type": "Test"},
                 config: {},
             } as AxiosResponse),
         );
 
         // Mock `ParfinHttpService.makeRequest` when real tokenizado frozen balance of call
-        jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
+        jest.spyOn(axios, 'request').mockResolvedValueOnce(
             Promise.resolve({
                 data: {
                     data: '0x0000000000000000000000000000000000000000000000000000000000000100',
                 },
                 status: 200,
                 statusText: 'OK',
-                headers: {},
+                headers: {"Content-Type": "Test"},
                 config: {},
             } as AxiosResponse),
         );
