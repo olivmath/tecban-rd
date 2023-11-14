@@ -1,25 +1,66 @@
+import { CustomerSmartContractEventsDto } from '../dto/customer-smart-contract-events.dto';
+import { ContractHelperModule } from 'src/helpers/contract-helper/contract-helper.module';
+import { RealTokenizadoModule } from 'src/real-tokenizado/real-tokenizado.module';
+import { TransactionsModule } from 'src/transactions/transactions.module';
+import { RealDigitalModule } from 'src/real-digital/real-digital.module';
+import { AllExceptionsFilter } from 'src/filters/http-exception.filter';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { HealthController } from 'src/health.controller';
+import { ParfinModule } from 'src/parfin/parfin.module';
+import { WalletModule } from 'src/wallet/wallet.module';
+import { LoggerModule } from 'src/logger/logger.module';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { TerminusModule } from '@nestjs/terminus';
+import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 import request from 'supertest';
-import { CustomerSmartContractEventsDto } from '../dto/customer-smart-contract-events.dto';
-import { WebhookModule } from '../webhook.module';
+import crypto from 'crypto';
+import * as dotenv from 'dotenv';
+
+
 
 describe('WebhookController', () => {
+    dotenv.config();
+
     let app: INestApplication;
-    const secret = process.env.PARFIN_PRIVATE_KEY;
+    let mongod: MongoMemoryServer;
+    const secret = process.env.PARFIN_PRIVATE_KEY
 
     beforeAll(async () => {
-        const moduleFixture: TestingModule = await Test.createTestingModule({
-            controllers: [WebhookModule],
+        mongod = await MongoMemoryServer.create();
+        const uri = mongod.getUri();
+        const moduleRef: TestingModule = await Test.createTestingModule({
+            imports: [
+                ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+                MongooseModule.forRoot(uri),
+                TerminusModule,
+                ParfinModule,
+                RealDigitalModule,
+                RealTokenizadoModule,
+                TransactionsModule,
+                WalletModule,
+                ContractHelperModule,
+                LoggerModule,
+            ],
+            providers: [
+                {
+                    provide: APP_FILTER,
+                    useClass: AllExceptionsFilter,
+                },
+            ],
+
+            controllers: [HealthController],
         }).compile();
 
-        app = moduleFixture.createNestApplication();
+        app = moduleRef.createNestApplication();
         await app.init();
-    });
+    }, 10000);
 
     afterAll(async () => {
         await app.close();
-    });
+    }, 10000);
 
     it('should return 200 with valid signature', async () => {
         const payload: CustomerSmartContractEventsDto = {
@@ -62,8 +103,7 @@ describe('WebhookController', () => {
         };
 
         const payloadJson = JSON.stringify(payload);
-        const signature = 'invalid-signature'; // Replace with an invalid signature
-
+        const signature = generateHash(secret, payloadJson)
         const response = await request(app.getHttpServer())
             .post('/webhook')
             .set('x-webhook-signature', signature)
