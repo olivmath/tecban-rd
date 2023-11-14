@@ -8,7 +8,7 @@ export class DecodeDataDTO {
         example: 'AddressDiscovery',
     })
     @IsString()
-    contractName: ContractName;
+    contractName: string;
 
     @ApiProperty({
         description: 'Nome da função que retornou dados do `contractName`',
@@ -32,7 +32,7 @@ export class EncodeDataDTO {
         example: 'ITPFtOperation1052',
     })
     @IsString()
-    contractName: ContractName;
+    contractName: string;
 
     @ApiProperty({
         description: 'Nome da função que vai ser chamada no `contractName`',

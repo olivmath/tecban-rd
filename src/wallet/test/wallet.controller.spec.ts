@@ -12,39 +12,20 @@ import { WalletService } from '../wallet.service';
 import { LoggerService } from 'src/logger/logger.service';
 import { BlockchainId, WalletType } from 'src/types/wallet.types';
 import { ParfinHttpService } from 'src/parfin/parfin.api.service';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 describe('WalletController', () => {
     let controller: WalletController;
     let mongod: MongoMemoryServer;
-    let service: ParfinHttpService;
 
     const client1 = new WalletClientCreateDTO();
     client1.blockchainId = BlockchainId.BLOCKCHAIN_ID;
     client1.walletType = WalletType.CUSTODY;
     client1.walletName = 'Lucas Oliveira';
-    client1.taxId = 12345678901;
-    client1.bankNumber = 123;
-    client1.account = 987654;
-    client1.branch = 4567;
-
-    const client2 = new WalletClientCreateDTO();
-    client2.walletName = 'Yuri Correa';
-    client2.blockchainId = BlockchainId.BLOCKCHAIN_ID;
-    client2.walletType = WalletType.CUSTODY;
-    client2.taxId = 98765432109;
-    client2.bankNumber = 456;
-    client2.account = 123789;
-    client2.branch = 9876;
-
-    const client3 = new WalletClientCreateDTO();
-    client3.walletName = 'Samer Valente';
-    client3.blockchainId = BlockchainId.BLOCKCHAIN_ID;
-    client3.walletType = WalletType.CUSTODY;
-    client3.taxId = 55555555505;
-    client3.bankNumber = 789;
-    client3.account = 456123;
-    client3.branch = 1234;
+    client1.taxId = "12345678901";
+    client1.bankNumber = "123";
+    client1.account = "987654";
+    client1.branch = "4567";
 
     beforeAll(async () => {
         // This will create an new instance of "MongoMemoryServer" and automatically start it
@@ -63,7 +44,6 @@ describe('WalletController', () => {
         }).compile();
 
         controller = module.get<WalletController>(WalletController);
-        service = module.get<ParfinHttpService>(ParfinHttpService);
     });
 
     afterAll(async () => {
@@ -73,7 +53,7 @@ describe('WalletController', () => {
     describe('createClientWallet', () => {
         it('should create a client wallet', async () => {
             // Mock `ParfinHttpService.makeRequest` when call `createWallet`
-            jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
+            jest.spyOn(axios, 'request').mockResolvedValueOnce(
                 Promise.resolve({
                     data: {
                         walletId: 'abcdef12-1234-4321-1234abcd4321',
@@ -81,31 +61,20 @@ describe('WalletController', () => {
                     },
                     status: 200,
                     statusText: 'OK',
-                    headers: {},
+                    headers: {"Content-Type": "Test"},
                     config: {},
                 } as AxiosResponse),
             );
-            // Mock `ParfinHttpService.makeRequest` when call `AddressDiscovery::addressDiscovery`
-            jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
-                Promise.resolve({
-                    data: {
-                        data: '0x00000000000000000000000060c48562056c6cfcd2128ce60fd18c67e81ed971',
-                    },
-                    status: 200,
-                    statusText: 'OK',
-                    headers: {},
-                    config: {},
-                } as AxiosResponse),
-            );
+
             // Mock `ParfinHttpService.makeRequest` when call `KeyDictionary::addAccount`
-            jest.spyOn(service, 'makeRequest').mockResolvedValueOnce(
+            jest.spyOn(axios, 'request').mockResolvedValueOnce(
                 Promise.resolve({
                     data: {
                         id: '497f6eca-6276-4993-bfeb-53cbbbba6f08',
                     },
                     status: 200,
                     statusText: 'OK',
-                    headers: {},
+                    headers: {"Content-Type": "Test"},
                     config: {},
                 } as AxiosResponse),
             );

@@ -41,13 +41,9 @@ export class WalletService {
         private readonly transactionService: TransactionsService,
         private readonly logger: LoggerService,
     ) {
-        this.keyDictionary =
-            this.contractHelper.getContractMethods('KeyDictionary');
-        this.realTokenizado =
-            this.contractHelper.getContractMethods('RealTokenizado');
-        this.realDigitalEnableAccount = this.contractHelper.getContractMethods(
-            'RealDigitalEnableAccount',
-        );
+        this.keyDictionary = this.contractHelper.getContractMethods('KEY_DICTIONARY');
+        this.realTokenizado = this.contractHelper.getContractMethods('REAL_TOKENIZADO');
+        this.realDigitalEnableAccount = this.contractHelper.getContractMethods('REAL_DIGITAL_ENABLE_ACCOUNT');
         this.logger.setContext('WalletService');
     }
 
@@ -88,20 +84,8 @@ export class WalletService {
         }
     }
 
-    async createClientWallet(
-        dto: WalletClientCreateDTO,
-    ): Promise<WalletCreateClientSuccessRes | any> {
-        const {
-            description,
-            assetId,
-            ownerId,
-            walletName,
-            taxId,
-            bankNumber,
-            account,
-            branch,
-            walletType
-        } = dto;
+    async createClientWallet(dto: WalletClientCreateDTO): Promise<WalletCreateClientSuccessRes | any> {
+        const { description, assetId, walletName, taxId, bankNumber, account, branch, walletType } = dto;
         const parfinDTO = new ParfinContractInteractDTO();
         const { blockchainId, ...parfinSendDTO } = parfinDTO;
         parfinSendDTO.description = description;
@@ -109,76 +93,36 @@ export class WalletService {
 
         const w3 = new Web3();
 
-        try {
-            // 1. Criando a carteira na Parfin
-            const parfinCreateRes = await this.parfinService.createWallet({ walletName, blockchainId, walletType })
-            const { address: walletAddress, walletId } = parfinCreateRes as ParfinCreateWalletSuccessRes
-            if (!walletId) {
-                throw new Error(
-                    `[ERROR]: Erro ao tentar criar a carteira ${dto.walletName} na Parfin. Parfin DTO: ${dto}`
-                );
-            }
+        // 1. Criando a carteira na Parfin
+        const { address: wallet, walletId } = await this.parfinService.createWallet({ walletName, blockchainId, walletType });
 
-            // // 2. Pegar endereço do contrato `Key Dictionary`
-            const { address: contractAddress } = await this.contractHelper.getContractAddress('KeyDictionary');
-            if (!contractAddress) {
-                throw new Error(
-                    `[ERROR]: Erro ao buscar o endereço do contrato Key Dictionary`,
-                );
-            }
+        // 2. Pegar endereço do contrato `Key Dictionary`
+        const { address: contractAddress } = this.contractHelper.getContractAddress('KEY_DICTIONARY');
 
-            // 3. Codificar a chamada do contrato `Key Dictionary`
-            const clientKey = w3.utils.keccak256(dto.taxId.toString())
-            parfinSendDTO.metadata = {
-                contractAddress: contractAddress,
-                data: this.keyDictionary['addAccount(bytes32,uint256,uint256,uint256,uint256,address)'](
-                    clientKey,
-                    taxId,
-                    bankNumber,
-                    account,
-                    branch,
-                    walletAddress,
-                )[0]
-            }
+        // 3. Codificar a chamada do contrato `Key Dictionary`
+        const clientKey = w3.utils.keccak256(dto.taxId.toString());
+        parfinSendDTO.metadata = {
+            contractAddress: contractAddress,
+            data: this.keyDictionary['addAccount(bytes32,uint256,uint256,uint256,uint256,address)'](
+                clientKey,
+                taxId,
+                bankNumber,
+                account,
+                branch,
+                wallet,
+            )[0],
+        };
 
-            // 4. Interagir com o contrato usando o endpoint send/write
-            const parfinSendRes = await this.parfinService.smartContractSend(
-                parfinSendDTO,
-            );
-            const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
-            if (!transactionId) {
-                const payload = JSON.stringify(parfinSendDTO)
-                throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato Key Dictionary. Parfin Send DTO: ${payload}`
-                );
-            }
-            await this.parfinService.transactionSignAndPush(transactionId);
+        // 4. Interagir com o contrato usando o endpoint send/write
+        const parfinSendRes = await this.parfinService.smartContractSend(parfinSendDTO);
+        const { id: parfinTxId } = parfinSendRes as ParfinSuccessRes;
 
-            // 5. Criando a carteira no banco de dados
-            const payload = {
-                ...parfinCreateRes,
-                bacenEnabled: false,
-                ownerId,
-                ownerType: OwnerType.INSTITUTION
-            } as Wallet
-            const wallet = await this.walletRepository.create(payload);
-            if (!wallet.id) {
-                throw new Error(
-                    `[ERROR]: Erro ao tentar criar a carteira ${dto.walletName} no banco de dados. Payload: ${payload}`
-                );
-            }
-
-            return {
-                ...wallet,
-                clientKey: clientKey,
-            }
-
-        } catch (error) {
-            this.logger.error(error);
-            throw new Error(
-                `[ERROR]: Erro ao tentar criar uma carteira de um cliente ${dto.walletName}`,
-            );
-        }
+        return {
+            clientKey,
+            wallet,
+            parfinTxId,
+            walletId,
+        };
     }
 
     async enableWallet(dto: WalletEnableDTO): Promise<any> {
@@ -193,7 +137,7 @@ export class WalletService {
         if (asset === 'RD') {
             try {
                 // 1. ???
-                const realDigitalEnableAccount = 'RealDigitalEnableAccount';
+                const realDigitalEnableAccount = 'REAL_DIGITAL_ENABLE_ACCOUNT';
                 const { address } = await this.contractHelper.getContractAddress(realDigitalEnableAccount);
                 if (!address) {
                     throw new Error(`[ERROR]: Erro ao buscar o contrato ${realDigitalEnableAccount}`);
