@@ -4,7 +4,7 @@ import { AppError } from 'src/error/app.error';
 
 describe('WrapperContractABI', () => {
     describe('Teste de encoding e decoding do Contract Wrapper', () => {
-        let wrapperContractABI = new WrapperContractABI(abiLoader.REAL_DIGITAL);
+        let wrapperContractABI = new WrapperContractABI(abiLoader.REAL_DIGITAL, "REAL_DIGITAL");
 
         it('deve criar uma instância de WrapperContractABI corretamente', () => {
             expect(wrapperContractABI).toBeInstanceOf(WrapperContractABI);
@@ -43,12 +43,12 @@ describe('WrapperContractABI', () => {
     describe('Teste de trycatch', () => {
         let wrapperContractABI: WrapperContractABI;
         beforeAll(() => {
-            wrapperContractABI = new WrapperContractABI(abiLoader.REAL_DIGITAL);
+            wrapperContractABI = new WrapperContractABI(abiLoader.REAL_DIGITAL, "REAL_DIGITAL");
         });
 
         it('deve retornar um erro de `Invalid ABI`', () => {
             try {
-                new WrapperContractABI([]);
+                new WrapperContractABI([], "");
                 fail('Deveria ter lançado um AppError');
             } catch (e) {
                 expect(e).toBeInstanceOf(AppError);
