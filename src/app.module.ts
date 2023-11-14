@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
@@ -15,6 +15,9 @@ import { AllExceptionsFilter } from './filters/http-exception.filter';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { RequestIdMiddleware } from './middleware/request-id.middleware';
+import { WebhookController } from './webhook/webhook.controller';
+import { WebhookModule } from './webhook/webhook.module';
+import { WebhookValidationMiddleware } from './middleware/webhook-validation.middleware';
 
 @Module({
     imports: [
@@ -29,6 +32,7 @@ import { RequestIdMiddleware } from './middleware/request-id.middleware';
         WalletModule,
         ContractHelperModule,
         LoggerModule,
+        WebhookModule,
     ],
     providers: [
         {
@@ -37,7 +41,7 @@ import { RequestIdMiddleware } from './middleware/request-id.middleware';
         },
     ],
 
-    controllers: [HealthController],
+    controllers: [HealthController, WebhookController],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
