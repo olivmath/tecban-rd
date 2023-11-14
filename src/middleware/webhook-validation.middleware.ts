@@ -1,8 +1,8 @@
-import { Injectable, NestMiddleware, BadRequestException } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import * as crypto from 'crypto';
-import { AppError } from 'src/error/app.error';
 import { LoggerService } from 'src/logger/logger.service';
+import { AppError } from 'src/error/app.error';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class WebhookValidationMiddleware implements NestMiddleware {
@@ -16,7 +16,9 @@ export class WebhookValidationMiddleware implements NestMiddleware {
             throw new AppError(401, 'Invalid webhook signature');
         }
 
-        
+        this.logger.log(req.headers["x-webhook-entity"] as string)
+        this.logger.log(req.headers["x-webhook-event-id"] as string)
+
         next();
     }
     
