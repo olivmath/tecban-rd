@@ -20,7 +20,7 @@ export class TPFtService {
     private readonly logger: LoggerService,
   ) {
     this.tpft =
-      this.contractHelper.getContractMethods('ITPFt');
+      this.contractHelper.getContractMethods('ITPFT');
     this.logger.setContext('TPFtService');
   }
 
