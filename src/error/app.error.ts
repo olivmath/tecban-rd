@@ -23,7 +23,7 @@ export class AppError extends Error {
      * @param message A mensagem de erro que vai voltar pro cliente .
      * @param data Dados adicionais, como parfinError ou erro original (Apenas para log).
      */
-    constructor(statusCode: number, message: string, data?: { parfinError?: ParfinError; erro?: Error }) {
+    constructor(statusCode: number, message: string, data?: { parfinError?: ParfinError; erro?: Error, requestId?: string }) {
         super(message);
 
         this.statusCode = statusCode;
@@ -36,7 +36,7 @@ export class AppError extends Error {
         this.originalStack = data?.erro ? this.captureOriginalStack(data.erro) : '';
         this.errorLocation = this.getErrorLocation(this.stack);
 
-        this.requestId = ''; // Você pode definir um requestId posteriormente, se necessário.
+        this.requestId = data?.requestId || "no-request-id";
     }
 
     private captureOriginalStack(erro: Error) {
