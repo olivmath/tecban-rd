@@ -36,7 +36,7 @@ export class ContractHelperService {
     // Função que busca todos os métodos de um contrato
     getContractMethods(contractName: string): ContractWrapper {
         const abi = abiLoader[contractName];
-        return new ContractWrapper(abi);
+        return new ContractWrapper(abi, contractName);
     }
 
     // Função que retorna o endereço de um contrato

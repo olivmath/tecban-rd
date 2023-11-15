@@ -59,15 +59,19 @@ type ABI = Array<any>;
 export default class WrapperContractABI {
     private functionsMap: { [signature: string]: (...args: any[]) => any[] };
 
-    constructor(abi: ABI) {
+    constructor(abi: ABI, name: string) {
         const web3 = new Web3();
 
         // Validation
+        if (typeof abi === "undefined") {
+            throw new AppError(500, `ABI not found, contractName: ${name}`);
+        }
+
         if (!Array.isArray(abi)) {
-            throw new AppError(500, 'InvalidABIType: must be an array');
+            throw new AppError(500, `InvalidABIType: must be an array.`);
         }
         if (abi.length === 0) {
-            throw new AppError(500, 'InvalidABILenght: must not be empty array');
+            throw new AppError(500, `InvalidABILenght: must not be empty array.`);
         }
         const invalidItem = abi.find((item) => {
             const isValid =
@@ -83,7 +87,7 @@ export default class WrapperContractABI {
         if (invalidItem) {
             throw new AppError(
                 500,
-                `InvalidABIItemType: Item ${JSON.stringify(invalidItem)} does not match the Item structure`,
+                `InvalidABIItemType: Item ${JSON.stringify(invalidItem)} does not match the Item structure.`,
             );
         }
 
