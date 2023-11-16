@@ -104,13 +104,10 @@ export class RealDigitalService {
                 data: '',
                 contractAddress: strAddress,
             };
-            parfinSendDTO.metadata.data =
-                this.str['requestToMint(uint256)'](Number(amount))[0];
+            parfinSendDTO.metadata.data = this.str['requestToMint(uint256)'](Number(amount))[0];
 
             // 3. ???
-            const parfinSendRes = await this.parfinService.smartContractSend(
-                parfinSendDTO,
-            );
+            const parfinSendRes = await this.parfinService.smartContractSend(parfinSendDTO);
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
             if (!transactionId) {
                 const payload = JSON.stringify(parfinSendDTO)
@@ -125,13 +122,12 @@ export class RealDigitalService {
             return {
                 parfinTxId: transactionId,
             };
-
         } catch (error) {
-            const payload = JSON.stringify(parfinSendDTO)
+            const payload = JSON.stringify(parfinSendDTO);
             this.logger.error(error);
             throw new Error(
                 `[ERROR]: Erro ao tentar fazer emissão de $${amount} Real Digital. 
-                Parfin Send DTO: ${payload}`
+                Parfin Send DTO: ${payload}`,
             );
         }
     }
@@ -152,13 +148,10 @@ export class RealDigitalService {
                 data: '',
                 contractAddress: strAddress,
             };
-            parfinSendDTO.metadata.data =
-                this.str['requestToBurn(uint256)'](Number(amount))[0];
+            parfinSendDTO.metadata.data = this.str['requestToBurn(uint256)'](Number(amount))[0];
 
             // 3. ???
-            const parfinSendRes = await this.parfinService.smartContractSend(
-                parfinSendDTO,
-            );
+            const parfinSendRes = await this.parfinService.smartContractSend(parfinSendDTO);
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
             if (!transactionId) {
                 const payload = JSON.stringify(parfinSendDTO)
@@ -173,12 +166,11 @@ export class RealDigitalService {
             return {
                 parfinTxId: transactionId,
             };
-
         } catch (error) {
-            const payload = JSON.stringify(parfinSendDTO)
+            const payload = JSON.stringify(parfinSendDTO);
             this.logger.error(error);
             throw new Error(
-                `[ERROR]: Erro ao tentar fazer o resgate de $${amount} Real Digital. Parfin Send DTO: ${payload}`
+                `[ERROR]: Erro ao tentar fazer o resgate de $${amount} Real Digital. Parfin Send DTO: ${payload}`,
             );
         }
     }
@@ -205,18 +197,13 @@ export class RealDigitalService {
                 contractAddress: realDigitalDefaultAccountAddress,
                 from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
             };
-            parfinCallDTO.metadata.data =
-                this.realDigitalDefaultAccount['defaultAccount(uint256)'](
-                    cnpj,
-                )[0];
+            parfinCallDTO.metadata.data = this.realDigitalDefaultAccount['defaultAccount(uint256)'](cnpj)[0];
 
             // 3. ???
-            const parfinCallRes = await this.parfinService.smartContractCall(
-                parfinCallDTO,
-            );
+            const parfinCallRes = await this.parfinService.smartContractCall(parfinCallDTO);
             const { data } = parfinCallRes as ParfinContractCallSuccessRes;
             if (!data) {
-                const payload = JSON.stringify(parfinCallDTO)
+                const payload = JSON.stringify(parfinCallDTO);
                 throw new Error(
                     `[ERROR]: Erro ao tentar interagir com contrato ${realDigitalDefaultAccountAddress}. 
                     Parfin Call DTO: ${payload}`
@@ -224,9 +211,7 @@ export class RealDigitalService {
             }
 
             // 4. ???
-            const receiverAddress = this.realDigitalDefaultAccount[
-                'defaultAccount'
-            ](data)[0] as string;
+            const receiverAddress = this.realDigitalDefaultAccount['defaultAccount'](data)[0] as string;
 
             // 5. ???
             const parfinDTO = new ParfinContractInteractDTO();
@@ -243,18 +228,16 @@ export class RealDigitalService {
             };
 
             // 7. ???
-            parfinSendDTO.metadata.data = this.realDigital[
-                'transfer(address,uint256)'
-            ](receiverAddress, Number(amount))[0];
+            parfinSendDTO.metadata.data = this.realDigital['transfer(address,uint256)'](
+                receiverAddress,
+                Number(amount),
+            )[0];
 
             // 8. ???
-            const parfinSendRes =
-                await this.parfinService.smartContractSend(
-                    parfinSendDTO,
-                );
+            const parfinSendRes = await this.parfinService.smartContractSend(parfinSendDTO);
             const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
             if (!transactionId) {
-                const payload = JSON.stringify(parfinSendDTO)
+                const payload = JSON.stringify(parfinSendDTO);
                 throw new Error(
                     `[ERROR]: Erro ao tentar interagir com contrato ${realDigitalAddress}. Parfin Send DTO: ${payload}`
                 );
@@ -268,9 +251,7 @@ export class RealDigitalService {
             };
         } catch (error) {
             this.logger.error(error);
-            throw new Error(
-                `[ERROR]: Erro ao tentar transferir $${amount} Real Digital para o CNPJ: ${cnpj}`
-            );
+            throw new Error(`[ERROR]: Erro ao tentar transferir $${amount} Real Digital para o CNPJ: ${cnpj}`);
         }
     }
 

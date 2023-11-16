@@ -39,7 +39,7 @@ export class WalletClientCreateDTO extends WalletCreateDTO {
     description?: string;
 
     @ApiProperty({
-        description: 'ID do dono da carteira',
+        description: 'ID do dono da carteira (deve ser criado para inserção no banco)',
         example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
     })
     @IsString()
@@ -47,7 +47,7 @@ export class WalletClientCreateDTO extends WalletCreateDTO {
     ownerId: string;
 
     @ApiProperty({
-        description: 'ID que identifica o ativo na Parfin',
+        description: 'ID que identifica o ativo na Parfin da wallet responsável por adicionar o cliente no dicionário',
         example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
     })
     @IsString()
