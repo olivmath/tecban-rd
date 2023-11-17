@@ -6,6 +6,7 @@ import { AppError } from 'src/error/app.error';
 import { Injectable } from '@nestjs/common';
 import abiLoader from '../abi-loader';
 import * as dotenv from 'dotenv';
+import WrapperContractABI from './contract-helper.wrapper';
 
 @Injectable()
 export class ContractHelperService {
@@ -34,13 +35,13 @@ export class ContractHelperService {
     }
 
     // Função que busca todos os métodos de um contrato
-    getContractMethods(contractName: string): ContractWrapper {
+    getContractMethods(contractName: string): WrapperContractABI {
         const abi = abiLoader[contractName];
         return new ContractWrapper(abi, contractName);
     }
 
     // Função que retorna o endereço de um contrato
-    getContractAddress(contractName: ContractName): ContractHelperGetContractSuccessRes {
+    getContractAddress(contractName: string): ContractHelperGetContractSuccessRes {
         const contractAddress = this.contracts[contractName];
 
         if (!contractAddress) {

@@ -1,24 +1,23 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { KeyDictionaryAddAccountDTO } from 'src/dtos/key-dictionary.dto';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
 import { ContractHelperService } from 'src/helpers/contract-helper/contract-helper.service';
+import WrapperContractABI from 'src/helpers/contract-helper/contract-helper.wrapper';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinService } from 'src/parfin/parfin.service';
 import { ParfinSuccessRes } from 'src/res/app/parfin.responses';
-import { ContractNameEnum } from 'src/types/contract-helper.types';
-import ContractWrapper from 'src/utils/contract-util/contract-wrapper';
 import Web3 from 'web3';
 
 @Injectable()
 export class KeyDictionaryService {
-    keyDictionary: ContractWrapper;
+    keyDictionary: WrapperContractABI;
 
     constructor(
         private readonly contractHelper: ContractHelperService,
         private readonly logger: LoggerService,
         private readonly parfinService: ParfinService,
     ) {
-        this.keyDictionary = this.contractHelper.getContractMethods(ContractNameEnum.KeyDictionary);
+        this.keyDictionary = this.contractHelper.getContractMethods('KEY_DICTIONARY');
         this.logger.setContext('KeyDictionaryService');
     }
 
@@ -27,7 +26,7 @@ export class KeyDictionaryService {
         const { description, taxId, bankNumber, account, branch, walletAddress } = dto;
 
         try {
-            const keyDictionaryContractName = ContractNameEnum.KeyDictionary;
+            const keyDictionaryContractName = 'KEY_DICTIONARY';
             const parfinDTO = new ParfinContractInteractDTO();
             const { blockchainId, ...parfinSendDTO } = parfinDTO;
             parfinSendDTO.description = description;
