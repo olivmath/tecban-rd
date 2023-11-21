@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { EventDto } from 'src/types/webhook.types';
 
 export class CustomerSmartContractEventsDto {
     @ApiProperty({ description: 'Unique identifier of the event' })
@@ -10,8 +11,8 @@ export class CustomerSmartContractEventsDto {
     @ApiProperty({ description: 'Creation date of the event' })
     CreatedAt: string;
 
-    @ApiProperty({ description: 'Name of the event' })
-    Event: string;
+    @ApiProperty({ description: 'Name of the event', type: EventDto })
+    Event: EventDto;
 
     @ApiProperty({ description: 'Blockchain identifier' })
     BlockchainId: string;

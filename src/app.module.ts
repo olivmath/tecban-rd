@@ -1,3 +1,8 @@
+import { MongooseModuleOptions, MongooseOptionsFactory } from '@nestjs/mongoose';
+import { Injectable } from '@nestjs/common';
+import * as mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
@@ -12,17 +17,41 @@ import { ContractHelperModule } from './helpers/contract-helper/contract-helper.
 import { TPFtModule } from './tpft/tpft.module';
 import { LoggerModule } from './logger/logger.module';
 import { AllExceptionsFilter } from './filters/http-exception.filter';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { RequestIdMiddleware } from './middleware/request-id.middleware';
 import { WebhookController } from './webhook/webhook.controller';
 import { WebhookModule } from './webhook/webhook.module';
-import { WebhookValidationMiddleware } from './middleware/webhook-validation.middleware';
+
+@Injectable()
+export class MongoDBMemoryServerFactory implements MongooseOptionsFactory {
+    private mongo: MongoMemoryServer;
+
+    constructor() {}
+
+    async createMongooseOptions(): Promise<MongooseModuleOptions> {
+        this.mongo = await MongoMemoryServer.create();
+        const mongoUri = this.mongo.getUri();
+        const mongooseOptions: MongooseModuleOptions = {
+            uri: mongoUri,
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        };
+        return mongooseOptions;
+    }
+
+    async closeMongoDBMemoryServer() {
+        await this.mongo.stop();
+        await mongoose.connection.close();
+    }
+}
 
 @Module({
     imports: [
         ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
-        MongooseModule.forRoot(process.env.DATABASE_URL),
+        MongooseModule.forRootAsync({
+            useClass: MongoDBMemoryServerFactory,
+        }),
         TerminusModule,
         ParfinModule,
         RealDigitalModule,

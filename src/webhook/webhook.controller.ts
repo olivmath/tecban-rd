@@ -1,15 +1,19 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { CustomerSmartContractEventsDto } from './dto/customer-smart-contract-events.dto';
+import { CustomerSmartContractEventsDto } from '../dtos/webhook.dto';
+import { WebhookService } from './webhook.service';
 
 @ApiTags('webhook')
 @Controller('webhook')
 export class WebhookController {
-  @Post()
-  @ApiOperation({ summary: 'Handle incoming webhook' })
-  @ApiResponse({ status: 200, description: 'Webhook processed successfully.' })
-  @ApiResponse({ status: 400, description: 'Invalid webhook signature.' })
-  handleWebhook(@Body() payload: CustomerSmartContractEventsDto): string {
-    return 'Webhook received';
-  }
+    constructor(private readonly webhook: WebhookService) {}
+
+    @Post()
+    @HttpCode(200)
+    @ApiOperation({ summary: 'Handle incoming webhook' })
+    @ApiResponse({ status: 200, description: 'Webhook processed successfully.' })
+    @ApiResponse({ status: 401, description: 'Invalid webhook signature.' })
+    handleWebhook(@Body() payload: CustomerSmartContractEventsDto): any {
+        return this.webhook.decodeEvent(payload)
+    }
 }

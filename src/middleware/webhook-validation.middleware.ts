@@ -12,18 +12,15 @@ export class WebhookValidationMiddleware implements NestMiddleware {
         const secret = process.env.PARFIN_PRIVATE_KEY;
         const payload = JSON.stringify(req.body);
 
-        if (!this.isValidSignature(signature, payload, secret)) {
-            throw new AppError(401, 'Invalid webhook signature');
-        }
-
-        this.logger.log(req.headers["x-webhook-entity"] as string)
-        this.logger.log(req.headers["x-webhook-event-id"] as string)
+        this.isValidSignature(signature, payload, secret);
 
         next();
     }
-    
-    private isValidSignature(signature: string, payload: string, secret: string): boolean {
+
+    private isValidSignature(signature: string, payload: string, secret: string) {
         const hash = crypto.createHmac('sha256', secret).update(payload).digest('hex');
-        return hash === signature;
+        if (hash !== signature) {
+            throw new AppError(401, 'Invalid webhook signature');
+        }
     }
 }
