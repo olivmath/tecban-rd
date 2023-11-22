@@ -96,8 +96,8 @@ export class KeyDictionaryService {
             };
 
             // 3. Interagir com o contrato através do método smartContractCall
-            const parfinSendRes = await this.parfinService.smartContractCall(parfinCallDTO);
-            const { data } = parfinSendRes;
+            const { data } = await this.parfinService.smartContractCall(parfinCallDTO);
+
             if (!data) {
                 const payload = JSON.stringify(parfinCallDTO);
                 throw new Error(
