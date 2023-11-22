@@ -5,6 +5,7 @@ import { ContractHelperService } from 'src/helpers/contract-helper/contract-help
 import WrapperContractABI from 'src/helpers/contract-helper/contract-helper.wrapper';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinService } from 'src/parfin/parfin.service';
+import { DecodedDataResponse, DecodedKeyDictionaryGetCustomerResponse } from 'src/res/app/contract-helper.responses';
 import Web3 from 'web3';
 
 @Injectable()
@@ -105,13 +106,22 @@ export class KeyDictionaryService {
                 );
             }
 
-            const { data: decodedData } = this.contractHelper.decodeData({
+            const dataToDecode = {
                 contractName: keyDictionaryContractName,
                 functionName: 'getCustomerData',
                 data,
-            });
+            };
 
-            return decodedData[0];
+            const decodeDataRes = this.contractHelper.decodeData(dataToDecode);
+            const { data: decodedData } = decodeDataRes as DecodedDataResponse;
+            const getCustomerDataRes: DecodedKeyDictionaryGetCustomerResponse = Object(decodedData[0]);
+            if (!getCustomerDataRes.taxId) {
+                throw new Error(
+                    `[ERROR]: Erro ao decodificar os dados do contrato: ${dataToDecode}`
+                );
+            }
+
+            return getCustomerDataRes;
         } catch (error) {
             this.logger.error(error);
             throw new Error(`[ERROR]: Erro ao buscar os dados do cliente com CPF: ${taxId}`);
