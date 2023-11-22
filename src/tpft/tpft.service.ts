@@ -3,13 +3,15 @@ import WrapperContractABI from 'src/helpers/contract-helper/contract-helper.wrap
 import { ParfinService } from 'src/parfin/parfin.service';
 import { Injectable } from '@nestjs/common';
 import {
-  ParfinContractCallSuccessRes,
+  ParfinContractCallSuccessRes, ParfinSuccessRes,
 } from 'src/res/app/parfin.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
 import { TPFtGetBalanceOfSuccessRes } from 'src/res/app/tpft.responses';
-import { TPFtGetBalanceOfDTO } from 'src/dtos/tpft.dto';
+import { TPFtGetBalanceOfDTO, TPFtSetApprovalForAllDTO } from 'src/dtos/tpft.dto';
 import { TpftName } from 'src/types/tpft.types';
+import { EncodeDataDTO } from 'src/dtos/contract-helper.dto';
+import { EncodedDataResponse } from 'src/res/app/contract-helper.responses';
 
 @Injectable()
 export class TPFtService {
@@ -22,6 +24,66 @@ export class TPFtService {
     this.tpft =
       this.contractHelper.getContractMethods('ITPFT');
     this.logger.setContext('TPFtService');
+  }
+
+  async setApprovalForAll(dto: TPFtSetApprovalForAllDTO): Promise<any> {
+    const { description, walletAddress, assetId, operator, approved } = dto as TPFtSetApprovalForAllDTO;
+    const parfinDTO = new ParfinContractInteractDTO();
+    const { blockchainId, ...parfinSendDTO } = parfinDTO;
+    parfinSendDTO.description = description;
+    parfinSendDTO.source = { assetId };
+
+    try {
+      // 1. Buscando o endereço do contrato ITPFt
+      const tpftAddress = process.env.TPFT_ADDRESS;
+
+      // 2. Criando o metadata para interagir com o método setApprovalForAll()
+      parfinSendDTO.metadata = {
+        data: '',
+        contractAddress: tpftAddress,
+        from: walletAddress,
+      };
+      const dataToEncode: EncodeDataDTO = {
+        contractName: 'ITPFT',
+        functionName: 'setApprovalForAll(address,bool)',
+        args: [
+          operator,
+          approved,
+        ],
+      };
+      const encodedDataRes = this.contractHelper.encodeData(dataToEncode);
+      const { data: encodedData } = encodedDataRes as EncodedDataResponse;
+      if (typeof encodedData[0] !== 'string') {
+        throw new Error(
+          `[ERROR]: Erro ao codificar os dados do contrato: ${dataToEncode}`
+        );
+      }
+      parfinSendDTO.metadata.data = encodedData[0];
+
+      // 3. Interagindo com o contrato ITPFt através do método setApprovalForAll()
+      const parfinSendRes = await this.parfinService.smartContractSend(parfinSendDTO);
+      const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+      if (!transactionId) {
+        const payload = JSON.stringify(parfinSendDTO)
+        throw new Error(
+          `[ERROR]: Erro ao tentar interagir com contrato ${tpftAddress}. Parfin Send DTO: ${payload}`
+        );
+      }
+
+      // 5. Assinando a transação na Parfin
+      await this.parfinService.transactionSignAndPush(transactionId);
+
+      return {
+        parfinTxId: transactionId,
+      };
+    } catch (error) {
+      const payload = JSON.stringify(parfinSendDTO);
+      this.logger.error(error);
+      throw new Error(
+        `[ERROR]: Erro ao tentar aprovar que o contrato ${operator} manipule TPFt. 
+                Parfin Send DTO: ${payload}`,
+      );
+    }
   }
 
   async balanceOf(dto: TPFtGetBalanceOfDTO): Promise<TPFtGetBalanceOfSuccessRes> {
