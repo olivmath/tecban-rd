@@ -2,34 +2,10 @@ import { ContractName } from 'src/types/contract-helper.types';
 import { IsArray, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class DecodeDataDTO {
-    @ApiProperty({
-        description: 'Nome do contrato onde será feito o encode',
-        example: 'AddressDiscovery',
-    })
-    @IsString()
-    contractName: string;
-
-    @ApiProperty({
-        description: 'Nome da função que retornou dados do `contractName`',
-        example: 'addressDiscovery',
-    })
-    @IsString()
-    functionName: string;
-
-    @ApiProperty({
-        description: 'Hexadecimal do retorno da `functionName`',
-        example:
-            '0x000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e',
-    })
-    @IsString()
-    data: string;
-}
-
 export class EncodeDataDTO {
     @ApiProperty({
         description: 'Nome do contrato onde será feito o decode',
-        example: 'ITPFtOperation1052',
+        example: 'ITPFT_1052',
     })
     @IsString()
     contractName: string;
@@ -63,4 +39,28 @@ export class EncodeDataDTO {
     })
     @IsArray()
     args: any[];
+}
+
+export class DecodeDataDTO {
+    @ApiProperty({
+        description: 'Nome do contrato onde será feito o encode',
+        example: 'AddressDiscovery',
+    })
+    @IsString()
+    contractName: string;
+
+    @ApiProperty({
+        description: 'Nome da função que retornou dados do `contractName`',
+        example: 'addressDiscovery',
+    })
+    @IsString()
+    functionName: string;
+
+    @ApiProperty({
+        description: 'Hexadecimal do retorno da `functionName`',
+        example:
+            '0x000000000000000000000000742d35Cc6634C0532925a3b844Bc454e4438f44e',
+    })
+    @IsString()
+    data: string;
 }
