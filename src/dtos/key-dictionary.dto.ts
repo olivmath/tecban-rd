@@ -46,3 +46,10 @@ export class KeyDictionaryGetCustomerDataDTO {
     @MaxLength(11, { message: 'Invalid CPF length' })
     taxId: string;
 }
+
+export class KeyDictionaryGetClientKeyDTO {
+    @ApiProperty({ description: 'Endereço da carteira do cliente', example: '0xdfc3ba0ba8dd4bd556d9caa29284212cdad2f3f1' })
+    @IsString()
+    @IsNotEmpty()
+    walletAddress: string;
+}

@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { KeyDictionaryAddAccountDTO } from 'src/dtos/key-dictionary.dto';
+import { DecodeDataDTO } from 'src/dtos/contract-helper.dto';
+import { KeyDictionaryAddAccountDTO, KeyDictionaryGetClientKeyDTO } from 'src/dtos/key-dictionary.dto';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
 import { ContractHelperService } from 'src/helpers/contract-helper/contract-helper.service';
 import WrapperContractABI from 'src/helpers/contract-helper/contract-helper.wrapper';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinService } from 'src/parfin/parfin.service';
-import { DecodedDataResponse, DecodedKeyDictionaryGetCustomerResponse } from 'src/res/app/contract-helper.responses';
+import { DecodedDataResponse, DecodedKeyDictionaryGetCustomerResponse, DecodedKeyDictionaryGetKeyResponse } from 'src/res/app/contract-helper.responses';
 import Web3 from 'web3';
 
 @Injectable()
@@ -125,6 +126,61 @@ export class KeyDictionaryService {
         } catch (error) {
             this.logger.error(error);
             throw new Error(`[ERROR]: Erro ao buscar os dados do cliente com CPF: ${taxId}`);
+        }
+    }
+
+    async getClientKey(dto: KeyDictionaryGetClientKeyDTO) {
+        const { walletAddress } = dto;
+        try {
+            const keyDictionaryContractName = 'KEY_DICTIONARY';
+            const parfinDTO = new ParfinContractInteractDTO();
+            const { blockchainId } = parfinDTO;
+            const { address } = this.contractHelper.getContractAddress(keyDictionaryContractName);
+            if (!address) {
+                throw new Error(`[ERROR]: Erro ao buscar o contrato ${keyDictionaryContractName}`);
+            }
+
+            const getKeyData = this.keyDictionary['getKey(address)'](walletAddress)[0];
+
+            const metadata = {
+                contractAddress: address,
+                data: getKeyData,
+                from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
+            };
+
+            const parfinCallDTO = {
+                metadata,
+                blockchainId,
+            };
+
+            const { data } = await this.parfinService.smartContractCall(parfinCallDTO);
+
+            if (!data) {
+                const payload = JSON.stringify(parfinCallDTO);
+                throw new Error(
+                    `[ERROR]: Erro ao tentar interagir com contrato ${keyDictionaryContractName}. Parfin Send DTO: ${payload}`,
+                );
+            }
+
+            const dataToDecode: DecodeDataDTO = {
+                contractName: keyDictionaryContractName,
+                functionName: 'getKey',
+                data
+            };
+
+            const decodeDataRes = this.contractHelper.decodeData(dataToDecode);
+            const { data: decodedData } = decodeDataRes as DecodedDataResponse;
+            const getCustomerDataRes = decodedData[0];
+            if (typeof getCustomerDataRes !== 'string') {
+                throw new Error(
+                    `[ERROR]: Erro ao decodificar os dados do contrato: ${dataToDecode}`
+                );
+            }
+
+            return getCustomerDataRes;
+        } catch (error) {
+            this.logger.error(error);
+            throw new Error(`[ERROR]: Erro ao buscar chave do cliente com a wallet: ${walletAddress}`);
         }
     }
 }

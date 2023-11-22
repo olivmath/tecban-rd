@@ -40,3 +40,8 @@ export class DecodedKeyDictionaryGetCustomerResponse {
     @ApiProperty({ description: 'Endereço da carteira da insituição responsável pelo cliente' })
     owner: string;
 }
+
+export class DecodedKeyDictionaryGetKeyResponse {
+    @ApiProperty({ description: 'Chave do cliente (hash do CPF)' })
+    clientKey: string;
+}
