@@ -1,4 +1,8 @@
-import { ContractHelperGetContractSuccessRes, DecodedDataResponse, EncodedDataResponse } from 'src/res/app/contract-helper.responses';
+import {
+    ContractHelperGetContractSuccessRes,
+    DecodedDataResponse,
+    EncodedDataResponse,
+} from 'src/res/app/contract-helper.responses';
 import { ContractName } from 'src/types/contract-helper.types';
 import { LoggerService } from 'src/logger/logger.service';
 import ContractWrapper from './contract-helper.wrapper';
@@ -51,7 +55,7 @@ export class ContractHelperService {
         return { address: contractAddress };
     }
 
-    encodeData(dto: EncodeDataDTO): EncodedDataResponse | BadRequestException {
+    encodeData(dto: EncodeDataDTO): EncodedDataResponse {
         const { contractName, functionName, args } = dto;
         const contract = this.getContractMethods(contractName);
         const encodedData = contract[functionName](...args);
@@ -59,7 +63,7 @@ export class ContractHelperService {
         return { data: encodedData };
     }
 
-    decodeData(dto: DecodeDataDTO): DecodedDataResponse | BadRequestException {
+    decodeData(dto: DecodeDataDTO): DecodedDataResponse {
         const { contractName, functionName, data } = dto;
         const contract = this.getContractMethods(contractName);
         const decodedData = contract[functionName](data);

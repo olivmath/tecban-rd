@@ -105,7 +105,13 @@ export class KeyDictionaryService {
                 );
             }
 
-            return { data };
+            const { data: decodedData } = this.contractHelper.decodeData({
+                contractName: keyDictionaryContractName,
+                functionName: 'getCustomerData',
+                data,
+            });
+
+            return decodedData[0];
         } catch (error) {
             this.logger.error(error);
             throw new Error(`[ERROR]: Erro ao buscar os dados do cliente com CPF: ${taxId}`);
