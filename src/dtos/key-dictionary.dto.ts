@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Length, MaxLength, MinLength } from 'class-validator';
 
 export class KeyDictionaryAddAccountDTO {
     @ApiProperty({
@@ -36,4 +36,13 @@ export class KeyDictionaryAddAccountDTO {
     @IsString()
     @IsNotEmpty()
     walletAddress: string;
+}
+
+export class KeyDictionaryGetCustomerDataDTO {
+    @ApiProperty({ description: 'CPF do cliente', example: '12345678901' })
+    @IsString()
+    @IsNotEmpty()
+    @MinLength(11, { message: 'Invalid CPF length' })
+    @MaxLength(11, { message: 'Invalid CPF length' })
+    taxId: string;
 }
