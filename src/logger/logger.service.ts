@@ -13,7 +13,7 @@ export class LoggerService extends ConsoleLogger {
         } else {
             const message = error.originalStack ? `From: ${error.originalStack} To: ` : '';
             super.error(
-                `[Request-ID]: ${error.requestId} - ${message}${error.errorLocation}: ${error.message}`,
+                `[Request-ID]: ${error.requestId} - ${message}\n${error.errorLocation}: ${error.message}`,
                 this.context,
             );
             if (process.env.LOG === 'DEBUG' && error.parfinError) {
