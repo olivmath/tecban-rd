@@ -1,0 +1,21 @@
+genesis-file = "dev.json"
+miner-enabled = true
+miner-coinbase = "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"
+rpc-http-cors-origins = ["*"]
+host-allowlist = ["*"]
+
+rpc-http-enabled = true
+rpc-http-host="127.0.0.1"
+rpc-http-port=8545
+
+rpc-ws-host="127.0.0.1"
+rpc-ws-port=8546
+rpc-ws-api=["ETH","NET","WEB3"]
+
+
+
+rpc-ws-enabled = true
+data-path = "./blockchain/"
+target-gas-limit = 9007199254740991
+min-gas-price = 0
+# logging = "WARN"
