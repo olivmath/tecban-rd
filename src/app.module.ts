@@ -22,6 +22,7 @@ import { LoggerMiddleware } from './logger/logger.middleware';
 import { RequestIdMiddleware } from './middleware/request-id.middleware';
 import { WebhookController } from './webhook/webhook.controller';
 import { WebhookModule } from './webhook/webhook.module';
+import { WebhookValidationMiddleware } from './middleware/webhook-validation.middleware';
 
 @Injectable()
 export class MongoDBMemoryServerFactory implements MongooseOptionsFactory {
@@ -74,6 +75,8 @@ export class MongoDBMemoryServerFactory implements MongooseOptionsFactory {
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(RequestIdMiddleware, LoggerMiddleware).forRoutes('*');
+        consumer.apply(RequestIdMiddleware).forRoutes('*');
+        consumer.apply(LoggerMiddleware).forRoutes('*');
+        consumer.apply(WebhookValidationMiddleware).forRoutes('api/v1/webhook');
     }
 }

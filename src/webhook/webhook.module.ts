@@ -9,8 +9,4 @@ import { WebhookService } from './webhook.service';
     providers: [LoggerService, WebhookService],
     exports: [WebhookService],
 })
-export class WebhookModule {
-    configure(consumer: MiddlewareConsumer) {
-        consumer.apply(WebhookValidationMiddleware).forRoutes('*');
-    }
-}
+export class WebhookModule {}
