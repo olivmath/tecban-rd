@@ -1,7 +1,12 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { TPFtService } from './tpft.service';
-import { TPFtGetBalanceOfDTO, TPFtGetBalanceOfQuery, TPFtSetApprovalForAllDTO } from 'src/dtos/tpft.dto';
+import {
+  TPFtAuctionPlacementDTO,
+  TPFtGetBalanceOfDTO,
+  TPFtGetBalanceOfQuery,
+  TPFtSetApprovalForAllDTO
+} from 'src/dtos/tpft.dto';
 import { getTpftBalance201 } from 'src/res/swagger/tpft.swagger';
 
 @Controller('tpft')
@@ -22,5 +27,12 @@ export class TPFtController {
   balanceOf(@Param('address') address: string, @Query() tpftID: TPFtGetBalanceOfQuery) {
     const dto = { address, ...tpftID } as TPFtGetBalanceOfDTO;
     return this.tpftService.balanceOf(dto);
+  }
+
+  // --- Operation 1002: TPFt Public Liquidity
+  @Post('auction-placement')
+  @ApiOperation({ summary: 'Execute TPFt Public Liquidity', description: 'Receive TPFt from the STN to the default wallet' })
+  auctionPlacement(@Body() dto: TPFtAuctionPlacementDTO) {
+    return this.tpftService.auctionPlacement(dto);
   }
 }

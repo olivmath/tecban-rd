@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import {
     RealDigitalApproveDTO,
     RealDigitalDTO,
+    RealDigitalIncreaseAllowanceDTO,
     RealDigitalTransferDTO,
 } from '../dtos/real-digital.dto';
 import {
@@ -14,6 +15,8 @@ import {
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
 import WrapperContractABI from 'src/helpers/contract-helper/contract-helper.wrapper';
+import { EncodeDataDTO } from 'src/dtos/contract-helper.dto';
+import { DecodedDataResponse, EncodedDataResponse } from 'src/res/app/contract-helper.responses';
 
 @Injectable()
 export class RealDigitalService {
@@ -287,5 +290,134 @@ export class RealDigitalService {
             realDigitalBalanceOf,
             realDigitalFrozenBalanceOf
         };
+    }
+
+    async allowance(owner: string, spender: string): Promise<any> {
+        const parfinDTO = new ParfinContractInteractDTO();
+        const parfinCallDTO = {
+            metadata: parfinDTO.metadata,
+            blockchainId: parfinDTO.blockchainId,
+        };
+
+        // 1. ???
+        const realDigitalAddress = process.env.REAL_DIGITAL_ADDRESS;
+
+        // 2. ???
+        parfinCallDTO.metadata = {
+            data: '',
+            contractAddress: realDigitalAddress,
+            from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
+        };
+        const dataToEncode: EncodeDataDTO = {
+            contractName: 'REAL_DIGITAL',
+            functionName: 'allowance(address,address)',
+            args: [
+                owner,
+                spender,
+            ]
+        }
+
+        try {
+            const encodeDataRes = this.contractHelper.encodeData(dataToEncode);
+            const { data: encodedData } = encodeDataRes as EncodedDataResponse;
+            if (typeof encodedData[0] !== 'string') {
+                throw new Error(
+                    `[ERROR]: Erro ao codificar os dados do contrato: ${dataToEncode}`
+                );
+            }
+            parfinCallDTO.metadata.data = encodedData[0];
+
+            // 3. ???
+            const parfinCallRes = await this.parfinService.smartContractCall(parfinCallDTO);
+            const { data } = parfinCallRes as ParfinContractCallSuccessRes;
+            if (!data) {
+                const payload = JSON.stringify(parfinCallDTO);
+                throw new Error(
+                    `[ERROR]: Erro ao tentar interagir com contrato ${realDigitalAddress}. 
+                    Parfin Call DTO: ${payload}`
+                );
+            }
+
+            // 4. ???
+            const dataToDecode = {
+                contractName: 'REAL_DIGITAL',
+                functionName: 'allowance',
+                data,
+            };
+
+            const decodeDataRes = this.contractHelper.decodeData(dataToDecode);
+            const { data: decodedData } = decodeDataRes as DecodedDataResponse;
+
+            return {
+                allowance: decodedData[0],
+            };
+        } catch (error) {
+            const payload = JSON.stringify(parfinCallDTO);
+            this.logger.error(error);
+            throw new Error(
+                `[ERROR]: Erro ao tentar consultar o valor de Real Digital que o contrato ${spender} pode gastar. 
+                    Parfin Send DTO: ${payload}`,
+            );
+        }
+    }
+
+    async increaseAllowance(dto: RealDigitalIncreaseAllowanceDTO): Promise<any> {
+        const { description, walletAddress, assetId, spender, addedValue } = dto;
+        const parfinDTO = new ParfinContractInteractDTO();
+        const { blockchainId, ...parfinSendDTO } = parfinDTO;
+        parfinSendDTO.description = description;
+        parfinSendDTO.source = { assetId };
+
+        try {
+            // 1. Buscando o endereço do contrato RealDigital
+            const realDigitalAddress = process.env.REAL_DIGITAL_ADDRESS;
+
+            // 2. Criando o metadata para interagir com o método increaseAllowance()
+            parfinSendDTO.metadata = {
+                data: '',
+                contractAddress: realDigitalAddress,
+                from: walletAddress,
+            };
+            const dataToEncode: EncodeDataDTO = {
+                contractName: 'REAL_DIGITAL',
+                functionName: 'increaseAllowance(address,uint256)',
+                args: [
+                    spender,
+                    addedValue,
+                ],
+            };
+            const encodedDataRes = this.contractHelper.encodeData(dataToEncode);
+            const { data: encodedData } = encodedDataRes as EncodedDataResponse;
+            if (typeof encodedData[0] !== 'string') {
+                throw new Error(
+                    `[ERROR]: Erro ao codificar os dados do contrato: ${dataToEncode}`
+                );
+            }
+            parfinSendDTO.metadata.data = encodedData[0];
+
+            // 3. Interagindo com o contrato ITPFt através do método setApprovalForAll()
+            const parfinSendRes = await this.parfinService.smartContractSend(parfinSendDTO);
+            const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+            if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
+                throw new Error(
+                    `[ERROR]: Erro ao tentar interagir com contrato ${realDigitalAddress}. Parfin Send DTO: ${payload}`
+                );
+            }
+
+            // 5. Assinando a transação na Parfin
+            await this.parfinService.transactionSignAndPush(transactionId);
+
+            return {
+                parfinTxId: transactionId,
+            };
+        } catch (error) {
+            const payload = JSON.stringify(parfinSendDTO);
+            this.logger.error(error);
+            throw new Error(
+                `[ERROR]: Erro ao tentar aumentar o valor de Real Digital que o contrato ${spender} pode gastar. 
+                    Parfin Send DTO: ${payload}`,
+            );
+        }
     }
 }
