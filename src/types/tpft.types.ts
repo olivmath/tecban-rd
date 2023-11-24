@@ -20,6 +20,6 @@ export enum TpftMaturityDate {
 }
 
 export enum TpftUnitPrice {
-  LTN = 98640997165,
+  LTN = 98640997100,
   LFT = 0, // Atualizar com valor unitário correto do LFT
 }
