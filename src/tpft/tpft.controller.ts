@@ -44,7 +44,7 @@ export class TPFtController {
   @Post('trade/institution/buy-from-another-institution')
   @tradeTpft201
   @ApiOperation({ summary: 'Buy TPFt from and institution', description: 'Buy TPFt from another institution' })
-  async institutionBuyTpftFromAnInstitution(dto: TPFtInstitutionBuyFromAnInstitutionDTO) {
+  async institutionBuyTpftFromAnInstitution(@Body() dto: TPFtInstitutionBuyFromAnInstitutionDTO) {
     return this.tpftService.buyTpftFromAnInstitution(dto);
   }
 
@@ -52,7 +52,7 @@ export class TPFtController {
   @Post('trade/institution/sell-to-another-institution')
   @tradeTpft201
   @ApiOperation({ summary: 'Sell TPFt to and institution', description: 'Sell TPFt to another institution' })
-  async institutionSellTpftToAnInstitution(dto: TPFtInstitutionSellToAnInstitutionDTO) {
+  async institutionSellTpftToAnInstitution(@Body() dto: TPFtInstitutionSellToAnInstitutionDTO) {
     return this.tpftService.sellTpftFromAnInstitution(dto);
   }
 }
