@@ -5,9 +5,11 @@ import {
   TPFtAuctionPlacementDTO,
   TPFtGetBalanceOfDTO,
   TPFtGetBalanceOfQuery,
+  TPFtInstitutionBuyFromAnInstitutionDTO,
+  TPFtInstitutionSellToAnInstitutionDTO,
   TPFtSetApprovalForAllDTO
 } from 'src/dtos/tpft.dto';
-import { getTpftBalance201 } from 'src/res/swagger/tpft.swagger';
+import { getTpftBalance201, tradeTpft201 } from 'src/res/swagger/tpft.swagger';
 
 @Controller('tpft')
 @ApiTags('TPFt Operations')
@@ -34,5 +36,23 @@ export class TPFtController {
   @ApiOperation({ summary: 'Execute TPFt Public Liquidity', description: 'Receive TPFt from the STN to the default wallet' })
   auctionPlacement(@Body() dto: TPFtAuctionPlacementDTO) {
     return this.tpftService.auctionPlacement(dto);
+  }
+
+  // --- Operation 1052: Institution Buy and Sell TPFt
+
+  // - Buy and Sell Between Institutions Using CNPJ
+  @Post('trade/institution/buy-from-another-institution')
+  @tradeTpft201
+  @ApiOperation({ summary: 'Buy TPFt from and institution', description: 'Buy TPFt from another institution' })
+  async institutionBuyTpftFromAnInstitution(dto: TPFtInstitutionBuyFromAnInstitutionDTO) {
+    return this.tpftService.buyTpftFromAnInstitution(dto);
+  }
+
+  // - Buy and Sell Between Institutions Using CNPJ
+  @Post('trade/institution/sell-to-another-institution')
+  @tradeTpft201
+  @ApiOperation({ summary: 'Sell TPFt to and institution', description: 'Sell TPFt to another institution' })
+  async institutionSellTpftToAnInstitution(dto: TPFtInstitutionSellToAnInstitutionDTO) {
+    return this.tpftService.sellTpftFromAnInstitution(dto);
   }
 }
