@@ -7,7 +7,7 @@ import {
 } from 'src/res/app/parfin.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
-import { TPFtGetBalanceOfSuccessRes, TPFtTradeRes } from 'src/res/app/tpft.responses';
+import { TPFtGetBalanceOfSuccessRes, TPFtBuyRes, TPFtSellRes } from 'src/res/app/tpft.responses';
 import {
   TPFtSetApprovalForAllDTO,
   TPFtGetBalanceOfDTO,
@@ -22,6 +22,7 @@ import { EncodedDataResponse } from 'src/res/app/contract-helper.responses';
 import { RealDigitalService } from 'src/real-digital/real-digital.service';
 import { RealDigitalApproveDTO } from 'src/dtos/real-digital.dto';
 import { ContractApproveRes } from 'src/res/app/contract.responses';
+import { getTradeTotal } from 'src/utils/getTradeTotal.util';
 
 @Injectable()
 export class TPFtService {
@@ -168,11 +169,11 @@ export class TPFtService {
   }
 
   // --- Operation 1002: TPFt Public Liquidity
-  async auctionPlacement(dto: TPFtAuctionPlacementDTO): Promise<TPFtTradeRes | any> {
+  async auctionPlacement(dto: TPFtAuctionPlacementDTO): Promise<any> {
     const {
       description,
       operationId,
-      tpftID,
+      tpftSymbol,
       tpftAmount,
     } = dto as TPFtAuctionPlacementDTO;
 
@@ -192,14 +193,14 @@ export class TPFtService {
     let code: TpftCode;
     let maturityDate: TpftMaturityDate;
     let unitPrice: TpftUnitPrice;
-    switch (tpftID) {
-      case '1':
+    switch (tpftSymbol) {
+      case 'LTN':
         acronym = TpftAcronym.LTN;
         code = TpftCode.LTN;
         maturityDate = TpftMaturityDate.LTN;
         unitPrice = TpftUnitPrice.LTN;
         break;
-      case '2':
+      case 'LFT':
         acronym = TpftAcronym.LFT;
         code = TpftCode.LFT;
         maturityDate = TpftMaturityDate.LFT;
@@ -279,13 +280,13 @@ export class TPFtService {
   // --- Operation 1052: Buy and Sell TPFt
 
   // - Buy and Sell Between Institutions Using CNPJ
-  async buyTpftFromAnInstitution(dto: TPFtInstitutionBuyFromAnInstitutionDTO): Promise<TPFtTradeRes | any> {
+  async buyTpftFromAnInstitution(dto: TPFtInstitutionBuyFromAnInstitutionDTO): Promise<TPFtBuyRes | any> {
     // 1. Receber o DTO da operação e buscar os endereços dos contratos
     const {
       description,
       operationId,
       cnpj8Sender,
-      tpftID,
+      tpftSymbol,
       tpftAmount,
     } = dto;
 
@@ -321,15 +322,15 @@ export class TPFtService {
     let maturityDate: TpftMaturityDate;
     let unitPrice: TpftUnitPrice;
     let floatUnitPrice: number;
-    switch (tpftID) {
-      case '1':
+    switch (tpftSymbol) {
+      case 'LTN':
         acronym = TpftAcronym.LTN;
         code = TpftCode.LTN;
         maturityDate = TpftMaturityDate.LTN;
         unitPrice = TpftUnitPrice.LTN;
         floatUnitPrice = 986.40997165;
         break;
-      case '2':
+      case 'LFT':
         acronym = TpftAcronym.LFT;
         code = TpftCode.LFT;
         maturityDate = TpftMaturityDate.LFT;
@@ -339,15 +340,14 @@ export class TPFtService {
     }
 
     // 3. Aprovar o valor da transação no RealDigital da carteira do receiver
-    const txTotal = (Number(tpftAmount.slice(0, -2)) * floatUnitPrice).toFixed(2);
-    const amount = txTotal.toString().replace('.', '');
+    const { total, formattedTotal } = getTradeTotal(tpftAmount, floatUnitPrice)
     const approveDTO: RealDigitalApproveDTO = {
       description:
-        `Aprovando o débito de $${txTotal} na carteira ${receiverWallet} para a compra de ${tpftAmount} ${acronym}`,
+        `Aprovando o débito de $${total} na carteira ${receiverWallet} para a compra de ${tpftAmount} ${acronym}`,
       walletAddress: receiverWallet,
       assetId: receiverAssetId,
       spender: tpftDvpAddress,
-      amount,
+      amount: formattedTotal,
     }
     const approveRes = await this.realDigitalService.approve(approveDTO);
     const { parfinTxId: approveTxId } = approveRes as ContractApproveRes;
@@ -409,10 +409,11 @@ export class TPFtService {
     return {
       approvalTxId: approveTxId,
       purchaseTxId: tradeTxId,
+      txData: dataToEncode,
     };
   }
 
-  async sellTpftFromAnInstitution(dto: TPFtInstitutionSellToAnInstitutionDTO): Promise<TPFtTradeRes | any> {
+  async sellTpftFromAnInstitution(dto: TPFtInstitutionSellToAnInstitutionDTO): Promise<TPFtSellRes | any> {
     // 1. Receber o DTO da operação e buscar os endereços dos contratos
     const {
       description,
