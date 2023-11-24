@@ -7,12 +7,20 @@ import {
 } from 'src/res/app/parfin.responses';
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
-import { TPFtGetBalanceOfSuccessRes } from 'src/res/app/tpft.responses';
-import { TPFtSetApprovalForAllDTO, TPFtGetBalanceOfDTO, TPFtAuctionPlacementDTO } from 'src/dtos/tpft.dto';
+import { TPFtGetBalanceOfSuccessRes, TPFtTradeRes } from 'src/res/app/tpft.responses';
+import {
+  TPFtSetApprovalForAllDTO,
+  TPFtGetBalanceOfDTO,
+  TPFtAuctionPlacementDTO,
+  TPFtInstitutionSellToAnInstitutionDTO,
+  TPFtInstitutionBuyFromAnInstitutionDTO
+} from 'src/dtos/tpft.dto';
 import { TpftAcronym, TpftCode, TpftID, TpftMaturityDate, TpftUnitPrice } from 'src/types/tpft.types';
 import Web3 from 'web3';
 import { EncodeDataDTO } from 'src/dtos/contract-helper.dto';
 import { EncodedDataResponse } from 'src/res/app/contract-helper.responses';
+import { RealDigitalService } from 'src/real-digital/real-digital.service';
+import { RealDigitalApproveDTO } from 'src/dtos/real-digital.dto';
 
 @Injectable()
 export class TPFtService {
@@ -20,6 +28,7 @@ export class TPFtService {
   constructor(
     private readonly contractHelper: ContractHelperService,
     private readonly parfinService: ParfinService,
+    private readonly realDigitalService: RealDigitalService,
     private readonly logger: LoggerService,
   ) {
     this.tpft = this.contractHelper.getContractMethods('ITPFT');
@@ -158,7 +167,7 @@ export class TPFtService {
   }
 
   // --- Operation 1002: TPFt Public Liquidity
-  async auctionPlacement(dto: TPFtAuctionPlacementDTO): Promise<any> {
+  async auctionPlacement(dto: TPFtAuctionPlacementDTO): Promise<TPFtTradeRes | any> {
     const {
       description,
       operationId,
@@ -173,7 +182,7 @@ export class TPFtService {
 
     const cnpj8Sender = process.env.STN_CNPJ8;
     const cnpj8Receiver = process.env.ARBI_CNPJ8;
-    const callerPartByReceiver = web3.utils.toBN(1);
+    const callerPartBySender = web3.utils.toBN(1);
 
     parfinSendDTO.description = description;
     parfinSendDTO.source = { assetId: process.env.BACEN_DEFAULT_ASSET_ID };
@@ -219,7 +228,7 @@ export class TPFtService {
           Number(operationId),
           Number(cnpj8Sender),
           Number(cnpj8Receiver),
-          callerPartByReceiver,
+          callerPartBySender,
           tpftData,
           Number(tpftAmount),
           unitPrice,
@@ -254,6 +263,7 @@ export class TPFtService {
 
       return {
         parfinTxId: transactionId,
+        txData: dataToEncode,
       };
     } catch (error) {
       const payload = JSON.stringify(parfinSendDTO)
@@ -263,5 +273,244 @@ export class TPFtService {
             Parfin Send DTO: ${payload}`
       );
     }
+  }
+
+  // --- Operation 1052: Buy and Sell TPFt
+
+  // - Buy and Sell Between Institutions Using CNPJ
+  async buyTpftFromAnInstitution(dto: TPFtInstitutionBuyFromAnInstitutionDTO): Promise<TPFtTradeRes | any> {
+    // 1. Receber o DTO da operação e buscar os endereços dos contratos
+    const {
+      description,
+      operationId,
+      cnpj8Sender,
+      tpftID,
+      tpftAmount,
+    } = dto;
+
+    const senderWallet = process.env.ARBI_DEFAULT_WALLET_ADDRESS;
+    const senderAssetId = process.env.ARBI_RD_ASSET_ID;
+    const bacenAssetId = process.env.BACEN_DEFAULT_ASSET_ID;
+
+    const tpftDvp = 'TPFT_DVP';
+    const { address: tpftDvpAddress } = this.contractHelper.getContractAddress(tpftDvp);
+    if (!tpftDvpAddress) {
+      throw new Error(`[ERROR]: Erro ao buscar o contrato ${tpftDvp}`);
+    }
+
+    const tpftOperation1052 = 'ITPFT_1052';
+    const { address: tpftOperation1052Address } = this.contractHelper.getContractAddress(tpftOperation1052);
+    if (!tpftOperation1052Address) {
+      throw new Error(`[ERROR]: Erro ao buscar o contrato ${tpftOperation1052}`);
+    }
+
+    // 2. Criar o DTO da Parfin
+    const web3 = new Web3();
+    const parfinDTO = new ParfinContractInteractDTO();
+    const { blockchainId, ...parfinSendDTO } = parfinDTO;
+
+    const cnpj8Receiver = process.env.ARBI_CNPJ8;
+    const callerPartBySender = web3.utils.toBN(1);
+
+    parfinSendDTO.description = description;
+    parfinSendDTO.source = { assetId: bacenAssetId };
+
+    let acronym: TpftAcronym;
+    let code: TpftCode;
+    let maturityDate: TpftMaturityDate;
+    let unitPrice: TpftUnitPrice;
+    let floatUnitPrice: number;
+    switch (tpftID) {
+      case '1':
+        acronym = TpftAcronym.LTN;
+        code = TpftCode.LTN;
+        maturityDate = TpftMaturityDate.LTN;
+        unitPrice = TpftUnitPrice.LTN;
+        floatUnitPrice = 986.40997165;
+        break;
+      case '2':
+        acronym = TpftAcronym.LFT;
+        code = TpftCode.LFT;
+        maturityDate = TpftMaturityDate.LFT;
+        unitPrice = TpftUnitPrice.LFT;
+        floatUnitPrice = 0; // Atualizar com valor unitário correto do LFT
+        break;
+    }
+
+    // 3. Aprovar o valor da transação no RealDigital da carteira do receiver
+    const txTotal = (Number(tpftAmount.slice(0, -2)) * floatUnitPrice).toFixed(2);
+    const approveDTO: RealDigitalApproveDTO = {
+      description:
+        `Aprovando o débito de ${txTotal} na carteira ${senderWallet} para a compra de ${tpftAmount} ${acronym}`,
+      walletAddress: senderWallet,
+      assetId: senderAssetId,
+      spender: tpftDvpAddress,
+      amount: txTotal,
+    }
+    const { parfinTxId } = await this.realDigitalService.approve(approveDTO);
+    if (!parfinTxId) {
+      throw new Error(`[ERROR]: Erro ao aprovar o débito de Real Digital na carteira ${senderWallet}`);
+    }
+
+    // 4. Criar o metadata de interação com o método trade()
+    parfinSendDTO.metadata = {
+      data: '',
+      contractAddress: tpftOperation1052Address,
+      from: senderWallet,
+    };
+    const tpftData = {
+      acronym,
+      code,
+      maturityDate,
+    };
+    const dataToEncode: EncodeDataDTO = {
+      contractName: tpftOperation1052,
+      functionName: 'trade(uint256,uint256,uint256,uint8,tuple,uint256,uint256)',
+      args: [
+        Number(operationId),
+        Number(cnpj8Sender),
+        Number(cnpj8Receiver),
+        callerPartBySender,
+        tpftData,
+        Number(tpftAmount),
+        unitPrice,
+      ],
+    };
+
+    // 5. Codificar o data do metadata
+    const encodeDataRes = this.contractHelper.encodeData(dataToEncode);
+    const { data: encodedData } = encodeDataRes as EncodedDataResponse;
+    if (typeof encodedData[0] !== 'string') {
+      throw new Error(
+        `[ERROR]: Erro ao codificar os dados do contrato: ${dataToEncode}`
+      );
+    }
+    parfinSendDTO.metadata.data = encodedData[0];
+
+    // 6. Interagir com o método trade()
+    const parfinSendRes = await this.parfinService.smartContractSend(
+      parfinSendDTO,
+    );
+
+    const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+    if (!transactionId) {
+      const payload = JSON.stringify(parfinSendDTO)
+      throw new Error(
+        `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${payload}`
+      );
+    }
+
+    // 7. Assinar a transação e retornar o ID
+    await this.parfinService.transactionSignAndPush(transactionId);
+
+    return {
+      parfinTxId: transactionId,
+    };
+  }
+
+  async sellTpftFromAnInstitution(dto: TPFtInstitutionSellToAnInstitutionDTO): Promise<TPFtTradeRes | any> {
+    // 1. Receber o DTO da operação e buscar os endereços dos contratos
+    const {
+      description,
+      operationId,
+      cnpj8Receiver,
+      tpftID,
+      tpftAmount,
+    } = dto;
+
+    const senderWallet = process.env.ARBI_DEFAULT_WALLET_ADDRESS;
+    const bacenAssetId = process.env.BACEN_DEFAULT_ASSET_ID;
+
+    const tpftOperation1052 = 'ITPFT_1052';
+    const { address: tpftOperation1052Address } = this.contractHelper.getContractAddress(tpftOperation1052);
+    if (!tpftOperation1052Address) {
+      throw new Error(`[ERROR]: Erro ao buscar o contrato ${tpftOperation1052}`);
+    }
+
+    // 2. Criar o DTO da Parfin
+    const web3 = new Web3();
+    const parfinDTO = new ParfinContractInteractDTO();
+    const { blockchainId, ...parfinSendDTO } = parfinDTO;
+
+    const cnpj8Sender = process.env.ARBI_CNPJ8;
+    const callerPartBySender = web3.utils.toBN(0);
+
+    parfinSendDTO.description = description;
+    parfinSendDTO.source = { assetId: bacenAssetId };
+
+    let acronym: TpftAcronym;
+    let code: TpftCode;
+    let maturityDate: TpftMaturityDate;
+    let unitPrice: TpftUnitPrice;
+    switch (tpftID) {
+      case '1':
+        acronym = TpftAcronym.LTN;
+        code = TpftCode.LTN;
+        maturityDate = TpftMaturityDate.LTN;
+        unitPrice = TpftUnitPrice.LTN;
+        break;
+      case '2':
+        acronym = TpftAcronym.LFT;
+        code = TpftCode.LFT;
+        maturityDate = TpftMaturityDate.LFT;
+        unitPrice = TpftUnitPrice.LFT;
+        break;
+    }
+
+    // 3. Criar o metadata de interação com o método trade()
+    parfinSendDTO.metadata = {
+      data: '',
+      contractAddress: tpftOperation1052Address,
+      from: senderWallet,
+    };
+    const tpftData = {
+      acronym,
+      code,
+      maturityDate,
+    };
+    const dataToEncode: EncodeDataDTO = {
+      contractName: tpftOperation1052,
+      functionName: 'trade(uint256,uint256,uint256,uint8,tuple,uint256,uint256)',
+      args: [
+        Number(operationId),
+        Number(cnpj8Sender),
+        Number(cnpj8Receiver),
+        callerPartBySender,
+        tpftData,
+        Number(tpftAmount),
+        unitPrice,
+      ],
+    };
+
+    // 4. Codificar o data do metadata
+    const encodeDataRes = this.contractHelper.encodeData(dataToEncode);
+    const { data: encodedData } = encodeDataRes as EncodedDataResponse;
+    if (typeof encodedData[0] !== 'string') {
+      throw new Error(
+        `[ERROR]: Erro ao codificar os dados do contrato: ${dataToEncode}`
+      );
+    }
+    parfinSendDTO.metadata.data = encodedData[0];
+
+    // 5. Interagir com o método trade()
+    const parfinSendRes = await this.parfinService.smartContractSend(
+      parfinSendDTO,
+    );
+
+    const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+    if (!transactionId) {
+      const payload = JSON.stringify(parfinSendDTO)
+      throw new Error(
+        `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${payload}`
+      );
+    }
+
+    // 6. Assinar a transação e retornar o ID
+    await this.parfinService.transactionSignAndPush(transactionId);
+
+    return {
+      parfinTxId: transactionId,
+      txData: dataToEncode,
+    };
   }
 }
