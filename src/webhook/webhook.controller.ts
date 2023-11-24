@@ -14,6 +14,6 @@ export class WebhookController {
     @ApiResponse({ status: 200, description: 'Webhook processed successfully.' })
     @ApiResponse({ status: 401, description: 'Invalid webhook signature.' })
     handleWebhook(@Body() payload: CustomerSmartContractEventsDto): any {
-        return this.webhook.decodeEvent(payload)
+        this.webhook.decodeEvent(payload);
     }
 }

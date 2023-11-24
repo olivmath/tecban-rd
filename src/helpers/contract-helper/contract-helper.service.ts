@@ -48,4 +48,17 @@ export class ContractHelperService {
         }
         return { address: contractAddress };
     }
+
+    getContractNameByAddress(address: string): string {
+        const contractNames = Object.keys(this.contracts);
+        const contractAddresses = Object.values(this.contracts);
+
+        const index = contractAddresses.indexOf(address);
+
+        if (index === -1) {
+            throw new AppError(500, 'Invalid contract address');
+        }
+
+        return contractNames[index];
+    }
 }
