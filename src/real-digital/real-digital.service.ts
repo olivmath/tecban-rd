@@ -17,6 +17,7 @@ import { ParfinContractInteractDTO } from '../dtos/parfin.dto';
 import WrapperContractABI from 'src/helpers/contract-helper/contract-helper.wrapper';
 import { EncodeDataDTO } from 'src/dtos/contract-helper.dto';
 import { DecodedDataResponse, EncodedDataResponse } from 'src/res/app/contract-helper.responses';
+import { ContractApproveRes } from 'src/res/app/contract.responses';
 
 @Injectable()
 export class RealDigitalService {
@@ -38,8 +39,8 @@ export class RealDigitalService {
         this.logger.setContext('RealDigitalService');
     }
 
-    async approve(dto: RealDigitalApproveDTO): Promise<any> {
-        const { description, walletAddress, assetId, amount } = dto as RealDigitalApproveDTO;
+    async approve(dto: RealDigitalApproveDTO): Promise<ContractApproveRes | any> {
+        const { description, walletAddress, assetId, spender, amount } = dto as RealDigitalApproveDTO;
         const parfinDTO = new ParfinContractInteractDTO();
         const { blockchainId, ...parfinSendDTO } = parfinDTO;
 
@@ -57,7 +58,6 @@ export class RealDigitalService {
                 contractAddress: realDigitalAddress,
                 from: walletAddress,
             };
-            const spender = process.env.SWAP_ONE_STEP_ADDRESS;
             parfinSendDTO.metadata.data =
                 this.realDigital['approve(address,uint256)'](spender, Number(amount))[0];
 
@@ -71,7 +71,7 @@ export class RealDigitalService {
             if (!transactionId) {
                 const payload = JSON.stringify(parfinSendDTO)
                 throw new Error(
-                    `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${payload}`
+                    `[ERROR]: Erro ao tentar interagir com contrato Real Digital. Parfin Send DTO: ${payload}`
                 );
             }
 
@@ -80,7 +80,7 @@ export class RealDigitalService {
 
             return {
                 parfinTxId: transactionId,
-            };
+            } as ContractApproveRes;
         } catch (error) {
             const payload = JSON.stringify(parfinSendDTO)
             this.logger.error(error);

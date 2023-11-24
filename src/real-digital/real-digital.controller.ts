@@ -7,6 +7,7 @@ import {
   RealDigitalTransferDTO,
 } from '../dtos/real-digital.dto';
 import { RealDigitalService } from './real-digital.service';
+import { approve201 } from 'src/res/swagger/contract.swagger';
 
 @Controller('real-digital')
 @ApiTags('Real Digital Operations')
@@ -14,6 +15,7 @@ export class RealDigitalController {
   constructor(private readonly realDigitalService: RealDigitalService) { }
 
   @Post('approve')
+  @approve201
   @ApiOperation({ summary: 'Approve a transaction', description: 'Approve a Real Digital transaction' })
   approve(@Body() dto: RealDigitalApproveDTO) {
     return this.realDigitalService.approve(dto);
