@@ -61,10 +61,10 @@ export class TPFtAuctionPlacementDTO {
   @IsNotEmpty()
   operationId: string;
 
-  @ApiProperty({ description: 'ID do TPFt (1, 2, etc.)' })
+  @ApiProperty({ description: 'Símbolo do TPFt da transação (LTN, LFT, etc.)' })
   @IsString()
   @IsNotEmpty()
-  tpftID: string;
+  tpftSymbol: string;
 
   @ApiProperty({
     description:
@@ -96,10 +96,10 @@ export class TPFtInstitutionBuyFromAnInstitutionDTO {
   @IsNotEmpty()
   cnpj8Sender: string;
 
-  @ApiProperty({ description: 'ID do TPFt da transação (1, 2, etc.)' })
+  @ApiProperty({ description: 'Símbolo do TPFt da transação (LTN, LFT, etc.)' })
   @IsString()
   @IsNotEmpty()
-  tpftID: string;
+  tpftSymbol: string;
 
   @ApiProperty({
     description:
