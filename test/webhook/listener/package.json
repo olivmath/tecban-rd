@@ -11,6 +11,6 @@
     "scripts": {
         "d": "./deploy.sh",
         "r": "node listener.js",
-        "e": "node send-tx.js"
+        "e": "node auto-transfer.js"
     }
 }

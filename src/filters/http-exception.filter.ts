@@ -22,6 +22,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
             });
         } else {
             appErr = exception;
+            appErr.requestId = requestId;
         }
 
         this.logger.error(appErr);
@@ -33,7 +34,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
         };
 
         response.setHeader('x-request-id', requestId);
-
         response.status(appErr.statusCode).json(body);
     }
 }
