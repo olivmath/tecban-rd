@@ -45,13 +45,19 @@ export class RealDigitalController {
   }
 
   @Get('allowance/')
-  @ApiOperation({ summary: 'Get allowance', description: '' })
+  @ApiOperation({
+    summary: 'Get allowance',
+    description: 'Get the allowed RD amount that an address is able to spend'
+  })
   allowance(@Query('owner') owner: string, @Query('spender') spender: string) {
     return this.realDigitalService.allowance(owner, spender);
   }
 
   @Post('increase-allowance/:address')
-  @ApiOperation({ summary: 'Increase allowance', description: '' })
+  @ApiOperation({
+    summary: 'Increase allowance',
+    description: 'Increase the allowed RD amount that an address is able to spend'
+  })
   increaseAllowance(@Body() dto: RealDigitalIncreaseAllowanceDTO) {
     return this.realDigitalService.increaseAllowance(dto);
   }
