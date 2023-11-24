@@ -21,6 +21,7 @@ import { EncodeDataDTO } from 'src/dtos/contract-helper.dto';
 import { EncodedDataResponse } from 'src/res/app/contract-helper.responses';
 import { RealDigitalService } from 'src/real-digital/real-digital.service';
 import { RealDigitalApproveDTO } from 'src/dtos/real-digital.dto';
+import { ContractApproveRes } from 'src/res/app/contract.responses';
 
 @Injectable()
 export class TPFtService {
@@ -288,8 +289,8 @@ export class TPFtService {
       tpftAmount,
     } = dto;
 
-    const senderWallet = process.env.ARBI_DEFAULT_WALLET_ADDRESS;
-    const senderAssetId = process.env.ARBI_RD_ASSET_ID;
+    const receiverWallet = process.env.ARBI_DEFAULT_WALLET_ADDRESS;
+    const receiverAssetId = process.env.ARBI_RD_ASSET_ID;
     const bacenAssetId = process.env.BACEN_DEFAULT_ASSET_ID;
 
     const tpftDvp = 'TPFT_DVP';
@@ -339,24 +340,26 @@ export class TPFtService {
 
     // 3. Aprovar o valor da transação no RealDigital da carteira do receiver
     const txTotal = (Number(tpftAmount.slice(0, -2)) * floatUnitPrice).toFixed(2);
+    const amount = txTotal.toString().replace('.', '');
     const approveDTO: RealDigitalApproveDTO = {
       description:
-        `Aprovando o débito de ${txTotal} na carteira ${senderWallet} para a compra de ${tpftAmount} ${acronym}`,
-      walletAddress: senderWallet,
-      assetId: senderAssetId,
+        `Aprovando o débito de $${txTotal} na carteira ${receiverWallet} para a compra de ${tpftAmount} ${acronym}`,
+      walletAddress: receiverWallet,
+      assetId: receiverAssetId,
       spender: tpftDvpAddress,
-      amount: txTotal,
+      amount,
     }
-    const { parfinTxId } = await this.realDigitalService.approve(approveDTO);
-    if (!parfinTxId) {
-      throw new Error(`[ERROR]: Erro ao aprovar o débito de Real Digital na carteira ${senderWallet}`);
+    const approveRes = await this.realDigitalService.approve(approveDTO);
+    const { parfinTxId: approveTxId } = approveRes as ContractApproveRes;
+    if (!approveTxId) {
+      throw new Error(`[ERROR]: Erro ao aprovar o débito de Real Digital na carteira ${receiverWallet}`);
     }
 
     // 4. Criar o metadata de interação com o método trade()
     parfinSendDTO.metadata = {
       data: '',
       contractAddress: tpftOperation1052Address,
-      from: senderWallet,
+      from: receiverWallet,
     };
     const tpftData = {
       acronym,
@@ -392,19 +395,20 @@ export class TPFtService {
       parfinSendDTO,
     );
 
-    const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
-    if (!transactionId) {
+    const { id: tradeTxId } = parfinSendRes as ParfinSuccessRes;
+    if (!tradeTxId) {
       const payload = JSON.stringify(parfinSendDTO)
       throw new Error(
-        `[ERROR]: Erro ao tentar interagir com contrato Real Tokenizado. Parfin Send DTO: ${payload}`
+        `[ERROR]: Erro ao tentar interagir com contrato ${tpftOperation1052}. Parfin Send DTO: ${payload}`
       );
     }
 
     // 7. Assinar a transação e retornar o ID
-    await this.parfinService.transactionSignAndPush(transactionId);
+    await this.parfinService.transactionSignAndPush(tradeTxId);
 
     return {
-      parfinTxId: transactionId,
+      approvalTxId: approveTxId,
+      purchaseTxId: tradeTxId,
     };
   }
 
