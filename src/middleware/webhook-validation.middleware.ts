@@ -16,8 +16,6 @@ export class WebhookValidationMiddleware implements NestMiddleware {
             .digest('hex');
 
         if (hash !== signature) {
-            this.logger.warn(`client signature: ${signature}`)
-            this.logger.warn(`server signature: ${hash}`)
             const requestId = req['requestId'] || req.headers['x-request-id'];
             throw new AppError(401, 'Invalid webhook signature', { requestId });
         }
