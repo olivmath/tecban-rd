@@ -14,7 +14,16 @@ export class TPFtGetBalanceOfSuccessRes {
   isExpired: boolean;
 }
 
-export class TPFtTradeRes {
+export class TPFtBuyRes {
+  @ApiProperty({ description: 'ID da transação na Parfin de approve()' })
+  approvalTxId: string;
+  @ApiProperty({ description: 'ID da transação na Parfin de compra' })
+  purchaseTxId: string;
+  @ApiProperty({ description: 'Dados da compra/venda de TPFt', type: EncodeDataDTO })
+  txData: EncodeDataDTO;
+}
+
+export class TPFtSellRes {
   @ApiProperty({ description: 'ID da transação na Parfin' })
   parfinTxId: string;
   @ApiProperty({ description: 'Dados da compra/venda de TPFt', type: EncodeDataDTO })
