@@ -9,7 +9,7 @@ import {
   TPFtInstitutionSellToAnInstitutionDTO,
   TPFtSetApprovalForAllDTO
 } from 'src/dtos/tpft.dto';
-import { getTpftBalance201, tradeTpft201 } from 'src/res/swagger/tpft.swagger';
+import { getTpftBalance201, buyTpft201, sellTpft201 } from 'src/res/swagger/tpft.swagger';
 
 @Controller('tpft')
 @ApiTags('TPFt Operations')
@@ -42,7 +42,7 @@ export class TPFtController {
 
   // - Buy and Sell Between Institutions Using CNPJ
   @Post('trade/institution/buy-from-another-institution')
-  @tradeTpft201
+  @buyTpft201
   @ApiOperation({ summary: 'Buy TPFt from and institution', description: 'Buy TPFt from another institution' })
   async institutionBuyTpftFromAnInstitution(@Body() dto: TPFtInstitutionBuyFromAnInstitutionDTO) {
     return this.tpftService.buyTpftFromAnInstitution(dto);
@@ -50,7 +50,7 @@ export class TPFtController {
 
   // - Buy and Sell Between Institutions Using CNPJ
   @Post('trade/institution/sell-to-another-institution')
-  @tradeTpft201
+  @sellTpft201
   @ApiOperation({ summary: 'Sell TPFt to and institution', description: 'Sell TPFt to another institution' })
   async institutionSellTpftToAnInstitution(@Body() dto: TPFtInstitutionSellToAnInstitutionDTO) {
     return this.tpftService.sellTpftFromAnInstitution(dto);
