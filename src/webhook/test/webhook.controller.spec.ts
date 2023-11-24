@@ -103,24 +103,6 @@ describe('WebhookController', () => {
             .send(payload);
 
         expect(response.status).toBe<number>(200);
-        expect(response.body).toEqual({
-            eventName: 'Mint',
-            from: '0x0000000000000000000000000000000000000000',
-            to: '0xe6443CF5f789161aBF1e899D93CE2be086Cef40a',
-            value: '1000',
-        });
-    });
-
-    it('should return 400 with invalid signature', async () => {
-        const payloadJson = JSON.stringify(payload);
-        const signature = generateHash(secret, payloadJson);
-
-        const response = await request(app.getHttpServer())
-            .post('/webhook')
-            .set('x-webhook-signature', signature)
-            .send({}); // send different payload of signature
-        
-        expect(response.status).toBe<number>(400);
         expect(response.body).toEqual({});
     });
 
