@@ -31,10 +31,10 @@ export class ContractHelperService {
             SWAP_ONE_STEP: process.env.SWAP_ONE_STEP_ADDRESS,
             SWAP_TWO_STEP: process.env.SWAP_TWO_STEP_ADDRESS,
             REAL_DIGITAL: process.env.REAL_DIGITAL_ADDRESS,
-            TPFT_1002: process.env.TPFT_1002_ADDRESS,
-            TPFT_1052: process.env.TPFT_1052_ADDRESS,
+            ITPFT_1002: process.env.TPFT_1002_ADDRESS,
+            ITPFT_1052: process.env.TPFT_1052_ADDRESS,
             TPFT_DVP: process.env.TPFT_DVP_ADDRESS,
-            TPFT: process.env.TPFT_ADDRESS,
+            ITPFT: process.env.TPFT_ADDRESS,
             STR: process.env.STR_ADDRESS,
         };
     }
@@ -50,7 +50,7 @@ export class ContractHelperService {
         const contractAddress = this.contracts[contractName];
 
         if (!contractAddress) {
-            throw new AppError(500, 'Invalid contract name');
+            throw new AppError(500, `Invalid contract name: ${contractName}`);
         }
         return { address: contractAddress };
     }
