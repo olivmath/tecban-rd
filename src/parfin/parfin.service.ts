@@ -101,6 +101,6 @@ export class ParfinService {
 
     async transactionSignAndPush(transactionId: string): Promise<any> {
         const url = `/v1/api/transaction/${transactionId}/sign-and-push`;
-        return await this.parfinHttp.makeRequest('POST', url, {});
+        return await this.parfinHttp.makeRequest('PUT', url, {});
     }
 }

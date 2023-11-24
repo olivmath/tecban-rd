@@ -89,3 +89,34 @@ export class RealDigitalTransferDTO {
   @IsNotEmpty()
   amount: string;
 }
+
+export class RealDigitalIncreaseAllowanceDTO {
+  @ApiProperty({
+    description: 'Descrição da interação com o contrato',
+    default: '',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ description: 'ID que identifica a carteira na Parfin' })
+  @IsString()
+  @IsNotEmpty()
+  walletAddress: string;
+
+  @ApiProperty({ description: 'ID que identifica o ativo na Parfin' })
+  @IsString()
+  @IsNotEmpty()
+  assetId: string;
+
+  @ApiProperty({ description: 'Endereço que irá executar a operação' })
+  @IsString()
+  @IsNotEmpty()
+  spender: string;
+
+  @ApiProperty({ description: 'Valor a ser incrementado' })
+  @IsString()
+  @IsNotEmpty()
+  addedValue: string;
+}

@@ -1,11 +1,17 @@
-import { ContractHelperGetContractSuccessRes } from 'src/res/app/contract-helper.responses';
+import {
+    ContractHelperGetContractSuccessRes,
+    DecodedDataResponse,
+    EncodedDataResponse,
+} from 'src/res/app/contract-helper.responses';
 import { ContractName } from 'src/types/contract-helper.types';
 import { LoggerService } from 'src/logger/logger.service';
 import ContractWrapper from './contract-helper.wrapper';
 import { AppError } from 'src/error/app.error';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import abiLoader from '../abi-loader';
 import * as dotenv from 'dotenv';
+import WrapperContractABI from './contract-helper.wrapper';
+import { DecodeDataDTO, EncodeDataDTO } from 'src/dtos/contract-helper.dto';
 
 @Injectable()
 export class ContractHelperService {
@@ -34,13 +40,13 @@ export class ContractHelperService {
     }
 
     // Função que busca todos os métodos de um contrato
-    getContractMethods(contractName: string): ContractWrapper {
+    getContractMethods(contractName: string): WrapperContractABI {
         const abi = abiLoader[contractName];
         return new ContractWrapper(abi, contractName);
     }
 
     // Função que retorna o endereço de um contrato
-    getContractAddress(contractName: ContractName): ContractHelperGetContractSuccessRes {
+    getContractAddress(contractName: string): ContractHelperGetContractSuccessRes {
         const contractAddress = this.contracts[contractName];
 
         if (!contractAddress) {
@@ -60,5 +66,21 @@ export class ContractHelperService {
         }
 
         return contractNames[index];
+    }
+
+    encodeData(dto: EncodeDataDTO): EncodedDataResponse {
+        const { contractName, functionName, args } = dto;
+        const contract = this.getContractMethods(contractName);
+        const encodedData = contract[functionName](...args);
+
+        return { data: encodedData };
+    }
+
+    decodeData(dto: DecodeDataDTO): DecodedDataResponse {
+        const { contractName, functionName, data } = dto;
+        const contract = this.getContractMethods(contractName);
+        const decodedData = contract[functionName](data);
+
+        return { data: decodedData };
     }
 }

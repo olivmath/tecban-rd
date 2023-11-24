@@ -35,13 +35,9 @@ export class ContractHelperController {
         summary: 'Encode function call to smartcontract',
         description: 'Encode function call to smartcontract for send to Parfin',
     })
-    async encodeData(@Body() body: EncodeDataDTO): Promise<EncodedDataResponse | BadRequestException> {
+    encodeData(@Body() dto: EncodeDataDTO) {
         this.logger.setContext('ContractHelperController::encodeData');
-
-        const contract = this.contractService.getContractMethods(body.contractName);
-        const encodedData = contract[body.functionName](...body.args);
-
-        return { data: encodedData };
+        return this.contractService.encodeData(dto);
     }
 
     @Post('decode-data')
@@ -51,12 +47,8 @@ export class ContractHelperController {
         description: 'Decode data returned from smartcontract via Parfin',
     })
     @ApiResponse({ status: 400, description: 'Bad Request' })
-    async decodeData(@Body() body: DecodeDataDTO): Promise<DecodedDataResponse | BadRequestException> {
+    decodeData(@Body() dto: DecodeDataDTO) {
         this.logger.setContext('ContractHelperController::decodeData');
-
-        const contract = this.contractService.getContractMethods(body.contractName);
-        const decodedData = contract[body.functionName](body.data);
-
-        return { data: decodedData };
+        return this.contractService.decodeData(dto);
     }
 }

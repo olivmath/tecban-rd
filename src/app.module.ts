@@ -14,6 +14,7 @@ import { ParfinModule } from './parfin/parfin.module';
 import { RealDigitalModule } from './real-digital/real-digital.module';
 import { RealTokenizadoModule } from './real-tokenizado/real-tokenizado.module';
 import { ContractHelperModule } from './helpers/contract-helper/contract-helper.module';
+import { KeyDictionaryModule } from './key-dictionary/key-dictionary.module';
 import { TPFtModule } from './tpft/tpft.module';
 import { LoggerModule } from './logger/logger.module';
 import { AllExceptionsFilter } from './filters/http-exception.filter';
@@ -61,6 +62,7 @@ export class MongoDBMemoryServerFactory implements MongooseOptionsFactory {
         TransactionsModule,
         WalletModule,
         ContractHelperModule,
+        KeyDictionaryModule,
         LoggerModule,
         WebhookModule,
     ],

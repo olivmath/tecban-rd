@@ -350,7 +350,7 @@ export class RealTokenizadoService {
             from: walletAddress,
         };
         try {
-            parfinSendDTO.metadata.data = this.swapOneStep[
+            parfinSendDTO.metadata.data = await this.swapOneStep[
                 'executeSwap(address,address,address,uint256)'
             ](tokenSender, tokenReceiver, receiver, Number(amount))[0];
 
@@ -381,7 +381,7 @@ export class RealTokenizadoService {
         realTokenizadoBalanceOf: number;
         realTokenizadoFrozenBalanceOf: number;
     }> {
-        const realTokenizadoAddress = process.env.ARBI_REAL_TOKENIZADO_ADDRESS;
+        const realTokenizadoAddress = process.env.REAL_TOKENIZADO_ARBI_ADDRESS;
         const encodedBalanceOfCall = this.realTokenizado['balanceOf(address)'](address)[0];
         const encodedFrozenBalanceOfCall = this.realTokenizado['frozenBalanceOf(address)'](address)[0];
         const parfinDTO = new ParfinContractInteractDTO();
