@@ -75,3 +75,73 @@ export class TPFtAuctionPlacementDTO {
   @IsNotEmpty()
   tpftAmount: string;
 }
+
+export class TPFtInstitutionBuyFromAnInstitutionDTO {
+  @ApiProperty({
+    description: 'Descrição da interação com o contrato na Parfin',
+    default: '',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ description: 'ID único da operação 1002 na data que a operação será executada' })
+  @IsString()
+  @IsNotEmpty()
+  operationId: string;
+
+  @ApiProperty({ description: 'CPNJ8 da instituição que está vendendo o TPFt' })
+  @IsString()
+  @IsNotEmpty()
+  cnpj8Sender: string;
+
+  @ApiProperty({ description: 'ID do TPFt da transação (1, 2, etc.)' })
+  @IsString()
+  @IsNotEmpty()
+  tpftID: string;
+
+  @ApiProperty({
+    description:
+      'Quantidade de TPFt da operação (incluir 2 casas decimais no final do número inteiro)',
+    example: '100000'
+  })
+  @IsString()
+  @IsNotEmpty()
+  tpftAmount: string;
+}
+
+export class TPFtInstitutionSellToAnInstitutionDTO {
+  @ApiProperty({
+    description: 'Descrição da interação com o contrato na Parfin',
+    default: '',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ description: 'ID único da operação 1002 na data que a operação será executada' })
+  @IsString()
+  @IsNotEmpty()
+  operationId: string;
+
+  @ApiProperty({ description: 'CPNJ8 da instituição que está vendendo o TPFt' })
+  @IsString()
+  @IsNotEmpty()
+  cnpj8Receiver: string;
+
+  @ApiProperty({ description: 'ID do TPFt da transação (1, 2, etc.)' })
+  @IsString()
+  @IsNotEmpty()
+  tpftID: string;
+
+  @ApiProperty({
+    description:
+      'Quantidade de TPFt da operação (incluir 2 casas decimais no final do número inteiro)',
+    example: '100000'
+  })
+  @IsString()
+  @IsNotEmpty()
+  tpftAmount: string;
+}
