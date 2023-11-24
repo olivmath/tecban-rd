@@ -10,5 +10,6 @@ import { LoggerService } from 'src/logger/logger.service';
     imports: [ParfinModule, TransactionsModule],
     controllers: [RealDigitalController],
     providers: [RealDigitalService, ContractHelperService, LoggerService],
+    exports: [RealDigitalService],
 })
 export class RealDigitalModule { }
