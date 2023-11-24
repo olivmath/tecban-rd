@@ -102,20 +102,16 @@ export default class WrapperContractABI {
                 const eventSignHash = web3.utils.keccak256(eventSign);
 
                 this.functionsMap[eventSignHash] = (...args: any[]) => {
-                    // Aqui você pode implementar a lógica de decodificação dos eventos
-                    const eventData = args[0]; // Supondo que o primeiro argumento seja o calldata do evento
+                    const eventData = args[0];
                     const data = args[1];
-
-                    // Decodificação dos parâmetros indexados do evento
                     const decodedParams = web3.eth.abi.decodeLog(item.inputs, data, eventData);
 
-                    // Mapear os parâmetros decodificados para seus nomes
                     const decodedData: Record<string, any> = {};
+                    decodedData["event"] = item.name
                     item.inputs.forEach((input, index) => {
                         decodedData[input.name] = decodedParams[index];
                     });
 
-                    // Retornar os parâmetros decodificados
                     return [decodedData];
                 };
             }
