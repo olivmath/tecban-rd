@@ -40,7 +40,7 @@ export class TPFtController {
 
   // --- Operation 1052: Institution Buy and Sell TPFt
 
-  // - Buy and Sell Between Institutions Using CNPJ
+  // - Buy TPFt from another institution using CNPJ
   @Post('trade/institution/buy-from-another-institution')
   @buyTpft201
   @ApiOperation({ summary: 'Buy TPFt from and institution', description: 'Buy TPFt from another institution' })
@@ -48,7 +48,7 @@ export class TPFtController {
     return this.tpftService.buyTpftFromAnInstitution(dto);
   }
 
-  // - Buy and Sell Between Institutions Using CNPJ
+  // - Sell TPFt from another institution using CNPJ
   @Post('trade/institution/sell-to-another-institution')
   @sellTpft201
   @ApiOperation({ summary: 'Sell TPFt to and institution', description: 'Sell TPFt to another institution' })
