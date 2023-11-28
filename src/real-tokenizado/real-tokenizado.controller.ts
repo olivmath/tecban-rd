@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import {
   RealTokenizadoMintDTO,
@@ -7,6 +7,7 @@ import {
   RealTokenizadoApproveDTO,
   RealTokenizadoBurnFromDTO,
   RealTokenizadoExternalTransferDTO,
+  RealTokenizadoIncreaseAllowanceDTO,
 } from '../dtos/real-tokenizado.dto';
 import { RealTokenizadoService } from './real-tokenizado.service';
 
@@ -56,5 +57,23 @@ export class RealTokenizadoController {
   @ApiParam({ name: 'address', example: '0x5be4C55e1977E555DB9a815a2CDed576A71Ca3c2' })
   balanceOf(@Param('address') address: string) {
     return this.realTokenizadoService.balanceOf(address);
+  }
+
+  @Get('allowance/')
+  @ApiOperation({
+    summary: 'Get allowance',
+    description: 'Get the allowed RT amount that an address is able to spend'
+  })
+  allowance(@Query('owner') owner: string, @Query('spender') spender: string) {
+    return this.realTokenizadoService.allowance(owner, spender);
+  }
+
+  @Post('increase-allowance/:address')
+  @ApiOperation({
+    summary: 'Increase allowance',
+    description: 'Increase the allowed RT amount that an address is able to spend'
+  })
+  increaseAllowance(@Body() dto: RealTokenizadoIncreaseAllowanceDTO) {
+    return this.realTokenizadoService.increaseAllowance(dto);
   }
 }
