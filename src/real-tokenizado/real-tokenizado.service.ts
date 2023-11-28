@@ -9,6 +9,7 @@ import {
     RealTokenizadoApproveDTO,
     RealTokenizadoBurnFromDTO,
     RealTokenizadoExternalTransferDTO,
+    RealTokenizadoIncreaseAllowanceDTO,
 } from '../dtos/real-tokenizado.dto';
 import {
     ParfinContractCallSuccessRes,
@@ -17,6 +18,8 @@ import {
 import { LoggerService } from 'src/logger/logger.service';
 import { ParfinContractInteractDTO } from 'src/dtos/parfin.dto';
 import WrapperContractABI from 'src/helpers/contract-helper/contract-helper.wrapper';
+import { EncodeDataDTO } from 'src/dtos/contract-helper.dto';
+import { DecodedDataResponse, EncodedDataResponse } from 'src/res/app/contract-helper.responses';
 
 @Injectable()
 export class RealTokenizadoService {
@@ -406,6 +409,135 @@ export class RealTokenizadoService {
             realTokenizadoBalanceOf: this.realTokenizado['balanceOf'](encodedBalanceOfResponse)[0],
             realTokenizadoFrozenBalanceOf: this.realTokenizado['frozenBalanceOf'](encodedFrozenBalanceOfResponse)[0],
         };
+    }
+
+    async allowance(owner: string, spender: string): Promise<any> {
+        const parfinDTO = new ParfinContractInteractDTO();
+        const parfinCallDTO = {
+            metadata: parfinDTO.metadata,
+            blockchainId: parfinDTO.blockchainId,
+        };
+
+        // 1. ???
+        const realTokenizadoAddress = process.env.REAL_TOKENIZADO_ARBI_ADDRESS;
+
+        // 2. ???
+        parfinCallDTO.metadata = {
+            data: '',
+            contractAddress: realTokenizadoAddress,
+            from: process.env.ARBI_DEFAULT_WALLET_ADDRESS,
+        };
+        const dataToEncode: EncodeDataDTO = {
+            contractName: 'REAL_TOKENIZADO',
+            functionName: 'allowance(address,address)',
+            args: [
+                owner,
+                spender,
+            ]
+        }
+
+        try {
+            const encodeDataRes = this.contractHelper.encodeData(dataToEncode);
+            const { data: encodedData } = encodeDataRes as EncodedDataResponse;
+            if (typeof encodedData[0] !== 'string') {
+                throw new Error(
+                    `[ERROR]: Erro ao codificar os dados do contrato: ${dataToEncode}`
+                );
+            }
+            parfinCallDTO.metadata.data = encodedData[0];
+
+            // 3. ???
+            const parfinCallRes = await this.parfinService.smartContractCall(parfinCallDTO);
+            const { data } = parfinCallRes as ParfinContractCallSuccessRes;
+            if (!data) {
+                const payload = JSON.stringify(parfinCallDTO);
+                throw new Error(
+                    `[ERROR]: Erro ao tentar interagir com contrato ${realTokenizadoAddress}. 
+                    Parfin Call DTO: ${payload}`
+                );
+            }
+
+            // 4. ???
+            const dataToDecode = {
+                contractName: 'REAL_TOKENIZADO',
+                functionName: 'allowance',
+                data,
+            };
+
+            const decodeDataRes = this.contractHelper.decodeData(dataToDecode);
+            const { data: decodedData } = decodeDataRes as DecodedDataResponse;
+
+            return {
+                allowance: decodedData[0],
+            };
+        } catch (error) {
+            const payload = JSON.stringify(parfinCallDTO);
+            this.logger.error(error);
+            throw new Error(
+                `[ERROR]: Erro ao tentar consultar o valor de Real Tokenizado que o contrato ${spender} pode gastar. 
+                    Parfin Send DTO: ${payload}`,
+            );
+        }
+    }
+
+    async increaseAllowance(dto: RealTokenizadoIncreaseAllowanceDTO): Promise<any> {
+        const { description, walletAddress, assetId, spender, addedValue } = dto;
+        const parfinDTO = new ParfinContractInteractDTO();
+        const { blockchainId, ...parfinSendDTO } = parfinDTO;
+        parfinSendDTO.description = description;
+        parfinSendDTO.source = { assetId };
+
+        try {
+            // 1. Buscando o endereço do contrato RealDigital
+            const realTokenizadoAddress = process.env.REAL_TOKENIZADO_ARBI_ADDRESS;
+
+            // 2. Criando o metadata para interagir com o método increaseAllowance()
+            parfinSendDTO.metadata = {
+                data: '',
+                contractAddress: realTokenizadoAddress,
+                from: walletAddress,
+            };
+            const dataToEncode: EncodeDataDTO = {
+                contractName: 'REAL_TOKENIZADO',
+                functionName: 'increaseAllowance(address,uint256)',
+                args: [
+                    spender,
+                    addedValue,
+                ],
+            };
+            const encodedDataRes = this.contractHelper.encodeData(dataToEncode);
+            const { data: encodedData } = encodedDataRes as EncodedDataResponse;
+            if (typeof encodedData[0] !== 'string') {
+                throw new Error(
+                    `[ERROR]: Erro ao codificar os dados do contrato: ${dataToEncode}`
+                );
+            }
+            parfinSendDTO.metadata.data = encodedData[0];
+
+            // 3. Interagindo com o contrato ITPFt através do método setApprovalForAll()
+            const parfinSendRes = await this.parfinService.smartContractSend(parfinSendDTO);
+            const { id: transactionId } = parfinSendRes as ParfinSuccessRes;
+            if (!transactionId) {
+                const payload = JSON.stringify(parfinSendDTO)
+                throw new Error(
+                    `[ERROR]: Erro ao tentar interagir com contrato ${realTokenizadoAddress}. Parfin Send DTO: ${payload}`
+                );
+            }
+
+            // 5. Assinando a transação na Parfin
+            await this.parfinService.transactionSignAndPush(transactionId);
+
+            return {
+                parfinTxId: transactionId,
+            };
+        } catch (error) {
+            const payload = JSON.stringify(parfinSendDTO);
+            this.logger.error(error);
+            throw new Error(
+                `[ERROR]: Erro ao tentar aumentar o valor de Real Tokenizado que o contrato ${spender} pode gastar. 
+                    Parfin Send DTO: ${payload}`,
+            );
+        }
     }
 }
 
