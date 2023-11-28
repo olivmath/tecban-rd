@@ -419,7 +419,7 @@ export class TPFtService {
       description,
       operationId,
       cnpj8Receiver,
-      tpftID,
+      tpftSymbol,
       tpftAmount,
     } = dto;
 
@@ -447,14 +447,14 @@ export class TPFtService {
     let code: TpftCode;
     let maturityDate: TpftMaturityDate;
     let unitPrice: TpftUnitPrice;
-    switch (tpftID) {
-      case '1':
+    switch (tpftSymbol) {
+      case 'LTN':
         acronym = TpftAcronym.LTN;
         code = TpftCode.LTN;
         maturityDate = TpftMaturityDate.LTN;
         unitPrice = TpftUnitPrice.LTN;
         break;
-      case '2':
+      case 'LFT':
         acronym = TpftAcronym.LFT;
         code = TpftCode.LFT;
         maturityDate = TpftMaturityDate.LFT;

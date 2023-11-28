@@ -131,10 +131,10 @@ export class TPFtInstitutionSellToAnInstitutionDTO {
   @IsNotEmpty()
   cnpj8Receiver: string;
 
-  @ApiProperty({ description: 'ID do TPFt da transação (1, 2, etc.)' })
+  @ApiProperty({ description: 'Símbolo do TPFt da transação (LTN, LFT, etc.)' })
   @IsString()
   @IsNotEmpty()
-  tpftID: string;
+  tpftSymbol: string;
 
   @ApiProperty({
     description:
