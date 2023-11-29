@@ -22,12 +22,13 @@ import { EncodedDataResponse } from 'src/res/app/contract-helper.responses';
 import { RealDigitalService } from 'src/real-digital/real-digital.service';
 import { RealDigitalApproveDTO } from 'src/dtos/real-digital.dto';
 import { ContractApproveRes } from 'src/res/app/contract.responses';
-import { getTradeTotal } from 'src/utils/getTradeTotal.util';
+import { UtilsService } from 'src/utils/util.service';
 
 @Injectable()
 export class TPFtService {
   tpft: WrapperContractABI;
   constructor(
+    private readonly utilsService: UtilsService,
     private readonly contractHelper: ContractHelperService,
     private readonly parfinService: ParfinService,
     private readonly realDigitalService: RealDigitalService,
@@ -340,7 +341,7 @@ export class TPFtService {
     }
 
     // 3. Aprovar o valor da transação no RealDigital da carteira do receiver
-    const { total, formattedTotal } = getTradeTotal(tpftAmount, floatUnitPrice)
+    const { total, formattedTotal } = this.utilsService.getTradeTotal(tpftAmount, floatUnitPrice)
     const approveDTO: RealDigitalApproveDTO = {
       description:
         `Aprovando o débito de $${total} na carteira ${receiverWallet} para a compra de ${tpftAmount} ${acronym}`,
