@@ -5,9 +5,10 @@ import { ContractHelperService } from 'src/helpers/contract-helper/contract-help
 import { ParfinModule } from 'src/parfin/parfin.module';
 import { LoggerService } from 'src/logger/logger.service';
 import { RealDigitalModule } from 'src/real-digital/real-digital.module';
+import { UtilsModule } from 'src/utils/util.module';
 
 @Module({
-  imports: [ParfinModule, RealDigitalModule],
+  imports: [ParfinModule, RealDigitalModule, UtilsModule],
   controllers: [TPFtController],
   providers: [TPFtService, ContractHelperService, LoggerService],
 })
