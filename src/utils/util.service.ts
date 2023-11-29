@@ -25,7 +25,8 @@ export class UtilsService {
             bankCode: bankCode,
             date: formattedDate,
             toString: function () {
-                return `${this.index}${this.bankCode}${this.date}`;
+                const operationId = `${this.index}${this.bankCode}${this.date}`;
+                return operationId;
             },
         };
     }
