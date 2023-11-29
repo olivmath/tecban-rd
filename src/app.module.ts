@@ -16,6 +16,7 @@ import { AllExceptionsFilter } from './filters/http-exception.filter';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { RequestIdMiddleware } from './middleware/request-id.middleware';
+import { OperationIdService } from './operation-id/operation-id.service';
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { RequestIdMiddleware } from './middleware/request-id.middleware';
             provide: APP_FILTER,
             useClass: AllExceptionsFilter,
         },
+        OperationIdService,
     ],
 
     controllers: [HealthController],
