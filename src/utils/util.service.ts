@@ -9,15 +9,17 @@ type OperationId = {
 
 @Injectable()
 export class UtilsService {
-    private sequenceNumber = 1;
 
     generateOperationId(): OperationId {
-        const formattedSequence = this.sequenceNumber.toString().padStart(5, '0');
+        const min = 1; // Minimum 4-digit number
+        const max = 9999; // Maximum 4-digit number
+
+        const random4DigitNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+        const formattedSequence = random4DigitNumber.toString().padStart(4, '0');
         const bankCode = '37';
         const currentDate = new Date();
         const formattedDate = currentDate.toISOString().slice(0, 10).replace(/-/g, '');
 
-        this.sequenceNumber++;
         return {
             index: formattedSequence,
             bankCode: bankCode,
