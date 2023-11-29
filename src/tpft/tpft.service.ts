@@ -418,11 +418,11 @@ export class TPFtService {
     // 1. Receber o DTO da operação e buscar os endereços dos contratos
     const {
       description,
-      operationId,
       cnpj8Receiver,
       tpftSymbol,
       tpftAmount,
     } = dto;
+    const operationId = this.utilsService.generateOperationId().toString();
 
     const senderWallet = process.env.ARBI_DEFAULT_WALLET_ADDRESS;
     const bacenAssetId = process.env.BACEN_DEFAULT_ASSET_ID;
