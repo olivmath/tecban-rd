@@ -56,7 +56,7 @@ export class TPFtAuctionPlacementDTO {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ description: 'ID único da operação 1002 na data que a operação será executada' })
+  @ApiProperty({ description: 'ID único da operação, criado pelo STN ou vendedor' })
   @IsString()
   @IsNotEmpty()
   operationId: string;
@@ -86,7 +86,7 @@ export class TPFtInstitutionBuyFromAnInstitutionDTO {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ description: 'ID único da operação 1002 na data que a operação será executada' })
+  @ApiProperty({ description: 'ID único da operação criado pelo vendedor' })
   @IsString()
   @IsNotEmpty()
   operationId: string;
@@ -120,11 +120,6 @@ export class TPFtInstitutionSellToAnInstitutionDTO {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @ApiProperty({ description: 'ID único da operação 1002 na data que a operação será executada' })
-  @IsString()
-  @IsNotEmpty()
-  operationId: string;
 
   @ApiProperty({ description: 'CPNJ8 da instituição que está vendendo o TPFt' })
   @IsString()
