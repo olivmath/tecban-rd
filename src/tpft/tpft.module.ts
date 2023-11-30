@@ -6,9 +6,10 @@ import { ParfinModule } from 'src/parfin/parfin.module';
 import { LoggerService } from 'src/logger/logger.service';
 import { RealDigitalModule } from 'src/real-digital/real-digital.module';
 import { UtilsModule } from 'src/utils/util.module';
+import { RealTokenizadoModule } from 'src/real-tokenizado/real-tokenizado.module';
 
 @Module({
-  imports: [ParfinModule, RealDigitalModule, UtilsModule],
+  imports: [ParfinModule, RealDigitalModule, RealTokenizadoModule, UtilsModule],
   controllers: [TPFtController],
   providers: [TPFtService, ContractHelperService, LoggerService],
 })
