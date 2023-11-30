@@ -15,16 +15,29 @@ export class ContractHelperController {
         this.logger.setContext('ContractHelperController');
     }
 
-    @Get('get-contract-address-by-name/:contractName')
+    @Get('get-saved-contract-address/:contractName')
     @ApiOperation({
-        summary: 'Get a contract address',
-        description: 'Get a contract address using the contract name',
+        summary: 'Get a saved contract address',
+        description: 'Get a contract address saved in the application',
     })
     @getContractAddress200
     async getContractAddressByName(@Param('contractName') contractName: string) {
         this.logger.setContext('ContractHelperController::getContractAddressByName');
 
         const address = await this.contractService.getContractAddress(contractName as ContractName);
+        return { address };
+    }
+
+    @Get('get-contract-address-from-blockchain/:contractName')
+    @ApiOperation({
+        summary: 'Get a contract address from the blockchain',
+        description: 'Get a contract address directly from the blockchain',
+    })
+    @getContractAddress200
+    async getContractAddressFromBlockchain(@Param('contractName') contractName: string) {
+        this.logger.setContext('ContractHelperController::getContractAddressFromBlockchain');
+
+        const address = await this.contractService.getContractAddressFromBlockchain(contractName);
         return { address };
     }
 
