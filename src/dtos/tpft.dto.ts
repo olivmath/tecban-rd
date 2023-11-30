@@ -11,7 +11,7 @@ export class TPFtSetApprovalForAllDTO {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ description: 'ID que identifica a carteira na Parfin', })
+  @ApiProperty({ description: 'Endereço da carteira que está criando a transação', })
   @IsString()
   @IsNotEmpty()
   walletAddress: string;
@@ -125,6 +125,91 @@ export class TPFtInstitutionSellToAnInstitutionDTO {
   @IsString()
   @IsNotEmpty()
   cnpj8Receiver: string;
+
+  @ApiProperty({ description: 'Símbolo do TPFt da transação (LTN, LFT, etc.)' })
+  @IsString()
+  @IsNotEmpty()
+  tpftSymbol: string;
+
+  @ApiProperty({
+    description:
+      'Quantidade de TPFt da operação (incluir 2 casas decimais no final do número inteiro)',
+    example: '100000'
+  })
+  @IsString()
+  @IsNotEmpty()
+  tpftAmount: string;
+}
+
+export class TPFtBuyParticipantAndItsClientDTO {
+  @ApiProperty({
+    description: 'Descrição da interação com o contrato na Parfin',
+    default: '',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ description: 'ID que identifica o ativo na Parfin' })
+  @IsString()
+  @IsNotEmpty()
+  assetId: string;
+
+  @ApiProperty({ description: 'ID único da operação criado pelo vendedor' })
+  @IsString()
+  @IsNotEmpty()
+  operationId: string;
+
+  @ApiProperty({ description: 'Endereço da carteira do vendedor' })
+  @IsString()
+  @IsNotEmpty()
+  sender: string;
+
+  @ApiProperty({ description: 'Endereço da carteira do comprador' })
+  @IsString()
+  @IsNotEmpty()
+  receiver: string;
+
+  @ApiProperty({ description: 'Símbolo do TPFt da transação (LTN, LFT, etc.)' })
+  @IsString()
+  @IsNotEmpty()
+  tpftSymbol: string;
+
+  @ApiProperty({
+    description:
+      'Quantidade de TPFt da operação (incluir 2 casas decimais no final do número inteiro)',
+    example: '100000'
+  })
+  @IsString()
+  @IsNotEmpty()
+  tpftAmount: string;
+}
+
+export class TPFtSellParticipantAndItsClientDTO {
+  @ApiProperty({
+    description: 'Descrição da interação com o contrato na Parfin',
+    default: '',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ description: 'ID que identifica o ativo na Parfin' })
+  @IsString()
+  @IsNotEmpty()
+  assetId: string;
+
+  @ApiProperty({ description: 'Endereço da carteira do vendedor' })
+  @IsString()
+  @IsNotEmpty()
+  sender: string;
+
+  @ApiProperty({ description: 'Endereço da carteira do comprador' })
+  @IsString()
+  @IsNotEmpty()
+  receiver: string;
 
   @ApiProperty({ description: 'Símbolo do TPFt da transação (LTN, LFT, etc.)' })
   @IsString()
