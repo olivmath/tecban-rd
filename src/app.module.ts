@@ -13,10 +13,12 @@ import { KeyDictionaryModule } from './key-dictionary/key-dictionary.module';
 import { TPFtModule } from './tpft/tpft.module';
 import { LoggerModule } from './logger/logger.module';
 import { AllExceptionsFilter } from './filters/http-exception.filter';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { RequestIdMiddleware } from './middleware/request-id.middleware';
-import { UtilsService } from './utils/util.service';
+import { WebhookController } from './webhook/webhook.controller';
+import { WebhookValidationMiddleware } from './middleware/webhook-validation.middleware';
+import { WebhookModule } from './webhook/webhook.module';
 import { UtilsModule } from './utils/util.module';
 
 @Module({
@@ -33,6 +35,7 @@ import { UtilsModule } from './utils/util.module';
         ContractHelperModule,
         KeyDictionaryModule,
         LoggerModule,
+        WebhookModule,
         UtilsModule,
     ],
     providers: [
@@ -41,11 +44,12 @@ import { UtilsModule } from './utils/util.module';
             useClass: AllExceptionsFilter,
         },
     ],
-
-    controllers: [HealthController],
+    controllers: [HealthController, WebhookController],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(RequestIdMiddleware, LoggerMiddleware).forRoutes('*');
+        consumer.apply(RequestIdMiddleware).forRoutes('*');
+        consumer.apply(LoggerMiddleware).forRoutes('*');
+        consumer.apply(WebhookValidationMiddleware).forRoutes('api/v1/webhook');
     }
 }

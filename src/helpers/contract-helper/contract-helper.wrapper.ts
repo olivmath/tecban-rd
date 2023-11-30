@@ -5,6 +5,7 @@ type inputOutput = {
     internalType: string;
     name: string;
     type: string;
+    indexed: boolean;
     components?: inputOutput[];
 };
 
@@ -63,7 +64,7 @@ export default class WrapperContractABI {
         const web3 = new Web3();
 
         // Validation
-        if (typeof abi === "undefined") {
+        if (typeof abi === 'undefined') {
             throw new AppError(500, `ABI not found, contractName: ${name}`);
         }
 
@@ -96,6 +97,25 @@ export default class WrapperContractABI {
         this.functionsMap = {};
 
         abi.forEach((item: Item) => {
+            if (item.type === 'event') {
+                const eventSign = `${item.name}(${item.inputs.map((input) => input.type).join(',')})`;
+                const eventSignHash = web3.utils.keccak256(eventSign);
+
+                this.functionsMap[eventSignHash] = (...args: any[]) => {
+                    const eventData = args[0];
+                    const data = args[1];
+                    const decodedParams = web3.eth.abi.decodeLog(item.inputs, data, eventData);
+
+                    const decodedData: Record<string, any> = {};
+                    decodedData["event"] = item.name
+                    item.inputs.forEach((input, index) => {
+                        decodedData[input.name] = decodedParams[index];
+                    });
+
+                    return [decodedData];
+                };
+            }
+
             if (item.type === 'function') {
                 const callFunctionSignature = `${item.name}(${item.inputs.map((input) => input.type).join(',')})`;
 

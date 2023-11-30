@@ -9,16 +9,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse();
         const request = ctx.getRequest();
+        const requestId = request['requestId'] || request.headers['x-request-id'];
 
         let appErr: AppError;
         if (exception instanceof HttpException) {
-            appErr = new AppError(exception.getStatus(), exception.message, { erro: exception });
+            const msg = exception.getResponse() as any;
+            appErr = new AppError(exception.getStatus(), msg.message, { erro: exception, requestId });
         } else if (exception instanceof AppError === false) {
             appErr = new AppError(500, exception.message ? exception.message : 'Error desconhecido', {
                 erro: exception,
+                requestId,
             });
         } else {
             appErr = exception;
+            appErr.requestId = requestId;
         }
 
         this.logger.error(appErr);
@@ -29,8 +33,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
             statusCode: appErr.statusCode,
         };
 
-        response.setHeader('x-request-id', request['requestId'] || request.headers['x-request-id']);
-
+        response.setHeader('x-request-id', requestId);
         response.status(appErr.statusCode).json(body);
     }
 }
