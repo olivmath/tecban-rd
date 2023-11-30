@@ -32,18 +32,12 @@ export class RealTokenizadoBurnDTO {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({
-    description: 'ID que identifica a carteira na Parfin',
-    example: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
-  })
+  @ApiProperty({ description: 'Endereço da carteira que está criando a transação', })
   @IsString()
   @IsNotEmpty()
   walletAddress: string;
 
-  @ApiProperty({
-    description: 'ID que identifica o ativo na Parfin',
-    example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
-  })
+  @ApiProperty({ description: 'ID que identifica o ativo na Parfin' })
   @IsString()
   @IsNotEmpty()
   assetId: string;
@@ -64,10 +58,7 @@ export class RealTokenizadoBurnFromDTO {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({
-    description: 'Endereço da conta onde será feito o resgate',
-    example: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
-  })
+  @ApiProperty({ description: 'Endereço da conta onde será feito o resgate' })
   @IsString()
   @IsNotEmpty()
   account: string;
@@ -91,18 +82,12 @@ export class RealTokenizadoApproveDTO {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({
-    description: 'ID que identifica a carteira na Parfin',
-    example: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
-  })
+  @ApiProperty({ description: 'Endereço da carteira que está criando a transação', })
   @IsString()
   @IsNotEmpty()
   walletAddress: string;
 
-  @ApiProperty({
-    description: 'ID que identifica o ativo na Parfin',
-    example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
-  })
+  @ApiProperty({ description: 'ID que identifica o ativo na Parfin' })
   @IsString()
   @IsNotEmpty()
   assetId: string;
@@ -128,18 +113,12 @@ export class RealTokenizadoInternalTransferDTO {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({
-    description: 'ID que identifica a carteira na Parfin',
-    example: '0xc0ffee254729296a45a3885639AC7E10F9d54979',
-  })
+  @ApiProperty({ description: 'Endereço da carteira que está criando a transação', })
   @IsString()
   @IsNotEmpty()
   walletAddress: string;
 
-  @ApiProperty({
-    description: 'ID que identifica o ativo na Parfin',
-    example: '01574a14-25bc-45f6-aaf6-cd71a60b1d35',
-  })
+  @ApiProperty({ description: 'ID que identifica o ativo na Parfin' })
   @IsString()
   @IsNotEmpty()
   assetId: string;
@@ -165,7 +144,7 @@ export class RealTokenizadoExternalTransferDTO {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ description: 'ID que identifica a carteira na Parfin' })
+  @ApiProperty({ description: 'Endereço da carteira que está criando a transação', })
   @IsString()
   @IsNotEmpty()
   walletAddress: string;
@@ -201,7 +180,7 @@ export class RealTokenizadoIncreaseAllowanceDTO {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ description: 'ID que identifica a carteira na Parfin' })
+  @ApiProperty({ description: 'Endereço da carteira que está criando a transação', })
   @IsString()
   @IsNotEmpty()
   walletAddress: string;
