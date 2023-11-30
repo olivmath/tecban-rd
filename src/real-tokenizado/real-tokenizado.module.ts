@@ -11,5 +11,6 @@ import { LoggerService } from 'src/logger/logger.service';
     imports: [ParfinModule, TransactionsModule],
     controllers: [RealTokenizadoController],
     providers: [RealTokenizadoService, ContractHelperService, LoggerService],
+    exports: [RealTokenizadoService]
 })
 export class RealTokenizadoModule { }
