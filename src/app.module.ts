@@ -16,6 +16,7 @@ import { AllExceptionsFilter } from './filters/http-exception.filter';
 import { APP_FILTER } from '@nestjs/core';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { RequestIdMiddleware } from './middleware/request-id.middleware';
+import { ConfigService } from 'config/config.service';
 import { WebhookController } from './webhook/webhook.controller';
 import { WebhookValidationMiddleware } from './middleware/webhook-validation.middleware';
 import { WebhookModule } from './webhook/webhook.module';
@@ -43,6 +44,7 @@ import { UtilsModule } from './utils/util.module';
             provide: APP_FILTER,
             useClass: AllExceptionsFilter,
         },
+        ConfigService
     ],
     controllers: [HealthController, WebhookController],
 })
