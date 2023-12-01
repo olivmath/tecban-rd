@@ -1,6 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { EncodeDataDTO } from "src/dtos/contract-helper.dto";
 
+
+export class TPFtApproveTradeRes {
+  @ApiProperty({ description: 'ID da transação na Parfin de realDigital.approve(TPFtDvP)' })
+  realDigitalTpftDvpApprovalTxId: string;
+  @ApiProperty({ description: 'ID da transação na Parfin de realDigital.approve(SwapOneStepFrom)' })
+  realDigitalSwapOneStepFromApprovalTxId: string;
+  @ApiProperty({ description: 'ID da transação na Parfin de realTokenizado.approve(TPFtDvP)' })
+  realTokenizadoTpftDvpApprovalTxId: string;
+}
 export class TPFtGetBalanceOfSuccessRes {
   @ApiProperty({ description: 'ID do TPFt (1, 2, etc.)' })
   tpftID: string;
@@ -17,6 +26,13 @@ export class TPFtGetBalanceOfSuccessRes {
 export class TPFtBuyRes {
   @ApiProperty({ description: 'ID da transação na Parfin de approve()' })
   approvalTxId: string;
+  @ApiProperty({ description: 'ID da transação na Parfin de compra' })
+  purchaseTxId: string;
+  @ApiProperty({ description: 'Dados da compra/venda de TPFt', type: EncodeDataDTO })
+  txData: EncodeDataDTO;
+}
+
+export class TPFtExternalBuyRes extends TPFtApproveTradeRes {
   @ApiProperty({ description: 'ID da transação na Parfin de compra' })
   purchaseTxId: string;
   @ApiProperty({ description: 'Dados da compra/venda de TPFt', type: EncodeDataDTO })
