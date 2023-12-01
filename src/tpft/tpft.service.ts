@@ -18,7 +18,8 @@ import {
   TPFtSellParticipantAndItsClientDTO,
   TPFfBuyDTO,
   TPFtSellDTO,
-  TPFtApproveTradeDTO
+  TPFtApproveTradeDTO,
+  TPFtTradeClientSameInstitutionDTO
 } from 'src/dtos/tpft.dto';
 import { TpftAcronym, TpftID } from 'src/types/tpft.types';
 import Web3 from 'web3';
@@ -557,7 +558,7 @@ export class TPFtService {
   // --- Operation 1052: Customer Buy and Sell TPFt
 
   // - Buy TPFt from institution or its customer
-  async buyTpftParticipantAndItsClient(dto: TPFtBuyParticipantAndItsClientDTO): Promise<TPFtBuyRes | any> {
+  async buyTpftInsideSameInstitution(dto: TPFtBuyParticipantAndItsClientDTO | TPFtTradeClientSameInstitutionDTO): Promise<TPFtBuyRes | any> {
     // 1. Receber o DTO da operação e buscar os endereços dos contratos
     const {
       description,
@@ -679,7 +680,7 @@ export class TPFtService {
   }
 
   // - Sell TPFt to institution or its customer
-  async sellTpftParticipantAndItsClient(dto: TPFtSellParticipantAndItsClientDTO): Promise<TPFtSellRes | any> {
+  async sellTpftInsideSameInstitution(dto: TPFtSellParticipantAndItsClientDTO | TPFtTradeClientSameInstitutionDTO): Promise<TPFtSellRes | any> {
     // 1. Receber o DTO da operação e buscar os endereços dos contratos
     const {
       description,
