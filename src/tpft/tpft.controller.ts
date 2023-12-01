@@ -2,16 +2,18 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { TPFtService } from './tpft.service';
 import {
+  TPFfBuyDTO,
   TPFtAuctionPlacementDTO,
   TPFtBuyParticipantAndItsClientDTO,
   TPFtGetBalanceOfDTO,
   TPFtGetBalanceOfQuery,
   TPFtInstitutionBuyFromAnInstitutionDTO,
   TPFtInstitutionSellToAnInstitutionDTO,
+  TPFtSellDTO,
   TPFtSellParticipantAndItsClientDTO,
   TPFtSetApprovalForAllDTO
 } from 'src/dtos/tpft.dto';
-import { getTpftBalance201, buyTpft201, sellTpft201 } from 'src/res/swagger/tpft.swagger';
+import { getTpftBalance201, buyTpft201, sellTpft201, externalBuyTpft201 } from 'src/res/swagger/tpft.swagger';
 
 @Controller('tpft')
 @ApiTags('TPFt Operations')
@@ -67,7 +69,7 @@ export class TPFtController {
   // --- Operation 1052: Customer Buy and Sell TPFt
 
   // - Buy TPFt from institution or its customer
-  @Post('trade/institution/buy-from-institution-or-its-customer')
+  @Post('trade/buy-from-institution-or-its-customer')
   @buyTpft201
   @ApiOperation({
     summary: 'Buy TPFt from an institution or its customer',
@@ -78,7 +80,7 @@ export class TPFtController {
   }
 
   // - Sell TPFt to institution or its customer
-  @Post('trade/institution/sell-to-institution-or-its-customer')
+  @Post('trade/sell-to-institution-or-its-customer')
   @sellTpft201
   @ApiOperation({
     summary: 'Sell TPFt to an institution or its customer',
@@ -86,5 +88,27 @@ export class TPFtController {
   })
   async sellTpftParticipantAndItsClient(@Body() dto: TPFtSellParticipantAndItsClientDTO) {
     return this.tpftService.sellTpftParticipantAndItsClient(dto);
+  }
+
+  // - Buy TPFt from another institution (client_insitution_A -> institution_B)
+  @Post('trade/customer/buy-from-another-institution')
+  @externalBuyTpft201
+  @ApiOperation({
+    summary: 'A customer can purchase TPFt from another institution',
+    description: 'Trade TPFt outside the institution (purchase operation)'
+  })
+  async buyTpftParticipantAndDifferentClient(@Body() dto: TPFfBuyDTO) {
+    return this.tpftService.buyTpftParticipantAndDifferentClient(dto);
+  }
+
+  // - Sell TPFt to a client from another institution (institution_A -> client_institution_B)
+  @Post('trade/institution/sell-to-customer-from-another-institution')
+  @sellTpft201
+  @ApiOperation({
+    summary: 'An institution can sell TPFt to a client from another institution',
+    description: 'Trade TPFt outside the institution (sale operation)'
+  })
+  async sellTpftParticipantAndDifferentClient(@Body() dto: TPFtSellDTO) {
+    return this.tpftService.sellTpftParticipantAndDifferentClient(dto);
   }
 }
