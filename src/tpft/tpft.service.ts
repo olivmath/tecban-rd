@@ -83,12 +83,12 @@ export class TPFtService {
       throw new Error(`[ERROR]: Erro ao aprovar o débito de Real Digital na carteira ${receiverWallet}`);
     }
 
-    // 3. Arpovando o contrato SwapOneStepFrom a manipular Real Digital na carteira do comprador
+    // 3. Arpovando o contrato SwapOneStepFrom a manipular Real Digital na carteira da IF do comprador
     const realDigitalSwapOneStepFromApproveDTO: RealDigitalApproveDTO = {
       description:
         `Aprovando o contrato SwapOneStepFrom a debitar $${total} RD da carteira ${receiverWallet} para a compra de TPFt`,
-      walletAddress: receiverWallet,
-      assetId: receiverAssetId,
+      walletAddress: institutionWallet,
+      assetId: institutionAssetId,
       spender: swapOneStepFromAddress,
       amount: formattedTotal,
     }
