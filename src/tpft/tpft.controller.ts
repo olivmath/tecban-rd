@@ -11,7 +11,8 @@ import {
   TPFtInstitutionSellToAnInstitutionDTO,
   TPFtSellDTO,
   TPFtSellParticipantAndItsClientDTO,
-  TPFtSetApprovalForAllDTO
+  TPFtSetApprovalForAllDTO,
+  TPFtTradeClientSameInstitutionDTO
 } from 'src/dtos/tpft.dto';
 import { getTpftBalance201, buyTpft201, sellTpft201, externalBuyTpft201 } from 'src/res/swagger/tpft.swagger';
 
@@ -76,7 +77,7 @@ export class TPFtController {
     description: 'Trade TPFt inside the same institution (purchase operation)'
   })
   async buyTpftParticipantAndItsClient(@Body() dto: TPFtBuyParticipantAndItsClientDTO) {
-    return this.tpftService.buyTpftParticipantAndItsClient(dto);
+    return this.tpftService.buyTpftInsideSameInstitution(dto);
   }
 
   // - Sell TPFt to institution or its customer
@@ -87,7 +88,7 @@ export class TPFtController {
     description: 'Trade TPFt inside the same institution (sale operation)'
   })
   async sellTpftParticipantAndItsClient(@Body() dto: TPFtSellParticipantAndItsClientDTO) {
-    return this.tpftService.sellTpftParticipantAndItsClient(dto);
+    return this.tpftService.sellTpftInsideSameInstitution(dto);
   }
 
   // - Buy TPFt from another institution (client_insitution_A -> institution_B)
@@ -110,5 +111,23 @@ export class TPFtController {
   })
   async sellTpftParticipantAndDifferentClient(@Body() dto: TPFtSellDTO) {
     return this.tpftService.sellTpftParticipantAndDifferentClient(dto);
+  }
+
+  // - trade TPFt to a client from same institution
+  @Post('trade/client-to-client-same-institution')
+  @ApiOperation({
+    summary: '',
+    description: ''
+  })
+  async tradeTpftClientSameInstitution(@Body() dto: TPFtTradeClientSameInstitutionDTO) {
+    if (dto.operationType==='sell')
+    {
+      return this.tpftService.sellTpftInsideSameInstitution(dto);
+    }
+    else{
+      return this.tpftService.buyTpftInsideSameInstitution(dto);
+    }
+
+    
   }
 }
