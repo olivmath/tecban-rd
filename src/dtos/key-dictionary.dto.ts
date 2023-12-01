@@ -47,9 +47,22 @@ export class KeyDictionaryGetCustomerDataDTO {
     taxId: string;
 }
 
-export class KeyDictionaryGetClientKeyDTO {
-    @ApiProperty({ description: 'Endereço da carteira do cliente', example: '0xdfc3ba0ba8dd4bd556d9caa29284212cdad2f3f1' })
+export class KeyDictionaryGetCustomerKeyDTO {
+    @ApiProperty({
+        description: 'Endereço da carteira do cliente',
+        example: '0xdfc3ba0ba8dd4bd556d9caa29284212cdad2f3f1',
+    })
     @IsString()
     @IsNotEmpty()
     walletAddress: string;
+}
+
+export class KeyDictionaryGetCustomerWalletDTO {
+    @ApiProperty({
+        description: 'A chave cuja carteira está sendo buscada',
+        example: '0xdfc3ba0ba8dd4bd556d9caa29284212cdad2f3f1',
+    })
+    @IsString()
+    @IsNotEmpty()
+    key: string;
 }
