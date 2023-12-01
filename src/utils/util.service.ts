@@ -1,11 +1,6 @@
 import { Injectable } from '@nestjs/common';
-
-type OperationId = {
-    index: string;
-    bankCode: string;
-    date: string;
-    toString: () => string;
-};
+import { TpftAcronym, TpftCode, TpftMaturityDate, TpftUnitPrice } from 'src/types/tpft.types';
+import { OperationId, TPFtInfo } from 'src/types/utils.types';
 
 @Injectable()
 export class UtilsService {
@@ -41,5 +36,37 @@ export class UtilsService {
 
         return { total, formattedTotal };
 
+    }
+
+    setTpftInfo(tpftSymbol: string): TPFtInfo {
+        let acronym: TpftAcronym;
+        let code: TpftCode;
+        let maturityDate: TpftMaturityDate;
+        let unitPrice: TpftUnitPrice;
+        let floatUnitPrice: number;
+        switch (tpftSymbol) {
+            case 'LTN':
+                acronym = TpftAcronym.LTN;
+                code = TpftCode.LTN;
+                maturityDate = TpftMaturityDate.LTN;
+                unitPrice = TpftUnitPrice.LTN;
+                floatUnitPrice = 986.40997165;
+                break;
+            case 'LFT':
+                acronym = TpftAcronym.LFT;
+                code = TpftCode.LFT;
+                maturityDate = TpftMaturityDate.LFT;
+                unitPrice = TpftUnitPrice.LFT;
+                floatUnitPrice = 985.40997100;
+                break;
+        }
+
+        return {
+            acronym,
+            code,
+            maturityDate,
+            unitPrice,
+            floatUnitPrice,
+        };
     }
 }
