@@ -300,3 +300,55 @@ export class TPFfBuyDTO extends TPFtSellDTO {
   @IsNotEmpty()
   operationId: string;
 }
+
+
+export class TPFtTradeClientSameInstitutionDTO {
+  @ApiProperty({
+    description: 'Descrição da interação com o contrato na Parfin',
+    default: '',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ description: 'ID que identifica o ativo na Parfin, relacionado a carteira executando a operação' })
+  @IsString()
+  @IsNotEmpty()
+  assetId: string;
+
+  @ApiProperty({ description: 'Endereço da carteira do vendedor' })
+  @IsString()
+  @IsNotEmpty()
+  sender: string;
+
+  @ApiProperty({ description: 'Endereço da carteira do comprador' })
+  @IsString()
+  @IsNotEmpty()
+  receiver: string;
+
+  @ApiProperty({ description: 'Símbolo do TPFt da transação (LTN, LFT, etc.)' })
+  @IsString()
+  @IsNotEmpty()
+  tpftSymbol: string;
+
+  @ApiProperty({
+    description:
+      'Quantidade de TPFt da operação (incluir 2 casas decimais no final do número inteiro)',
+    example: '100000'
+  })
+  @IsString()
+  @IsNotEmpty()
+  tpftAmount: string;
+
+  @ApiProperty({ description: 'ID único da operação criado pelo vendedor' })
+  @IsString()
+  @IsOptional()
+  operationId?: string;
+
+  @ApiProperty({ description: 'Tipo da Operação: compra ou venda' })
+  @IsString()
+  @IsNotEmpty()
+  operationType: string;
+
+}
