@@ -1,6 +1,24 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
+export class TPFtApproveTradeDTO {
+  @ApiProperty({ description: 'Endereço da carteira do comprador' })
+  @IsString()
+  @IsNotEmpty()
+  receiverWallet: string;
+  @ApiProperty({ description: 'ID do asset da carteira do comprador na Parfin' })
+  @IsString()
+  @IsNotEmpty()
+  receiverAssetId: string;
+  @ApiProperty({ description: 'Valor da transação' })
+  @IsString()
+  @IsNotEmpty()
+  total: string;
+  @ApiProperty({ description: 'Valor formatado da transação para os métodos approve()' })
+  @IsString()
+  @IsNotEmpty()
+  formattedTotal: string;
+}
 export class TPFtSetApprovalForAllDTO {
   @ApiProperty({
     description: 'Descrição da interação com o contrato',
@@ -224,4 +242,61 @@ export class TPFtSellParticipantAndItsClientDTO {
   @IsString()
   @IsNotEmpty()
   tpftAmount: string;
+}
+
+export class TPFtSellDTO {
+  @ApiProperty({
+    description: 'Descrição da interação com o contrato na Parfin',
+    default: '',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ description: 'ID que identifica o ativo na Parfin, relacionado a carteira executando a operação' })
+  @IsString()
+  @IsNotEmpty()
+  assetId: string;
+
+  @ApiProperty({ description: 'Endereço da carteira do vendedor' })
+  @IsString()
+  @IsNotEmpty()
+  sender: string;
+
+  @ApiProperty({ description: 'Endereço do contrato Real Tokenizado da IF relaciona ao vendedor' })
+  @IsString()
+  @IsNotEmpty()
+  senderToken: string;
+
+  @ApiProperty({ description: 'Endereço da carteira do comprador' })
+  @IsString()
+  @IsNotEmpty()
+  receiver: string;
+
+  @ApiProperty({ description: 'Endereço do contrato Real Tokenizado da IF relaciona ao comprador' })
+  @IsString()
+  @IsNotEmpty()
+  receiverToken: string;
+
+  @ApiProperty({ description: 'Símbolo do TPFt da transação (LTN, LFT, etc.)' })
+  @IsString()
+  @IsNotEmpty()
+  tpftSymbol: string;
+
+  @ApiProperty({
+    description:
+      'Quantidade de TPFt da operação (incluir 2 casas decimais no final do número inteiro)',
+    example: '100000'
+  })
+  @IsString()
+  @IsNotEmpty()
+  tpftAmount: string;
+}
+
+export class TPFfBuyDTO extends TPFtSellDTO {
+  @ApiProperty({ description: 'ID único da operação criado pelo vendedor' })
+  @IsString()
+  @IsNotEmpty()
+  operationId: string;
 }
