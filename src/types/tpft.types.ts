@@ -17,6 +17,7 @@ export enum TpftCode {
 export enum TpftMaturityDate {
   LTN = 1732147200,
   LFT = 1706140800,
+  LTN_2023 = 1700524800
 }
 
 export enum TpftUnitPrice {

@@ -50,11 +50,11 @@ export class TPFtService {
 
 
 
-  async approveBuyTpftDiffParticipant(data: {dto: ClientToClientAnotherInstitutionDTO, isInstitution: boolean}): Promise<TPFtApproveTradeRes | any> {
-    const receiverAssetId = data.dto.assetId
-    const receiverWallet = data.dto.receiver
-    const formattedTotal = data.dto.tpftAmount
-    const total = data.dto.tpftAmount
+  async approveBuyTpftDiffParticipant(data: {dto: TPFtApproveTradeDTO, isInstitution: boolean}): Promise<TPFtApproveTradeRes | any> {
+    const receiverAssetId = data.dto.receiverAssetId
+    const receiverWallet = data.dto.receiverWallet
+    const formattedTotal = data.dto.formattedTotal
+    const total = data.dto.total
     
     // 1. Buscando os endereços dos contratos
     const institutionWallet = process.env.ARBI_DEFAULT_WALLET_ADDRESS;
@@ -122,11 +122,13 @@ export class TPFtService {
     const realTokenizadoTpftDvpApproveRes =
       await this.realTokenizadoService.approve(realTokenizadoTpftDvpApproveDTO);
 
-    const { parfinTxId: realTokenizadoTpftDvpApprovalTxId } =
+    const { parfinTxId } =
       realTokenizadoTpftDvpApproveRes as ContractApproveRes;
     if (!realTokenizadoTpftDvpApprovalTxId) {
       throw new Error(`[ERROR]: Erro ao aprovar o débito de Real Digital na carteira ${receiverWallet}`);
-    }}
+    }
+    realTokenizadoTpftDvpApprovalTxId = parfinTxId
+  }
 
     return {
       realDigitalTpftDvpApprovalTxId,
@@ -830,7 +832,7 @@ export class TPFtService {
       total,
       formattedTotal,
     }
-    const approveRes = await this.approveBuyTpftDiffParticipant(data);
+    const approveRes = await this.approveBuyTpftDiffParticipant({dto: approveDTO, isInstitution: data.isInstitution});
     const {
       realDigitalTpftDvpApprovalTxId, realDigitalSwapOneStepFromApprovalTxId, realTokenizadoTpftDvpApprovalTxId,
     } = approveRes as TPFtApproveTradeRes;

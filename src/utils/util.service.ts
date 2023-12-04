@@ -50,7 +50,7 @@ export class UtilsService {
                 code = TpftCode.LTN;
                 maturityDate = TpftMaturityDate.LTN;
                 unitPrice = TpftUnitPrice.LTN;
-                floatUnitPrice = 986.40997165;
+                floatUnitPrice = 986.40997100;
                 break;
             case 'LFT':
                 acronym = TpftAcronym.LFT;
