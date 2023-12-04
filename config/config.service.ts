@@ -30,7 +30,7 @@ export class ConfigService {
     ARBI_DEFAULT_WALLET_ADDRESS: string;
     ARBI_RD_ASSET_ID: string;
     ARBI_RT_ASSET_ID: string;
-    BACEN_DEFAULT_ASSET_ID: string;
+    ARBI_BACEN_ASSET_ID: string;
     // - Cliente 1 do Banco Arbi
     ARBI_CLIENT_1_WALLET_ADDRESS: string;
     ARBI_CLIENT_1_RT_ASSET_ID: string;
@@ -108,7 +108,7 @@ export class ConfigService {
         this.ARBI_DEFAULT_WALLET_ADDRESS = ensure('ARBI_DEFAULT_WALLET_ADDRESS');
         this.ARBI_RD_ASSET_ID = ensure('ARBI_RD_ASSET_ID');
         this.ARBI_RT_ASSET_ID = ensure('ARBI_RT_ASSET_ID');
-        this.BACEN_DEFAULT_ASSET_ID = ensure('ACEN_DEFAULT_ASSET_ID');
+        this.ARBI_BACEN_ASSET_ID = ensure('ARBI_BACEN_ASSET_ID');
         this.ARBI_CLIENT_1_WALLET_ADDRESS = ensure('ARBI_CLIENT_1_WALLET_ADDRESS');
         this.ARBI_CLIENT_1_RT_ASSET_ID = ensure('ARBI_CLIENT_1_RT_ASSET_ID');
         this.ARBI_CLIENT_1_BACEN_ASSET_ID = ensure('ARBI_CLIENT_1_BACEN_ASSET_ID');
