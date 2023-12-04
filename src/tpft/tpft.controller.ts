@@ -112,7 +112,7 @@ export class TPFtController {
     description: 'Trade TPFt outside the institution (sale operation)'
   })
   async sellTpftParticipantAndDifferentClient(@Body() dto: TPFtSellDTO) {
-    return this.tpftService.sellTpftParticipantAndDifferentClient(dto);
+    return this.tpftService.sellTpftOutsideInstitution(dto);
   }
 
   // - trade TPFt to a client from same institution
@@ -139,9 +139,21 @@ export class TPFtController {
   })
   async clientToClientAnotherInstitution(@Body() dto: ClientToClientAnotherInstitutionDTO) {
     if (dto.OperationType === OperationEnum.SELL) {
-      return {}
+      return this.tpftService.sellTpftOutsideInstitution(dto);
     } else {
       return this.tpftService.buyTpftDiffParticipant({ dto, isInstitution: false });
     }
   }
+  // {
+  //   "OperationType": "buy",
+  //   "description": "Cliente do banco Arbi comprando 1 LTN do cliente do bradesco",
+  //   "assetId": "720f61dc-124d-446c-a04e-58cf7a053c90",
+  //   "sender": "0xB78e8EC20764bB574F0A475D5C81e905EA2d9317",
+  //   "senderToken": "0xe95433c3c258dCda8a9Acdc16288945B821d0093",
+  //   "receiver": "0xdfc3ba0ba8dd4bd556d9caa29284212cdad2f3f1",
+  //   "receiverToken": "0x5CDaAE24ed9dC6b2bFFDd7734216824EFF21D90a",
+  //   "tpftSymbol": "LTN",
+  //   "tpftAmount": "100",
+  //   "operationId": "001121"
+  // }
 }

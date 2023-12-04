@@ -886,7 +886,7 @@ export class TPFtService {
     }
 
     // 7. Assinar a transação e retornar os dados da transação
-    // await this.parfinService.transactionSignAndPush(transactionId);
+    await this.parfinService.transactionSignAndPush(transactionId);
 
     return {
       realDigitalTpftDvpApprovalTxId: realDigitalTpftDvpApprovalTxId,
@@ -898,7 +898,7 @@ export class TPFtService {
   }
 
   // - Sell TPFt: Institution A -> Client Institution B
-  async sellTpftParticipantAndDifferentClient(dto: TPFtSellDTO): Promise<TPFtSellRes | any> {
+  async sellTpftOutsideInstitution(dto: ClientToClientAnotherInstitutionDTO): Promise<TPFtSellRes | any> {
     // 1. Receber o DTO da operação e buscar os endereços dos contratos
     const {
       description,
@@ -925,7 +925,7 @@ export class TPFtService {
 
     const callerPartBySender = web3.utils.toBN(0);
 
-    parfinSendDTO.description = description;
+    parfinSendDTO.description = `${description} - Operation ID: ${operationId}`;
     parfinSendDTO.source = { assetId };
 
     const { acronym, code, maturityDate, unitPrice } = this.utilsService.setTpftInfo(tpftSymbol);
