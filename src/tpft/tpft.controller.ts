@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { TPFtService } from './tpft.service';
 import {
+  ClientToClientAnotherInstitutionDTO,
   TPFfBuyDTO,
   TPFtAuctionPlacementDTO,
   TPFtBuyParticipantAndItsClientDTO,
@@ -15,6 +16,7 @@ import {
   TPFtTradeClientSameInstitutionDTO
 } from 'src/dtos/tpft.dto';
 import { getTpftBalance201, buyTpft201, sellTpft201, externalBuyTpft201 } from 'src/res/swagger/tpft.swagger';
+import { OperationEnum } from 'src/types/tpft.types';
 
 @Controller('tpft')
 @ApiTags('TPFt Operations')
@@ -99,9 +101,9 @@ export class TPFtController {
     description: 'Trade TPFt outside the institution (purchase operation)'
   })
   async buyTpftParticipantAndDifferentClient(@Body() dto: TPFfBuyDTO) {
-    return this.tpftService.buyTpftParticipantAndDifferentClient(dto);
+    return this.tpftService.buyTpftDiffParticipant({dto, isInstitution: false});
   }
-
+  
   // - Sell TPFt to a client from another institution (institution_A -> client_institution_B)
   @Post('trade/institution/sell-to-customer-from-another-institution')
   @sellTpft201
@@ -127,7 +129,19 @@ export class TPFtController {
     else{
       return this.tpftService.buyTpftInsideSameInstitution(dto);
     }
-
-    
+  }  
+  
+  @Post('trade/client-to-client/another-institution')  
+  @sellTpft201
+  @ApiOperation({
+    summary: 'Trade TPFt between clients from diff institutions',
+    description: 'Do Buy or Sell Operation'
+  })
+  async clientToClientAnotherInstitution(@Body() dto: ClientToClientAnotherInstitutionDTO) {
+    if (dto.OperationType === OperationEnum.SELL) {
+      return {}
+    } else {
+      return this.tpftService.buyTpftDiffParticipant({ dto, isInstitution: false });
+    }
   }
 }

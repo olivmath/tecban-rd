@@ -8,7 +8,7 @@ export class TPFtApproveTradeRes {
   @ApiProperty({ description: 'ID da transação na Parfin de realDigital.approve(SwapOneStepFrom)' })
   realDigitalSwapOneStepFromApprovalTxId: string;
   @ApiProperty({ description: 'ID da transação na Parfin de realTokenizado.approve(TPFtDvP)' })
-  realTokenizadoTpftDvpApprovalTxId: string;
+  realTokenizadoTpftDvpApprovalTxId?: string;
 }
 export class TPFtGetBalanceOfSuccessRes {
   @ApiProperty({ description: 'ID do TPFt (1, 2, etc.)' })

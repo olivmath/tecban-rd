@@ -23,3 +23,8 @@ export enum TpftUnitPrice {
   LTN = 98640997100,
   LFT = 98540997100,
 }
+
+export enum OperationEnum {
+  SELL = 'sell',
+  BUY = 'buy',
+}

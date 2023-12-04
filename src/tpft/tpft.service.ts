@@ -19,7 +19,8 @@ import {
   TPFfBuyDTO,
   TPFtSellDTO,
   TPFtApproveTradeDTO,
-  TPFtTradeClientSameInstitutionDTO
+  TPFtTradeClientSameInstitutionDTO,
+  ClientToClientAnotherInstitutionDTO
 } from 'src/dtos/tpft.dto';
 import { TpftAcronym, TpftID } from 'src/types/tpft.types';
 import Web3 from 'web3';
@@ -47,9 +48,15 @@ export class TPFtService {
     this.logger.setContext('TPFtService');
   }
 
-  async approveParticipantAndDifferentClientTrade(dto: TPFtApproveTradeDTO): Promise<TPFtApproveTradeRes | any> {
+
+
+  async approveBuyTpftDiffParticipant(data: {dto: ClientToClientAnotherInstitutionDTO, isInstitution: boolean}): Promise<TPFtApproveTradeRes | any> {
+    const receiverAssetId = data.dto.assetId
+    const receiverWallet = data.dto.receiver
+    const formattedTotal = data.dto.tpftAmount
+    const total = data.dto.tpftAmount
+    
     // 1. Buscando os endereços dos contratos
-    const { receiverWallet, receiverAssetId, total, formattedTotal } = dto;
     const institutionWallet = process.env.ARBI_DEFAULT_WALLET_ADDRESS;
     const institutionAssetId = process.env.ARBI_RD_ASSET_ID;
 
@@ -72,7 +79,7 @@ export class TPFtService {
       walletAddress: institutionWallet,
       assetId: institutionAssetId,
       spender: tpftDvpAddress,
-      amount: formattedTotal,
+      amount:   formattedTotal,
     }
     const realDigitalTpftDvpApproveRes =
       await this.realDigitalService.approve(realDigitalTpftDvpApproveDTO);
@@ -101,6 +108,8 @@ export class TPFtService {
       throw new Error(`[ERROR]: Erro ao aprovar o débito de Real Digital na carteira ${receiverWallet}`);
     }
 
+   let realTokenizadoTpftDvpApprovalTxId: string = "";
+   if (!data.isInstitution) {
     // 4. Arpovando o contrato TPFtDvP a manipular Real Tokenizado na carteira do comprador
     const realTokenizadoTpftDvpApproveDTO: RealTokenizadoApproveDTO = {
       description:
@@ -117,7 +126,7 @@ export class TPFtService {
       realTokenizadoTpftDvpApproveRes as ContractApproveRes;
     if (!realTokenizadoTpftDvpApprovalTxId) {
       throw new Error(`[ERROR]: Erro ao aprovar o débito de Real Digital na carteira ${receiverWallet}`);
-    }
+    }}
 
     return {
       realDigitalTpftDvpApprovalTxId,
@@ -778,7 +787,7 @@ export class TPFtService {
   }
 
   // - Buy TPFt: Client Institution A -> Institution B
-  async buyTpftParticipantAndDifferentClient(dto: TPFfBuyDTO): Promise<TPFtExternalBuyRes | any> {
+  async buyTpftDiffParticipant(data: {dto: ClientToClientAnotherInstitutionDTO, isInstitution: boolean}): Promise<TPFtExternalBuyRes | any> {
     // 1. Receber o DTO da operação e buscar os endereços dos contratos
     const {
       description,
@@ -790,7 +799,7 @@ export class TPFtService {
       receiverToken,
       tpftSymbol,
       tpftAmount,
-    } = dto;
+    } = data.dto;
 
     const receiverWallet = receiver;
     const receiverAssetId = assetId;
@@ -821,7 +830,7 @@ export class TPFtService {
       total,
       formattedTotal,
     }
-    const approveRes = await this.approveParticipantAndDifferentClientTrade(approveDTO);
+    const approveRes = await this.approveBuyTpftDiffParticipant(data);
     const {
       realDigitalTpftDvpApprovalTxId, realDigitalSwapOneStepFromApprovalTxId, realTokenizadoTpftDvpApprovalTxId,
     } = approveRes as TPFtApproveTradeRes;
@@ -877,7 +886,7 @@ export class TPFtService {
     }
 
     // 7. Assinar a transação e retornar os dados da transação
-    await this.parfinService.transactionSignAndPush(transactionId);
+    // await this.parfinService.transactionSignAndPush(transactionId);
 
     return {
       realDigitalTpftDvpApprovalTxId: realDigitalTpftDvpApprovalTxId,
@@ -887,6 +896,7 @@ export class TPFtService {
       txData: dataToEncode,
     } as TPFtExternalBuyRes;
   }
+
   // - Sell TPFt: Institution A -> Client Institution B
   async sellTpftParticipantAndDifferentClient(dto: TPFtSellDTO): Promise<TPFtSellRes | any> {
     // 1. Receber o DTO da operação e buscar os endereços dos contratos
