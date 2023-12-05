@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+coverage.json
+typechain
+typechain-types
+.env
+volumes
+# OS
+.DS_Store
+.*keys
+keys

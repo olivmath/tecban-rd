@@ -1,0 +1,16 @@
+export type ContractName =
+    | 'REAL_DIGITAL_DEFAULT_ACCOUNT'
+    | 'REAL_DIGITAL_ENABLE_ACCOUNT'
+    | 'SWAP_TWO_STEP_RESERVE'
+    | 'ARBI_REAL_TOKENIZADO'
+    | 'SWAP_ONE_STEP_FROM'
+    | 'ADDRESS_DISCOVERY'
+    | 'KEY_DICTIONARY'
+    | 'SWAP_ONE_STEP'
+    | 'SWAP_TWO_STEP'
+    | 'REAL_DIGITAL'
+    | 'TPFT_1002'
+    | 'TPFT_1052'
+    | 'TPFT_DVP'
+    | 'TPFT'
+    | 'STR';
